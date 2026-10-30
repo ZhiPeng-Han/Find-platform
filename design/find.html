@@ -1,0 +1,1172 @@
+<title>Find 中古器材计划</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@400;600&display=swap">
+<style>
+/* 版式概念：中古店检品卡 + 八十年代相机说明书。左侧标签栏、右侧正文的规格表栅格；红色只用作冲印师在印样上的油性笔圈注。夜间主题是暗房。 */
+:root{
+  --paper:#F0F1EC; --panel:#E4E6DF; --tag:#FAFAF7;
+  --ink:#15181A; --ink-2:#4A4F51; --ink-3:#7F8586; --rule:#C8CBC3;
+  --red:#C22E1B; --ok:#2D6A4D; --warn:#A0620C;
+  --film:#1B1815; --film-ink:#E39B55;
+  --f-sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --f-serif:"Noto Serif SC","Songti SC","STSong","SimSun",serif;
+  --f-num:"Barlow Condensed","Roboto Condensed","Arial Narrow",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#111312; --panel:#1A1D1B; --tag:#181B19;
+    --ink:#E6E7E1; --ink-2:#A6AAA4; --ink-3:#6C716C; --rule:#2B2F2C;
+    --red:#E4553B; --ok:#6CB38C; --warn:#D9A04A;
+    --film:#0C0B0A; --film-ink:#E39B55; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111312; --panel:#1A1D1B; --tag:#181B19;
+  --ink:#E6E7E1; --ink-2:#A6AAA4; --ink-3:#6C716C; --rule:#2B2F2C;
+  --red:#E4553B; --ok:#6CB38C; --warn:#D9A04A;
+  --film:#0C0B0A; --film-ink:#E39B55; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-sans);font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+a{color:inherit}
+h1,h2,h3{text-wrap:balance;margin:0}
+p{margin:0}
+.wrap{max-width:1152px;margin-inline:auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.mono{font-family:var(--f-mono)}
+.note{font-size:13px;color:var(--ink-3)}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+
+/* 顶栏 */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--paper);border-bottom:1px solid var(--rule)}
+.top .wrap{display:flex;align-items:center;gap:28px;height:56px}
+.brand{position:relative;font-family:var(--f-num);font-weight:700;font-size:22px;letter-spacing:.32em;padding:2px 4px 2px 9px;text-decoration:none}
+.brand::before,.brand::after{content:"";position:absolute;width:8px;height:8px;border:1.5px solid var(--ink)}
+.brand::before{left:0;top:0;border-right:0;border-bottom:0}
+.brand::after{right:0;bottom:0;border-left:0;border-top:0}
+.nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto}
+.nav a{text-decoration:none;font-size:14px;padding:6px 12px;color:var(--ink-2);white-space:nowrap;border-bottom:2px solid transparent}
+.nav a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--red)}
+@media (max-width:560px){.top .wrap{gap:12px}.nav a{padding:6px 8px}.brand{font-size:19px}}
+
+/* 首屏 */
+.hero{padding-block:72px 64px}
+.ruler{display:flex;align-items:flex-end;gap:18px;font-family:var(--f-num);font-weight:600;font-size:clamp(44px,8vw,96px);line-height:.9;letter-spacing:.01em}
+.ruler i{flex:1;height:22px;margin-bottom:.14em;background:
+  repeating-linear-gradient(90deg,var(--ink) 0 1.5px,transparent 1.5px 100%) left bottom/calc(100%/30) 22px repeat-x,
+  repeating-linear-gradient(90deg,var(--ink-3) 0 1px,transparent 1px 100%) left bottom/calc(100%/150) 10px repeat-x;
+  border-bottom:1.5px solid var(--ink)}
+.ruler-cap{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px;color:var(--ink-3);margin-top:10px;letter-spacing:.06em}
+.hero h1{font-weight:900;font-size:clamp(30px,4.6vw,54px);line-height:1.3;margin-top:48px;max-width:20em;letter-spacing:.01em}
+.mark{position:relative;white-space:nowrap}
+.mark svg{position:absolute;left:-7%;top:-26%;width:114%;height:150%;overflow:visible;pointer-events:none}
+.mark path{fill:none;stroke:var(--red);stroke-width:3;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.lede{font-size:18px;line-height:1.9;color:var(--ink-2);max-width:38em;margin-top:28px}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;margin:48px 0 0;border-top:1.5px solid var(--ink)}
+.facts div{padding:14px 16px 0 0}
+.facts dt{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);letter-spacing:.08em}
+.facts dd{margin:4px 0 0;font-weight:500;font-size:15px;line-height:1.6}
+@media (max-width:720px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.facts div{padding-bottom:12px}}
+
+/* 章节：规格表栅格 */
+.sec{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px 40px;padding-block:56px;border-top:1px solid var(--rule)}
+.sec>.lab{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;color:var(--ink-3);padding-top:10px}
+.sec>.lab b{display:block;font-family:var(--f-sans);font-weight:700;font-size:15px;letter-spacing:.04em;color:var(--ink);margin-bottom:2px}
+.sec h2{font-weight:900;font-size:clamp(24px,3vw,34px);line-height:1.35}
+.sec .intro{color:var(--ink-2);max-width:40em;margin-top:14px}
+.body{min-width:0}
+@media (max-width:760px){.sec{grid-template-columns:minmax(0,1fr);padding-block:44px}.sec>.lab{padding-top:0}}
+
+/* 三股力量 */
+.forces{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:36px}
+.force h3{font-size:18px;font-weight:700;line-height:1.5;margin-top:6px}
+.force .k{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;color:var(--red)}
+.force p{color:var(--ink-2);font-size:15px;margin-top:10px}
+@media (max-width:860px){.forces{grid-template-columns:minmax(0,1fr);gap:24px}}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;margin-top:44px}
+.chart{background:var(--panel);padding:20px 20px 14px;min-width:0}
+.chart h4{margin:0;font-size:15px;font-weight:700}
+.chart .note{margin-top:4px}
+.chart svg{display:block;width:100%;height:auto;margin-top:10px}
+@media (max-width:860px){.charts{grid-template-columns:minmax(0,1fr)}}
+svg text{font-family:var(--f-sans)}
+.t-ink{fill:var(--ink)} .t-2{fill:var(--ink-2)} .t-3{fill:var(--ink-3)} .t-red{fill:var(--red)} .t-paper{fill:var(--paper)}
+.s-ink{stroke:var(--ink)} .s-2{stroke:var(--ink-2)} .s-3{stroke:var(--ink-3)} .s-rule{stroke:var(--rule)} .s-red{stroke:var(--red)}
+.f-none{fill:none}
+.f-ink{fill:var(--ink)} .f-3{fill:var(--ink-3)} .f-red{fill:var(--red)} .f-paper{fill:var(--paper)} .f-panel{fill:var(--panel)} .f-tag{fill:var(--tag)}
+
+/* 相位图 */
+.phase{margin-top:32px;overflow-x:auto}
+.phase table{width:100%;min-width:720px;border-collapse:collapse}
+.phase th{font-family:var(--f-mono);font-weight:500;font-size:12px;color:var(--ink-3);letter-spacing:.1em;text-align:left;padding:0 0 10px;border-bottom:1.5px solid var(--ink)}
+.phase td{padding:16px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.phase td.cat{width:24%;padding-right:16px}
+.phase td.cat b{display:block;font-weight:700}
+.phase td.cat span{font-size:13px;color:var(--ink-3)}
+.phase td.trk{width:40%;padding-right:24px}
+.phase td.act{font-size:14px;color:var(--ink-2)}
+.track{position:relative;height:28px;margin-top:6px;background:
+  linear-gradient(90deg,var(--rule) 0 1px,transparent 1px) 0 0/25% 100% repeat-x}
+.track::after{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px solid var(--ink-3)}
+.track .dot{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--red);z-index:1}
+.track .lbl{position:absolute;top:-2px;font-size:12px;color:var(--red);transform:translateX(10px);white-space:nowrap;font-weight:500}
+.phase-head{display:grid;grid-template-columns:repeat(4,1fr)}
+
+/* 业务 */
+.svc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin-top:32px;border-top:1.5px solid var(--ink)}
+.svc>div{padding:20px 24px 22px 0;border-bottom:1px solid var(--rule)}
+.svc>div:nth-child(odd){border-right:1px solid var(--rule)}
+.svc>div:nth-child(even){padding-left:24px}
+.svc h3{font-size:18px;font-weight:700}
+.svc p{font-size:15px;color:var(--ink-2);margin-top:8px}
+.svc .fee{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);margin-top:10px;letter-spacing:.04em}
+@media (max-width:720px){.svc{grid-template-columns:minmax(0,1fr)}.svc>div:nth-child(odd){border-right:0}.svc>div:nth-child(even){padding-left:0}}
+.not{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:24px;font-size:15px}
+.not span{color:var(--ink-2)}
+.not s{text-decoration-color:var(--red);text-decoration-thickness:2px;color:var(--ink)}
+
+/* 入口 */
+.entries{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:32px}
+.entry{background:var(--tag);border:1px solid var(--rule);padding:20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.entry .who{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);letter-spacing:.08em}
+.entry h3{font-size:20px;font-weight:900}
+.entry p{font-size:15px;color:var(--ink-2)}
+.entry dl{margin:auto 0 0;padding-top:12px;border-top:1px dashed var(--rule);display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+.entry dt{color:var(--ink-3)} .entry dd{margin:0}
+.into{display:flex;align-items:center;gap:14px;margin-top:18px;font-size:15px}
+.into i{flex:1;height:1px;background:var(--ink-3)}
+.into b{font-weight:700;border:1.5px solid var(--red);color:var(--red);padding:4px 12px}
+@media (max-width:860px){.entries{grid-template-columns:minmax(0,1fr)}}
+
+/* 飞轮 */
+.fly{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:40px;align-items:center;margin-top:24px}
+.fly svg{width:100%;height:auto;display:block}
+.fly ol{margin:0;padding:0;list-style:none;display:grid;gap:14px;counter-reset:s}
+.fly li{display:grid;grid-template-columns:28px 1fr;gap:10px;font-size:15px;color:var(--ink-2)}
+.fly li::before{counter-increment:s;content:counter(s);font-family:var(--f-num);font-weight:600;font-size:20px;color:var(--ink);line-height:1.4}
+.fly li b{color:var(--ink);font-weight:700}
+@media (max-width:860px){.fly{grid-template-columns:minmax(0,1fr)}}
+
+/* AI 分工表 */
+.tbl{margin-top:28px;overflow-x:auto}
+.tbl table{width:100%;min-width:620px;border-collapse:collapse;font-size:15px}
+.tbl th{text-align:left;font-family:var(--f-mono);font-weight:500;font-size:12px;letter-spacing:.1em;color:var(--ink-3);padding:0 16px 10px 0;border-bottom:1.5px solid var(--ink)}
+.tbl td{padding:14px 16px 14px 0;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--ink-2)}
+.tbl td:first-child{color:var(--ink);font-weight:700;white-space:nowrap}
+
+/* 3D 与故事 */
+.verdict{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;margin-top:28px;align-items:start}
+.verdict svg{width:100%;height:auto;display:block;background:var(--panel)}
+.vlist{display:grid;gap:18px}
+.vlist div{display:grid;grid-template-columns:72px 1fr;gap:12px}
+.chip{font-size:12px;font-weight:700;letter-spacing:.06em;text-align:center;padding:3px 0;border:1.5px solid var(--ink);height:max-content}
+.chip.hot{border-color:var(--red);color:var(--red)}
+.chip.dim{border-color:var(--ink-3);color:var(--ink-3)}
+.vlist h3{font-size:16px;font-weight:700;line-height:1.5}
+.vlist p{font-size:14px;color:var(--ink-2);margin-top:2px}
+@media (max-width:860px){.verdict{grid-template-columns:minmax(0,1fr)}}
+
+/* 路线 */
+.road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:32px;border-top:1.5px solid var(--ink)}
+.road>div{padding:18px 24px 0 0;min-width:0}
+.road>div+div{padding-left:24px;border-left:1px solid var(--rule)}
+.road .when{font-family:var(--f-num);font-weight:600;font-size:26px;line-height:1.2}
+.road .when small{font-family:var(--f-sans);font-size:13px;font-weight:500;color:var(--ink-3);margin-left:6px}
+.road h3{font-size:17px;font-weight:700;margin-top:8px}
+.road ul{margin:10px 0 0;padding-left:1.1em;font-size:14px;color:var(--ink-2)}
+.road .kpi{margin-top:14px;padding:10px 12px;background:var(--panel);font-size:13px}
+.road .kpi b{display:block;font-family:var(--f-mono);font-weight:500;font-size:11px;letter-spacing:.1em;color:var(--ink-3)}
+@media (max-width:860px){.road{grid-template-columns:minmax(0,1fr)}.road>div+div{padding-left:0;border-left:0;border-top:1px solid var(--rule);margin-top:20px}}
+.risks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 40px;margin-top:28px}
+.risks div{border-left:3px solid var(--warn);padding-left:14px}
+.risks h3{font-size:16px;font-weight:700}
+.risks p{font-size:14px;color:var(--ink-2);margin-top:4px}
+@media (max-width:720px){.risks{grid-template-columns:minmax(0,1fr)}}
+.foot{border-top:1px solid var(--rule);padding-block:28px 48px;font-size:13px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+
+/* ===== 器材护照 ===== */
+.pp-head{padding-block:44px 28px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:end;border-bottom:1.5px solid var(--ink)}
+.crumb{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);letter-spacing:.06em}
+.pp-head h1{font-family:var(--f-num);font-weight:600;font-size:clamp(46px,7vw,84px);line-height:1;margin-top:10px;letter-spacing:.01em}
+.pp-head .sub{font-size:16px;color:var(--ink-2);margin-top:12px}
+.stamp{border:1.5px solid var(--red);color:var(--red);padding:8px 14px;text-align:center;transform:rotate(-3deg);font-family:var(--f-mono);font-size:12px;line-height:1.5;letter-spacing:.06em}
+.stamp b{display:block;font-family:var(--f-num);font-size:26px;letter-spacing:.04em;font-weight:600}
+@media (max-width:620px){.pp-head{grid-template-columns:minmax(0,1fr)}.stamp{justify-self:start}}
+.sample{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--warn);border:1px solid var(--warn);padding:1px 8px;margin-left:8px;vertical-align:3px}
+.pp{display:grid;grid-template-columns:300px minmax(0,1fr);gap:48px;padding-block:36px 24px}
+@media (max-width:900px){.pp{grid-template-columns:minmax(0,1fr);gap:28px}}
+.tagcard{position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);align-self:start;background:var(--tag);border:1px solid var(--rule);padding:22px 20px 20px}
+@media (max-width:900px){.tagcard{position:static}}
+.tagcard::before{content:"";position:absolute;top:12px;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;border:1.5px solid var(--ink-3);background:var(--paper)}
+.grade{display:flex;align-items:baseline;gap:12px;margin-top:14px}
+.grade b{font-family:var(--f-num);font-weight:700;font-size:72px;line-height:1}
+.grade span{font-size:14px;color:var(--ink-2)}
+.kv{margin:16px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 14px;font-size:14px;border-top:1px solid var(--rule);padding-top:14px}
+.kv dt{color:var(--ink-3)} .kv dd{margin:0;text-align:right}
+.price{margin-top:18px;padding-top:16px;border-top:1.5px solid var(--ink)}
+.price .p{font-family:var(--f-num);font-weight:600;font-size:44px;line-height:1}
+.price .p small{font-size:22px;margin-right:2px}
+.price p{font-size:13px;color:var(--ink-2);margin-top:8px}
+.buyback{margin-top:14px;background:var(--panel);padding:12px 14px;font-size:13px;line-height:1.7}
+.buyback b{font-weight:700;color:var(--ink)}
+.btn{display:block;width:100%;margin-top:14px;padding:11px 0;font:inherit;font-size:15px;font-weight:700;background:var(--ink);color:var(--paper);border:0;cursor:pointer}
+.btn[aria-pressed="true"]{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.pp-main{display:grid;grid-template-columns:minmax(0,1fr);gap:52px;min-width:0}
+.blk h2{font-size:22px;font-weight:900;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.blk h2 small{font-family:var(--f-mono);font-weight:400;font-size:12px;color:var(--ink-3);letter-spacing:.06em}
+.blk .intro{color:var(--ink-2);font-size:15px;margin-top:8px;max-width:40em}
+.scale{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:18px;border:1.5px solid var(--ink)}
+.scale div{padding:10px 10px 12px;border-right:1px solid var(--rule);min-width:0}
+.scale div:last-child{border-right:0}
+.scale b{font-family:var(--f-num);font-size:26px;font-weight:600;line-height:1}
+.scale span{display:block;font-size:12px;color:var(--ink-2);margin-top:6px;line-height:1.5}
+.scale .on{background:var(--ink);color:var(--paper)}
+.scale .on span{color:var(--paper);opacity:.8}
+@media (max-width:560px){.scale span{display:none}.scale div{text-align:center}}
+.parts{margin-top:20px;overflow-x:auto}
+.parts table{width:100%;min-width:520px;border-collapse:collapse;font-size:14px}
+.parts td{padding:10px 12px 10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.parts td:first-child{width:96px;color:var(--ink-3)}
+.parts td.g{width:48px;font-family:var(--f-num);font-weight:600;font-size:18px;line-height:1.3}
+.pchart{background:var(--panel);padding:16px 16px 10px;margin-top:18px;overflow-x:auto}
+.pchart svg{display:block;width:100%;min-width:560px;height:auto}
+.readout{font-family:var(--f-mono);font-size:12px;color:var(--ink-2);margin-top:12px;overflow-x:auto;white-space:nowrap}
+.readout table{border-collapse:collapse}
+.readout td{padding:2px 14px 2px 0}
+.lens{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:28px;margin-top:18px;align-items:center}
+.lens svg{width:100%;height:auto;display:block;background:var(--panel)}
+.lens dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:10px 16px;font-size:14px}
+.lens dt{color:var(--ink-3)} .lens dd{margin:0}
+@media (max-width:640px){.lens{grid-template-columns:minmax(0,1fr)}}
+.checks{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px}
+.checks li{display:grid;grid-template-columns:1fr auto;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:14px}
+.checks li small{display:block;color:var(--ink-3);font-size:12px;line-height:1.5}
+.st{font-size:12px;font-weight:700;padding:1px 8px;height:max-content;white-space:nowrap}
+.st.ok{color:var(--ok);border:1px solid var(--ok)}
+.st.fix{color:var(--ink);border:1px solid var(--ink)}
+.st.warn{color:var(--warn);border:1px solid var(--warn)}
+@media (max-width:640px){.checks{grid-template-columns:minmax(0,1fr)}}
+.roll{position:relative;margin-top:18px;overflow-x:auto;background:var(--film)}
+.roll-in{position:relative;min-width:760px}
+.roll canvas{display:block;width:100%;height:auto}
+.roll svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.roll svg path{fill:none;stroke:var(--red);stroke-width:3;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.frames{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:10px;font-size:13px;color:var(--ink-2)}
+.frames b{font-family:var(--f-mono);font-weight:500;color:var(--ink);margin-right:6px}
+@media (max-width:640px){.frames{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.life{list-style:none;margin:18px 0 0;padding:0}
+.life li{display:grid;grid-template-columns:92px minmax(0,1fr);gap:18px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.life .y{font-family:var(--f-num);font-weight:600;font-size:24px;line-height:1.2}
+.life p{font-size:15px;color:var(--ink-2)}
+.life p b{color:var(--ink);font-weight:700;display:block}
+.life li.next{border-bottom:0}
+.life li.next .y,.life li.next p b{color:var(--red)}
+.letter{margin-top:18px;background:var(--tag);border:1px solid var(--rule);padding:32px clamp(20px,5vw,48px);font-family:var(--f-serif);font-size:17px;line-height:2.1;max-width:38em;background-image:repeating-linear-gradient(180deg,transparent 0 calc(2.1em - 1px),var(--rule) calc(2.1em - 1px) 2.1em);background-position:0 31px}
+.letter p+p{margin-top:0;text-indent:0}
+.letter .sig{text-align:right;margin-top:8px;font-size:15px;color:var(--ink-2)}
+.spec{margin-top:16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;font-size:14px}
+.spec div{display:grid;grid-template-columns:80px 1fr;gap:12px;padding:8px 0;border-bottom:1px solid var(--rule)}
+.spec dt{color:var(--ink-3)} .spec dd{margin:0}
+@media (max-width:640px){.spec{grid-template-columns:minmax(0,1fr)}}
+.carry{margin-top:6px;border:1.5px dashed var(--ink-3);padding:20px 22px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.carry .pg{font-family:var(--f-num);font-weight:600;font-size:40px;line-height:1;color:var(--red)}
+.carry p{font-size:15px;color:var(--ink-2)}
+
+/* ===== 图谱 ===== */
+.at-head{padding-block:44px 8px}
+.at-head h1{font-weight:900;font-size:clamp(28px,4vw,44px);line-height:1.3}
+.at-head h1 .num{font-weight:600;font-size:1.2em;letter-spacing:.01em}
+.at-head p{color:var(--ink-2);max-width:42em;margin-top:14px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:20px;font-size:13px;color:var(--ink-2);align-items:center}
+.legend svg{vertical-align:-3px;margin-right:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.chips button{font:inherit;font-size:13px;padding:4px 12px;background:transparent;color:var(--ink-2);border:1px solid var(--rule);cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.lanes{display:grid;grid-template-columns:96px minmax(0,1fr);margin-top:18px;border-top:1.5px solid var(--ink);border-bottom:1px solid var(--rule)}
+.lane-names div{display:flex;align-items:center;font-size:13px;font-weight:700;border-bottom:1px solid var(--rule);padding-right:8px}
+.lane-names div:first-child{font-family:var(--f-mono);font-weight:400;color:var(--ink-3);font-size:11px;letter-spacing:.08em}
+.lane-scroll{overflow-x:auto;min-width:0}
+#atlas-svg{display:block}
+#atlas-svg .it{cursor:pointer}
+#atlas-svg .it:focus{outline:none}
+#atlas-svg .it:focus-visible .hit{stroke:var(--red);stroke-width:1.5}
+#atlas-svg .it.dim{opacity:.16}
+#atlas-svg .it.sel text{fill:var(--red);font-weight:700}
+#atlas-svg .it.sel .g{stroke:var(--red)}
+#atlas-svg .it.sel .g.fill{fill:var(--red)}
+.detail{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);gap:16px 40px;padding-block:28px;border-bottom:1px solid var(--rule)}
+.detail .yr{font-family:var(--f-num);font-weight:600;font-size:64px;line-height:.9}
+.detail h2{font-size:24px;font-weight:900}
+.detail .meta{font-size:13px;color:var(--ink-3);margin-top:4px}
+.detail h3{font-family:var(--f-mono);font-weight:500;font-size:12px;letter-spacing:.1em;color:var(--ink-3)}
+.detail p{font-size:15px;color:var(--ink-2);margin-top:6px}
+@media (max-width:860px){.detail{grid-template-columns:auto minmax(0,1fr)}.detail>div:last-child{grid-column:1/-1}}
+.list{margin-top:32px;overflow-x:auto}
+.list table{width:100%;min-width:760px;border-collapse:collapse;font-size:14px}
+.list th{text-align:left;font-family:var(--f-mono);font-weight:500;font-size:12px;letter-spacing:.08em;color:var(--ink-3);padding:0 14px 8px 0;border-bottom:1.5px solid var(--ink)}
+.list td{padding:9px 14px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--ink-2)}
+.list td:first-child{font-family:var(--f-num);font-weight:600;font-size:16px;color:var(--ink)}
+.list td:nth-child(2){color:var(--ink);font-weight:500;white-space:nowrap}
+.list tr{cursor:pointer}
+.list tr:hover td{background:var(--panel)}
+@media (prefers-reduced-motion:no-preference){.nav a,.chips button,.btn{transition:background .15s,color .15s,border-color .15s}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#thesis" aria-label="Find 首页">FIND</a>
+    <nav class="nav" aria-label="页面">
+      <a href="#thesis">构想</a>
+      <a href="#passport">器材护照</a>
+      <a href="#atlas">三十年图谱</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ===================== 构想 ===================== -->
+<main data-view="thesis">
+  <section class="hero wrap">
+    <div class="ruler" aria-label="1976 至 2006"><span>1976</span><i></i><span>2006</span></div>
+    <div class="ruler-cap"><span>第一任主人买下它们</span><span>距今 50 — 20 年</span></div>
+    <h1>三十年的相机，<br>正在等<span class="mark">下一任主人<svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M9,23 C5,9 38,3 61,4 C86,5 98,12 95,23 C92,34 63,38 41,37 C17,36 3,29 7,18 C9,12 19,8 31,6"/></svg></span>。</h1>
+    <p class="lede">Find 只做 1976 到 2006 年间、有历史价值的机身和镜头。寄售、代买、寻物，每一台都带一本器材护照，里面有检测数据、本机样张、历任主人和它经历过的事。</p>
+    <dl class="facts">
+      <div><dt>品类</dt><dd>1976–2006 的机身与镜头</dd></div>
+      <div><dt>渠道</dt><dd>先做线上，检测交给合作师傅</dd></div>
+      <div><dt>定位</dt><dd>做深做精，客单价 ¥1,500 以上</dd></div>
+      <div><dt>暂不做</dt><dd>维修业务、全品类、低价走量</dd></div>
+    </dl>
+  </section>
+
+  <div class="wrap">
+    <section class="sec">
+      <div class="lab"><b>时机</b>WHY NOW</div>
+      <div class="body">
+        <h2>未来十五年，这批器材会集中换手</h2>
+        <p class="intro">三件事同时在发生。它们叠在一起，就是 Find 等的那个窗口。</p>
+        <div class="forces">
+          <div class="force">
+            <span class="k">供给</span>
+            <h3>第一任主人正在把器材交出来</h3>
+            <p>这些器材大多在 1976 到 2006 年间被买下，买它们的人当年二三十岁，今天五十到七十多岁。退休、搬家、整理遗物，会让大量器材从柜子和防潮箱里出来。谁先建立信任，谁先接到这批货。</p>
+          </div>
+          <div class="force">
+            <span class="k">需求</span>
+            <h3>图像越容易生成，真实越值钱</h3>
+            <p>屏幕上的照片可以被随意生成以后，一台有出处、有经历、能拍出底片的相机，提供的是可以被证明的真实。年轻人买胶片机和 CCD，买的是过程、手感和确定性。</p>
+          </div>
+          <div class="force">
+            <span class="k">稀缺</span>
+            <h3>好品和普品的差价会越拉越大</h3>
+            <p>这些器材早已停产，零件越来越少，懂它们的师傅越来越老。检测清楚、来历清楚的器材，和说不清的器材，价格会持续分化。这个差价就是 Find 的生意。</p>
+          </div>
+        </div>
+
+        <div class="charts">
+          <figure class="chart" style="margin:0">
+            <h4>器材的代际时钟</h4>
+            <p class="note">按出生年份推算，不含行情数据</p>
+            <svg viewBox="0 0 640 250" role="img" aria-label="第一任主人出生于 1950 到 1975 年，在 1976 到 2006 年买下器材，推测 2026 到 2042 年是器材流向市场的高峰">
+              <defs>
+                <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                  <rect width="7" height="7" class="f-panel"/>
+                  <line x1="0" y1="0" x2="0" y2="7" class="s-red" stroke-width="2.4"/>
+                </pattern>
+              </defs>
+              <g class="s-rule" stroke-width="1">
+                <line x1="69" y1="20" x2="69" y2="206"/><line x1="127" y1="20" x2="127" y2="206"/><line x1="185" y1="20" x2="185" y2="206"/><line x1="243" y1="20" x2="243" y2="206"/><line x1="301" y1="20" x2="301" y2="206"/><line x1="359" y1="20" x2="359" y2="206"/><line x1="417" y1="20" x2="417" y2="206"/><line x1="475" y1="20" x2="475" y2="206"/><line x1="533" y1="20" x2="533" y2="206"/><line x1="591" y1="20" x2="591" y2="206"/>
+              </g>
+              <text x="69" y="34" font-size="13" class="t-2">第一任主人出生</text>
+              <rect x="69" y="42" width="145" height="24" class="f-3"/>
+              <text x="220" y="59" font-size="12" class="t-3">1950–1975</text>
+
+              <text x="220" y="94" font-size="13" class="t-ink" font-weight="700">买下这些器材，当年二三十岁</text>
+              <rect x="220" y="102" width="174" height="24" class="f-ink"/>
+              <text x="400" y="119" font-size="12" class="t-3">1976–2006</text>
+
+              <text x="507" y="154" font-size="13" class="t-red" font-weight="700" text-anchor="end">流向市场的高峰</text>
+              <text x="507" y="170" font-size="12" class="t-3" text-anchor="end">推测 2026–2042</text>
+              <rect x="510" y="140" width="93" height="34" fill="url(#hatch)"/>
+              <rect x="510" y="140" width="93" height="34" class="f-none s-red" stroke-width="1.5"/>
+
+              <line x1="510" y1="16" x2="510" y2="206" class="s-red" stroke-width="1.5" stroke-dasharray="4 3"/>
+              <text x="516" y="28" font-size="12" class="t-red" font-weight="700">2026 今天</text>
+              <text x="516" y="44" font-size="12" class="t-2">主人 51–76 岁</text>
+
+              <line x1="40" y1="206" x2="620" y2="206" class="s-ink" stroke-width="1.5"/>
+              <g font-size="12" class="t-3" text-anchor="middle">
+                <text x="69" y="226">1950</text><text x="185" y="226">1970</text><text x="301" y="226">1990</text><text x="417" y="226">2010</text><text x="533" y="226">2030</text>
+              </g>
+            </svg>
+          </figure>
+          <figure class="chart" style="margin:0">
+            <h4>成色与档案带来的价差</h4>
+            <p class="note">示意图，表达判断，不代表真实价格</p>
+            <svg viewBox="0 0 640 250" role="img" aria-label="示意：有检测和档案的好品价格持续上行，说不清来历的普品基本持平，两者差价扩大">
+              <line x1="40" y1="20" x2="40" y2="206" class="s-ink" stroke-width="1.5"/>
+              <line x1="40" y1="206" x2="620" y2="206" class="s-ink" stroke-width="1.5"/>
+              <line x1="330" y1="20" x2="330" y2="206" class="s-3" stroke-width="1" stroke-dasharray="4 3"/>
+              <path d="M330,105 C430,88 520,66 610,45 L610,150 C520,145 430,141 330,140 Z" class="f-red" opacity=".13"/>
+              <path d="M40,140 C150,132 250,118 330,105" class="f-none s-ink" stroke-width="2.5"/>
+              <path d="M330,105 C430,88 520,66 610,45" class="f-none s-ink" stroke-width="2.5" stroke-dasharray="7 5"/>
+              <path d="M40,150 C150,146 250,143 330,140" class="f-none s-3" stroke-width="2.5"/>
+              <path d="M330,140 C430,141 520,145 610,150" class="f-none s-3" stroke-width="2.5" stroke-dasharray="7 5"/>
+              <text x="606" y="34" font-size="13" class="t-ink" font-weight="700" text-anchor="end">有检测、有档案的好品</text>
+              <text x="606" y="172" font-size="13" class="t-2" text-anchor="end">说不清来历的普品</text>
+              <text x="470" y="112" font-size="13" class="t-red" font-weight="700" text-anchor="middle">这部分差价</text>
+              <text x="470" y="129" font-size="13" class="t-red" font-weight="700" text-anchor="middle">是 Find 的生意</text>
+              <text x="26" y="113" font-size="12" class="t-3" text-anchor="middle" transform="rotate(-90 26 113)">成交价</text>
+              <g font-size="12" class="t-3">
+                <text x="44" y="226">十年前</text><text x="330" y="226" text-anchor="middle">今天</text><text x="616" y="226" text-anchor="end">十年后</text>
+              </g>
+            </svg>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="lab"><b>判断</b>WHERE THE WAVE IS</div>
+      <div class="body">
+        <h2>不同品类，正处在不同的位置</h2>
+        <p class="intro">以下是 Find 的判断，用来决定先收什么、怎么收，不是行情数据。红点越靠左，越早；越靠右，价格越成熟。</p>
+        <div class="phase">
+          <table>
+            <thead>
+              <tr><th>品类</th><th><div class="phase-head"><span>萌芽</span><span>升温</span><span>高位</span><span>沉淀</span></div></th><th>Find 怎么做</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="cat"><b>早期数码</b><span>2000–2006 · CCD 与第一代数码单反</span></td><td class="trk"><div class="track"><span class="dot" style="left:6%"></span><span class="lbl" style="left:6%">刚满 20 年</span></div></td><td class="act">先建档案和知识库，少量试收。电池、存储卡格式和屏幕是检测重点。</td></tr>
+              <tr><td class="cat"><b>自动对焦胶片单反</b><span>EOS-1V、F100、F5 一代</span></td><td class="trk"><div class="track"><span class="dot" style="left:20%"></span><span class="lbl" style="left:20%">被低估</span></div></td><td class="act">性能好、价格低。提前收货，用内容讲清楚它们好在哪。</td></tr>
+              <tr><td class="cat"><b>中画幅</b><span>哈苏 V、Mamiya 7、Pentax 67</span></td><td class="trk"><div class="track"><span class="dot" style="left:44%"></span><span class="lbl" style="left:44%">稳步升温</span></div></td><td class="act">客单价高，买家专业。代买和寻物委托的主力品类。</td></tr>
+              <tr><td class="cat"><b>高端便携机</b><span>Contax T2、GR1、TC-1</span></td><td class="trk"><div class="track"><span class="dot" style="left:62%"></span><span class="lbl" style="left:62%">高位，波动大</span></div></td><td class="act">电子件难修，检测和保修最值钱。谨慎收货，不追高。</td></tr>
+              <tr><td class="cat"><b>机械旁轴</b><span>徕卡 M、Bessa、Hexar RF</span></td><td class="trk"><div class="track"><span class="dot" style="left:74%"></span><span class="lbl" style="left:74%">长期高位</span></div></td><td class="act">硬通货，改装和仿制风险最高。鉴定加护照，体现专业度。</td></tr>
+              <tr><td class="cat"><b>手动单反</b><span>FM2、AE-1、OM 系列</span></td><td class="trk"><div class="track"><span class="dot" style="left:88%"></span><span class="lbl" style="left:88%;transform:translateX(-100%) translateX(-10px)">价格已成熟</span></div></td><td class="act">量最大，国内家庭记忆最深。做“估一估”的入口品类。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="lab"><b>业务</b>WHAT WE DO</div>
+      <div class="body">
+        <h2>四件事，每件都围着护照转</h2>
+        <div class="svc">
+          <div><h3>寄售</h3><p>卖家把器材交给 Find。检测、拍摄、建护照、定价、答疑、售后都由我们完成，卖家只等收款。</p><div class="fee">收入 · 成交佣金</div></div>
+          <div><h3>代买与寻物</h3><p>买家说出型号、成色底线和预算，我们在国内和日本中古渠道找货、验货、交付，并附上护照。</p><div class="fee">收入 · 寻物服务费</div></div>
+          <div><h3>器材护照</h3><p>每台器材一份档案：检测数据、本机测试卷、历任主人、维修记录。转手时继续往后写。</p><div class="fee">收入 · 认证费，或含在佣金里</div></div>
+          <div><h3>回购与置换</h3><p>在 Find 买的器材，约定期限内按约定比例回购，或抵扣换购下一台。试错成本低了，人才敢去探索。</p><div class="fee">收入 · 二次流转的佣金</div></div>
+        </div>
+        <div class="not">
+          <span>第一阶段明确不做：</span>
+          <s>维修业务</s><span>检测由合作师傅完成，需要维修的转介出去</span>
+          <s>¥1,500 以下的器材</s><span>检测成本覆盖不了</span>
+          <s>1976 年以前、2006 年以后</s><span>先把一个时代做透</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="lab"><b>入口</b>WAYS IN</div>
+      <div class="body">
+        <h2>三个线上入口，最后都落到同一本护照</h2>
+        <p class="intro">入口不是“一个平台”，而是用户愿意马上做的一个动作。</p>
+        <div class="entries">
+          <div class="entry">
+            <span class="who">面向卖家</span>
+            <h3>估一估</h3>
+            <p>拍三张照片，告诉你这台相机的年代、来历和价格区间，再对比自己卖、寄售、直接出给我们各能拿多少。</p>
+            <dl><dt>传播</dt><dd>小红书、抖音的“家里老相机”内容</dd><dt>看什么</dt><dd>估价后转寄售的比例</dd></dl>
+          </div>
+          <div class="entry">
+            <span class="who">面向买家</span>
+            <h3>帮我找</h3>
+            <p>填型号、成色底线、预算和期限。找到后先发检测报告和测试卷，买家确认再付款。</p>
+            <dl><dt>传播</dt><dd>老玩家口碑、垂直社群</dd><dt>看什么</dt><dd>委托到成交的比例和周期</dd></dl>
+          </div>
+          <div class="entry">
+            <span class="who">面向社群</span>
+            <h3>一台器材的履历</h3>
+            <p>每周讲一台在售器材的真实经历。这篇内容同时就是它的商品页，读完可以直接买下。</p>
+            <dl><dt>传播</dt><dd>公众号、小红书长图文</dd><dt>看什么</dt><dd>收藏数、读完后的咨询</dd></dl>
+          </div>
+        </div>
+        <div class="into"><i></i><b>器材护照</b><i></i></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="lab"><b>飞轮</b>FLYWHEEL</div>
+      <div class="body">
+        <h2>档案越厚，器材越值钱</h2>
+        <div class="fly">
+          <svg id="fly" viewBox="0 0 520 400" role="img" aria-label="器材护照带来更高成交价，卖家回流，平台获得更多带档案的器材，积累成交与检测数据，数据又让护照更可信"></svg>
+          <ol>
+            <li><span><b>器材护照</b>让买家敢出价，让说不清的器材变成说得清的器材。</span></li>
+            <li><span><b>更高成交价</b>需要验证的第一个数字：比闲鱼同款高出多少。</span></li>
+            <li><span><b>卖家回流</b>卖得快、卖得好、不用应付砍价和调包，卖家会带着下一台回来，也会介绍朋友。</span></li>
+            <li><span><b>更多带档案的器材</b>在 Find 买的器材再卖时，档案已经在了，第二次流转几乎没有额外成本。</span></li>
+            <li><span><b>成交与检测数据</b>沉淀成 Find 自己的行情库，“估一估”和“帮我找”越用越准。这才是 AI 的燃料。</span></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="lab"><b>AI</b>DIVISION OF WORK</div>
+      <div class="body">
+        <h2>AI 当助手，结论由人签字</h2>
+        <p class="intro">这群用户对“AI 赋能”的口号天然警惕。让 AI 做麻烦的整理工作，把判断和签字留给师傅和主人。</p>
+        <div class="tbl">
+          <table>
+            <thead><tr><th>环节</th><th>AI 做</th><th>人做</th></tr></thead>
+            <tbody>
+              <tr><td>检测</td><td>从背光照片里初筛霉、雾、划痕，标出位置</td><td>师傅复核，签字，承担结论</td></tr>
+              <tr><td>定价</td><td>汇总同型号成交记录和成色，给出价格区间</td><td>结合履历和稀缺度最终定价</td></tr>
+              <tr><td>推荐</td><td>按“想要的画面”推荐机身、镜头和胶卷组合；该劝退时劝退</td><td>老玩家在社群里补充经验</td></tr>
+              <tr><td>建档</td><td>把检测数据、对话录音和照片整理成护照初稿</td><td>主人确认故事，写那封信</td></tr>
+              <tr><td>考证</td><td>根据序列号、铭牌和批次特征，推定产年和版本</td><td>疑难件交给熟悉该型号的师傅</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="lab"><b>内容</b>STORIES &amp; 3D</div>
+      <div class="body">
+        <h2>历史故事和 3D，投入要分清轻重</h2>
+        <p class="intro">买二手的人最关心的是这一台。凡是关于“这一台”的内容都值得做重，关于“这个型号”的内容做轻。</p>
+        <div class="verdict">
+          <svg viewBox="0 0 420 320" role="img" aria-label="四类内容的成本与对成交帮助的对比">
+            <line x1="225" y1="20" x2="225" y2="270" class="s-rule" stroke-width="1"/>
+            <line x1="50" y1="145" x2="400" y2="145" class="s-rule" stroke-width="1"/>
+            <line x1="50" y1="20" x2="50" y2="270" class="s-ink" stroke-width="1.5"/>
+            <line x1="50" y1="270" x2="400" y2="270" class="s-ink" stroke-width="1.5"/>
+            <text x="58" y="38" font-size="12" class="t-red" font-weight="700">先做这里</text>
+            <text x="392" y="262" font-size="12" class="t-3" text-anchor="end">谨慎投入</text>
+            <circle cx="102" cy="52" r="7" class="f-red"/><text x="114" y="57" font-size="13" class="t-ink" font-weight="700">单台履历</text>
+            <circle cx="160" cy="98" r="7" class="f-red"/><text x="172" y="103" font-size="13" class="t-ink" font-weight="700">实物 360° 与扫描</text>
+            <circle cx="120" cy="195" r="7" class="f-3"/><text x="132" y="200" font-size="13" class="t-2">型号历史</text>
+            <circle cx="345" cy="208" r="7" class="f-3"/><text x="333" y="213" font-size="13" class="t-2" text-anchor="end">CG 3D 模型</text>
+            <text x="225" y="296" font-size="12" class="t-3" text-anchor="middle">制作成本 →</text>
+            <text x="30" y="145" font-size="12" class="t-3" text-anchor="middle" transform="rotate(-90 30 145)">对成交的帮助 →</text>
+          </svg>
+          <div class="vlist">
+            <div><span class="chip hot">重点做</span><div><h3>单台履历</h3><p>独一无二，别人抄不走，直接影响成交价。成本主要是一次认真的聊天。</p></div></div>
+            <div><span class="chip hot">优先做</span><div><h3>实物 360° 转台与 3D 扫描</h3><p>转台加手机视频就能做，真实的划痕和磨损都被记录下来，本身就是信任工具。</p></div></div>
+            <div><span class="chip">轻做</span><div><h3>型号历史</h3><p>用于搜索流量和新手教育。谁都能写，AI 也能批量生成，构不成壁垒。重点写对决策有用的部分，比如哪些批次有通病。</p></div></div>
+            <div><span class="chip dim">少量做</span><div><h3>CG 3D 动效模型</h3><p>只给少数标志性机型做，用来讲快门、测距原理和尺寸对比。完美的模型和实物有落差，不能代替实拍。</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="lab"><b>路线</b>ROADMAP</div>
+      <div class="body">
+        <h2>先手工跑通，再写代码</h2>
+        <div class="road">
+          <div>
+            <div class="when">0–3<small>个月</small></div>
+            <h3>手工验证</h3>
+            <ul><li>一个小红书账号，一个微信群</li><li>手工接 30 台寄售，集中在 FM2、M6、T2 这类认知度高的型号</li><li>护照先用排版好的长图</li></ul>
+            <div class="kpi"><b>验证</b>有护照的成交价比闲鱼同款高多少；平均几天成交</div>
+          </div>
+          <div>
+            <div class="when">3–9<small>个月</small></div>
+            <h3>做成产品</h3>
+            <ul><li>护照页、估一估、寻物委托表单</li><li>AI 初筛和定价助手，先给内部用</li><li>建立成色分级标准并公开</li></ul>
+            <div class="kpi"><b>验证</b>卖家第二次寄售的比例；寻物委托的成交率</div>
+          </div>
+          <div>
+            <div class="when">9–18<small>个月</small></div>
+            <h3>让档案流转</h3>
+            <ul><li>回购与置换上线</li><li>“我的器材库”：用户为自己的器材建档、看估值</li><li>护照随器材二次流转</li></ul>
+            <div class="kpi"><b>验证</b>二次流转器材的溢价；器材库用户转寄售的比例</div>
+          </div>
+        </div>
+        <h3 style="font-size:17px;font-weight:700;margin-top:48px">上线前要想清楚的事</h3>
+        <div class="risks">
+          <div><h3>资金</h3><p>买家付款走持牌支付机构的担保交易，平台不沉淀资金，避开“二清”问题。</p></div>
+          <div><h3>鉴定责任</h3><p>护照里写了“无霉无雾”，看错了怎么赔。赔付规则和师傅的责任边界要写成文字。</p></div>
+          <div><h3>跨境代买</h3><p>从日本找货走正规跨境渠道，税费在报价里写清楚，不做灰色代购。</p></div>
+          <div><h3>寄售期间</h3><p>器材在 Find 手上时的保险、仓储防潮、运输破损，由谁负责。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot"><span>Find · 构想稿 · 2026 年 10 月</span><span>图表为示意和判断，不含真实行情数据</span></footer>
+  </div>
+</main>
+
+<!-- ===================== 器材护照 ===================== -->
+<main data-view="passport" hidden>
+  <div class="wrap">
+    <div class="pp-head">
+      <div>
+        <div class="crumb">在售 / 手动单反 / 1980 年代<span class="sample">示例页面</span></div>
+        <h1>Nikon FM2N</h1>
+        <p class="sub">银色机身，配 Ai-S Nikkor 50mm f/1.4。按序列号推定 1986 年产，一位主人，用了三十八年。</p>
+      </div>
+      <div class="stamp">FIND 器材护照<b>No.26-0137</b>第 2 页起</div>
+    </div>
+
+    <div class="pp">
+      <aside class="tagcard" aria-label="检品卡">
+        <div class="crumb">综合成色</div>
+        <div class="grade"><b>AB</b><span>良品<br>正常使用痕迹，功能完好</span></div>
+        <dl class="kv">
+          <dt>护照编号</dt><dd class="mono">26-0137</dd>
+          <dt>机身序列号</dt><dd class="mono">N8•••••42</dd>
+          <dt>推定产年</dt><dd>1986</dd>
+          <dt>快门结构</dt><dd>全机械</dd>
+          <dt>历任主人</dt><dd>1 位</dd>
+          <dt>检测日期</dt><dd class="mono">2026.10.18</dd>
+          <dt>检测师傅</dt><dd>陈师傅</dd>
+          <dt>检测项目</dt><dd>26 项，本页列出 12 项</dd>
+        </dl>
+        <div class="price">
+          <div class="p num"><small>¥</small>4,680</div>
+          <p>同型号近期成交 ¥3,600–5,200。本机定在中上，理由是完整履历、更换过遮光海绵、附测试卷。</p>
+        </div>
+        <div class="buyback"><b>180 天回购</b>：按成交价 70% 回购，或按 80% 抵扣换购 Find 的下一台。</div>
+        <button class="btn" id="watch" type="button" aria-pressed="false">关注这台</button>
+        <p class="note" style="margin-top:10px">价格、编号与人物均为示例。</p>
+      </aside>
+
+      <div class="pp-main">
+        <section class="blk">
+          <h2>成色<small>GRADE</small></h2>
+          <p class="intro">Find 使用五级成色标准，每一级都写清楚允许什么、不允许什么。综合等级取各部件中影响使用的最低一项。</p>
+          <div class="scale" role="list">
+            <div role="listitem"><b>A+</b><span>近新，几乎无使用痕迹</span></div>
+            <div role="listitem"><b>A</b><span>美品，轻微使用痕迹</span></div>
+            <div role="listitem" class="on" aria-current="true"><b>AB</b><span>良品，正常使用痕迹</span></div>
+            <div role="listitem"><b>B</b><span>明显磨损，功能正常</span></div>
+            <div role="listitem"><b>C</b><span>有瑕疵或需注意项</span></div>
+          </div>
+          <div class="parts">
+            <table>
+              <tr><td>外观</td><td class="g">AB</td><td>顶盖两侧边角轻微掉漆，露出黄铜底色；无凹陷，无磕碰变形</td></tr>
+              <tr><td>取景器</td><td class="g">A</td><td>对焦屏轻微尘点，不影响对焦；裂像清晰</td></tr>
+              <tr><td>快门</td><td class="g">A</td><td>13 档实测都在 ±1/3 EV 以内，高速档略快，见下方读数</td></tr>
+              <tr><td>测光</td><td class="g">A</td><td>与标准测光表对比，EV 12 时偏差 −0.2 EV</td></tr>
+              <tr><td>卷片与计数</td><td class="g">A</td><td>卷片顺畅，计数器归零正常</td></tr>
+              <tr><td>镜头光学</td><td class="g">A</td><td>背光检查无霉、无雾、无划痕，有 3 处微尘</td></tr>
+              <tr><td>镜头机械</td><td class="g">AB</td><td>对焦顺滑，阻尼略轻；光圈环档位清楚</td></tr>
+            </table>
+          </div>
+        </section>
+
+        <section class="blk">
+          <h2>快门实测<small>SHUTTER · 13 档</small></h2>
+          <p class="intro">每档测 5 次取平均。0 表示与标称一致，正值代表曝光偏多，负值代表偏少。灰色带是 ±1/3 EV，胶片的宽容度足以覆盖。</p>
+          <div class="pchart"><svg id="shutter" viewBox="0 0 680 250" role="img" aria-label="快门 13 档实测偏差，全部在正负三分之一档以内"></svg></div>
+          <div class="readout" id="readout"></div>
+        </section>
+
+        <section class="blk">
+          <h2>镜头背光检查<small>AI-S 50mm f/1.4</small></h2>
+          <p class="intro">强光手电从后组照入，逐片检查。AI 先从照片里标出可疑位置，师傅再用放大镜复核。</p>
+          <div class="lens">
+            <svg viewBox="0 0 420 300" role="img" aria-label="镜头前视示意图，标出三处微尘的位置">
+              <circle cx="150" cy="150" r="128" class="f-tag s-ink" stroke-width="1.5"/>
+              <circle cx="150" cy="150" r="112" class="f-none s-3" stroke-width="1"/>
+              <circle cx="150" cy="150" r="84" class="f-none s-3" stroke-width="1" stroke-dasharray="3 4"/>
+              <circle cx="150" cy="150" r="52" class="f-none s-3" stroke-width="1" stroke-dasharray="3 4"/>
+              <g class="s-3" stroke-width="1"><line x1="150" y1="30" x2="150" y2="270"/><line x1="30" y1="150" x2="270" y2="150"/></g>
+              <circle cx="188" cy="104" r="3.5" class="f-red"/>
+              <circle cx="116" cy="178" r="3" class="f-red"/>
+              <circle cx="201" cy="190" r="2.5" class="f-red"/>
+              <g class="s-red" stroke-width="1">
+                <polyline points="188,104 230,64 292,64" class="f-none"/>
+                <polyline points="116,178 70,262 292,262" class="f-none"/>
+                <polyline points="201,190 250,214 292,214" class="f-none"/>
+              </g>
+              <g font-size="12">
+                <text x="296" y="60" class="t-ink" font-weight="700">微尘 ①</text><text x="296" y="76" class="t-3">第 2 片，0.1mm</text>
+                <text x="296" y="210" class="t-ink" font-weight="700">微尘 ②</text><text x="296" y="226" class="t-3">第 4 片，0.1mm</text>
+                <text x="296" y="258" class="t-ink" font-weight="700">微尘 ③</text><text x="296" y="274" class="t-3">后组内侧</text>
+              </g>
+              <text x="14" y="22" font-size="11" class="t-3" font-family="IBM Plex Mono, monospace">前视 · 7 片 6 组</text>
+            </svg>
+            <dl>
+              <dt>霉斑</dt><dd>无</dd>
+              <dt>雾化</dt><dd>无</dd>
+              <dt>划痕</dt><dd>无</dd>
+              <dt>镀膜</dt><dd>正常，无脱膜</dd>
+              <dt>微尘</dt><dd>3 处，不影响成像</dd>
+              <dt>光圈叶片</dt><dd>干净，无油</dd>
+              <dt>结论</dt><dd><b>可以直接使用，无需清洁</b></dd>
+            </dl>
+          </div>
+        </section>
+
+        <section class="blk">
+          <h2>检查清单<small>12 / 26</small></h2>
+          <ul class="checks">
+            <li><span>快门帘外观</span><span class="st ok">正常</span></li>
+            <li><span>反光镜与阻尼</span><span class="st ok">正常</span></li>
+            <li><span>遮光海绵<small>原海绵已粉化，2026.10 更换</small></span><span class="st fix">已处理</span></li>
+            <li><span>测光 LED（+ ○ −）</span><span class="st ok">正常</span></li>
+            <li><span>电池仓<small>轻微氧化，已清洁触点</small></span><span class="st fix">已处理</span></li>
+            <li><span>自拍杆</span><span class="st ok">正常</span></li>
+            <li><span>热靴触点</span><span class="st ok">正常</span></li>
+            <li><span>后盖锁扣</span><span class="st ok">正常</span></li>
+            <li><span>镜头对焦环<small>阻尼偏轻，不影响使用</small></span><span class="st warn">注意</span></li>
+            <li><span>光圈叶片</span><span class="st ok">正常</span></li>
+            <li><span>铭牌与序列号<small>与顶盖、底盖记录一致</small></span><span class="st ok">正常</span></li>
+            <li><span>改装与非原厂零件</span><span class="st ok">未发现</span></li>
+          </ul>
+        </section>
+
+        <section class="blk">
+          <h2>本机测试卷<small>B&amp;W ISO 400 · 第 12–16 张</small></h2>
+          <p class="intro">每台机身检测时拍一卷测试卷，冲洗后做成印样附在护照里。红笔圈出的是锐度判读用的那一张。</p>
+          <div class="roll">
+            <div class="roll-in">
+              <canvas id="roll" width="1642" height="300" aria-label="测试卷印样：西门子星、灰阶、砖墙、逆光、网格五张"></canvas>
+              <svg viewBox="0 0 1642 300" preserveAspectRatio="none" aria-hidden="true"><path d="M22,44 C110,36 250,38 333,46 C340,110 338,190 330,262 C230,268 110,266 20,258 C14,180 16,110 26,40 L60,38"/></svg>
+            </div>
+          </div>
+          <div class="frames">
+            <span><b>12</b>西门子星，看锐度</span>
+            <span><b>13</b>灰阶，看曝光</span>
+            <span><b>14</b>砖墙，看细节</span>
+            <span><b>15</b>逆光，看眩光</span>
+            <span><b>16</b>网格，看畸变</span>
+          </div>
+        </section>
+
+        <section class="blk">
+          <h2>履历<small>PROVENANCE</small></h2>
+          <ol class="life">
+            <li><span class="y">1986</span><p><b>出厂</b>按序列号段推定，FM2N 量产中期。</p></li>
+            <li><span class="y">1988</span><p><b>第一任主人在广州买下</b>据主人回忆，攒了大半年工资。原包装盒和说明书仍在。</p></li>
+            <li><span class="y">1988–2003</span><p><b>跟着主人在报社工作</b>拍过旧城改造、修桥和 1998 年的洪水，也拍了家里两代人。</p></li>
+            <li><span class="y">2003</span><p><b>主人换用数码相机</b>它被收进防潮箱，每年拿出来空拍几次。</p></li>
+            <li><span class="y">2026.09</span><p><b>委托 Find 寄售</b>主人的女儿帮忙寄出，附上这封信。</p></li>
+            <li><span class="y">2026.10</span><p><b>Find 检测与建档</b>更换遮光海绵，清洁电池仓，拍测试卷，建立护照。</p></li>
+            <li class="next"><span class="y">下一页</span><p><b>等下一任主人来写</b>新主人可以在护照里补充自己拍过的照片和去过的地方。</p></li>
+          </ol>
+        </section>
+
+        <section class="blk">
+          <h2>第一任主人的信<small>随机附赠原件</small></h2>
+          <div class="letter">
+            <p>它跟了我三十八年。</p>
+            <p>八八年在广州买的，那时候一个月工资不到两百块，攒了很久。后来在报社用了十几年，拆迁、修桥、发大水，都是它拍的。</p>
+            <p>快门一直很脆，冬天也不卡。镜头里那几粒灰，大概是九八年在江边落下的，我一直没舍得拆。</p>
+            <p>现在年纪大了，背不动了。希望下一位多带它出门，别让它待在柜子里。</p>
+            <p class="sig">周先生 · 2026 年 9 月（示例文本）</p>
+          </div>
+        </section>
+
+        <section class="blk">
+          <h2>关于这个型号<small>FM2 / FM2N</small></h2>
+          <p class="intro">FM2 是八九十年代很多摄影记者的随身机。全机械快门，不装电池也能拍，只有测光需要电。</p>
+          <dl class="spec">
+            <div><dt>发布</dt><dd>1982 年（FM2）</dd></div>
+            <div><dt>改进</dt><dd>1984 年起为 FM2N，闪光同步提高到 1/250</dd></div>
+            <div><dt>快门</dt><dd>纵走金属帘，1 – 1/4000 秒，B 门</dd></div>
+            <div><dt>测光</dt><dd>中央重点，取景器内 + ○ − 三颗 LED</dd></div>
+            <div><dt>停产</dt><dd>2001 年</dd></div>
+            <div><dt>版本</dt><dd>早期蜂巢纹快门帘版本需单独标注</dd></div>
+          </dl>
+        </section>
+
+        <section class="blk">
+          <div class="carry">
+            <span class="pg">P.3</span>
+            <p>这本护照会跟着它走。下一次转手时，检测和履历接着往下写，档案完整的器材更容易卖出好价钱。</p>
+          </div>
+        </section>
+      </div>
+    </div>
+    <footer class="foot"><span>Find 器材护照 · 示例</span><span>人物、价格、编号与测试数据均为演示用</span></footer>
+  </div>
+</main>
+
+<!-- ===================== 图谱 ===================== -->
+<main data-view="atlas" hidden>
+  <div class="wrap">
+    <div class="at-head">
+      <h1><span class="num">1976–2006</span> 器材图谱</h1>
+      <p>收录 <span id="count" class="num">58</span> 台这三十年里有代表性的机身和镜头。点任意一个点，查看它的时代意义和检测时要注意的地方。点的形状代表快门结构：越偏电子，坏了越难修，检测越重要。</p>
+      <div class="legend">
+        <span><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" class="f-ink"/></svg>全机械，可修性高</span>
+        <span><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" class="f-paper s-ink" stroke-width="1.5"/><path d="M7,1.5 A5.5,5.5 0 0 0 7,12.5 Z" class="f-ink"/></svg>机械与电子混合</span>
+        <span><svg width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="5" class="f-paper s-ink" stroke-width="1.5"/></svg>电子控制，修复空间小</span>
+        <span><svg width="14" height="14" aria-hidden="true"><rect x="2" y="2" width="10" height="10" class="f-paper s-ink" stroke-width="1.5" transform="rotate(45 7 7)"/></svg>镜头</span>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="lanes">
+      <div class="lane-names" id="lane-names"></div>
+      <div class="lane-scroll"><svg id="atlas-svg" role="group" aria-label="1976 到 2006 年器材时间轴"></svg></div>
+    </div>
+    <div class="detail" id="detail" aria-live="polite"></div>
+    <div class="list"><table><thead><tr><th>年份</th><th>型号</th><th>类别</th><th>结构</th><th>检测关注点</th></tr></thead><tbody id="list"></tbody></table></div>
+    <footer class="foot"><span>Find · 三十年图谱 · 第一版</span><span>年份按发布年计；检测关注点为常见情况，具体以单台检测为准</span></footer>
+  </div>
+</main>
+
+<script>
+(function(){
+  /* ---------- 路由 ---------- */
+  const VIEWS=['thesis','passport','atlas'];
+  const drawn={};
+  function route(scroll){
+    let h=location.hash.slice(1); if(!VIEWS.includes(h)) h='thesis';
+    document.querySelectorAll('main[data-view]').forEach(m=>{m.hidden=m.dataset.view!==h});
+    document.querySelectorAll('.nav a').forEach(a=>{
+      if(a.getAttribute('href')==='#'+h) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
+    });
+    if(scroll) window.scrollTo(0,0);
+  }
+  window.addEventListener('hashchange',()=>route(true));
+  route(false);
+
+  const NS='http://www.w3.org/2000/svg';
+  const el=(tag,attrs,text)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e};
+
+  /* ---------- 飞轮 ---------- */
+  (function(){
+    const svg=document.getElementById('fly');
+    const cx=260,cy=200,r=140;
+    const nodes=['器材护照','更高成交价','卖家回流','更多带档案的器材','成交与检测数据'];
+    const defs=el('defs',{});
+    const mk=el('marker',{id:'arw',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'7',markerHeight:'7',orient:'auto'});
+    mk.appendChild(el('path',{d:'M0,0 L10,5 L0,10 z',class:'f-3'}));
+    defs.appendChild(mk);svg.appendChild(defs);
+    svg.appendChild(el('circle',{cx,cy,r:r-34,class:'f-panel'}));
+    const ang=i=>(-90+i*72)*Math.PI/180;
+    for(let i=0;i<5;i++){
+      const a0=ang(i)+0.34,a1=ang(i+1)-0.34;
+      const x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
+      svg.appendChild(el('path',{d:`M${x0.toFixed(1)},${y0.toFixed(1)} A${r},${r} 0 0 1 ${x1.toFixed(1)},${y1.toFixed(1)}`,class:'f-none s-3','stroke-width':'1.5','marker-end':'url(#arw)'}));
+    }
+    nodes.forEach((t,i)=>{
+      const x=cx+r*Math.cos(ang(i)),y=cy+r*Math.sin(ang(i));
+      const w=t.length*15+30,h=36;
+      const g=el('g',{});
+      g.appendChild(el('rect',{x:(x-w/2).toFixed(1),y:(y-h/2).toFixed(1),width:w,height:h,class:i===0?'f-tag s-red':'f-tag s-ink','stroke-width':i===0?'2':'1.2'}));
+      g.appendChild(el('text',{x:x.toFixed(1),y:(y+5).toFixed(1),'text-anchor':'middle','font-size':'14','font-weight':'700',class:i===0?'t-red':'t-ink'},t));
+      svg.appendChild(g);
+    });
+    svg.appendChild(el('text',{x:cx,y:cy-4,'text-anchor':'middle','font-size':'15','font-weight':'900',class:'t-ink'},'档案越厚'));
+    svg.appendChild(el('text',{x:cx,y:cy+20,'text-anchor':'middle','font-size':'15','font-weight':'900',class:'t-ink'},'器材越值钱'));
+  })();
+
+  /* ---------- 快门实测 ---------- */
+  (function(){
+    const lab=['1s','2','4','8','15','30','60','125','250','500','1000','2000','4000'];
+    const nomExact=[1,1/2,1/4,1/8,1/15,1/30,1/60,1/125,1/250,1/500,1/1000,1/2000,1/4000];
+    const dev=[0.04,0.02,-0.03,0.00,0.05,0.03,-0.02,-0.04,-0.07,-0.11,-0.16,-0.21,-0.29];
+    const svg=document.getElementById('shutter');
+    const L=56,R=664,T=20,B=200,ymax=0.5;
+    const X=i=>L+(R-L)*(i+0.5)/lab.length;
+    const Y=v=>T+(B-T)*(ymax-v)/(2*ymax);
+    svg.appendChild(el('rect',{x:L,y:Y(1/3),width:R-L,height:Y(-1/3)-Y(1/3),class:'f-tag'}));
+    [0.5,1/3,0,-1/3,-0.5].forEach(v=>{
+      svg.appendChild(el('line',{x1:L,x2:R,y1:Y(v),y2:Y(v),class:v===0?'s-ink':'s-rule','stroke-width':v===0?'1.5':'1'}));
+      const t=v===0?'0':(v>0?'+':'−')+(Math.abs(v)===0.5?'½':'⅓');
+      svg.appendChild(el('text',{x:L-10,y:Y(v)+4,'text-anchor':'end','font-size':'12',class:'t-3'},t));
+    });
+    svg.appendChild(el('text',{x:L-10,y:T-6,'text-anchor':'end','font-size':'11',class:'t-3'},'EV'));
+    dev.forEach((d,i)=>{
+      const warn=Math.abs(d)>=0.25;
+      svg.appendChild(el('line',{x1:X(i),x2:X(i),y1:Y(0),y2:Y(d),class:warn?'s-red':'s-2','stroke-width':'1.5'}));
+      svg.appendChild(el('circle',{cx:X(i),cy:Y(d),r:5,class:warn?'f-red':'f-ink'}));
+      svg.appendChild(el('text',{x:X(i),y:B+22,'text-anchor':'middle','font-size':'13','font-family':'Barlow Condensed, Arial Narrow, sans-serif','font-weight':'600',class:i===0?'t-red':'t-ink'},lab[i]));
+    });
+    svg.appendChild(el('text',{x:X(12),y:Y(dev[12])+20,'text-anchor':'middle','font-size':'11',class:'t-red'},'接近边界'));
+    svg.appendChild(el('text',{x:L,y:B+42,'font-size':'11',class:'t-3'},'快门转盘刻度（分之一秒）'));
+    // 读数表
+    const fmt=s=>s>=0.5?(s.toFixed(2)+' s'):('1/'+Math.round(1/s));
+    let rows='<table><tr><td>标称</td>'+lab.map(l=>'<td>'+(l==='1s'?'1 s':'1/'+l)+'</td>').join('')+'</tr>';
+    rows+='<tr><td>实测</td>'+nomExact.map((n,i)=>'<td>'+fmt(n*Math.pow(2,dev[i]))+'</td>').join('')+'</tr>';
+    rows+='<tr><td>偏差</td>'+dev.map(d=>'<td>'+(d>0?'+':d<0?'−':'')+Math.abs(d).toFixed(2)+'</td>').join('')+'</tr></table>';
+    document.getElementById('readout').innerHTML=rows;
+  })();
+
+  /* ---------- 测试卷印样 ---------- */
+  (function(){
+    const c=document.getElementById('roll'),g=c.getContext('2d');
+    const W=c.width,H=c.height;
+    const FW=308,FH=206,GAP=17,FY=47;
+    g.fillStyle='#1b1815';g.fillRect(0,0,W,H);
+    // 片基边缘的轻微亮度
+    g.fillStyle='rgba(255,240,220,.04)';g.fillRect(0,0,W,40);g.fillRect(0,H-40,W,40);
+    // 齿孔
+    g.fillStyle='#ece6db';
+    const pitch=40.7;
+    for(let x=10;x<W;x+=pitch){
+      rr(g,x,13,24,17,3);rr(g,x,H-30,24,17,3);
+    }
+    function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();g.fill()}
+    // 边码
+    g.fillStyle='#e39b55';g.font='600 13px "IBM Plex Mono", monospace';g.textBaseline='middle';
+    for(let i=0;i<5;i++){
+      const fx=GAP+i*(FW+GAP);
+      g.fillText(String(12+i),fx+4,H-8+0);
+      g.fillText((12+i)+'A',fx+FW/2+6,H-8);
+      if(i%2===0) g.fillText('FIND TEST 400',fx+FW/2-40,8);
+      g.fillText('▸',fx+FW-14,H-8);
+    }
+    const frames=[star,steps,brick,flare,grid];
+    frames.forEach((fn,i)=>{
+      const fx=GAP+i*(FW+GAP);
+      g.save();g.beginPath();g.rect(fx,FY,FW,FH);g.clip();g.translate(fx,FY);
+      fn(g,FW,FH);
+      // 暗角
+      const v=g.createRadialGradient(FW/2,FH/2,FH*0.35,FW/2,FH/2,FW*0.62);
+      v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.42)');
+      g.fillStyle=v;g.fillRect(0,0,FW,FH);
+      g.restore();
+      grain(fx,FY,FW,FH);
+    });
+    function grain(x,y,w,h){
+      const d=g.getImageData(x,y,w,h),p=d.data;
+      let s=1234+x;
+      for(let k=0;k<p.length;k+=4){
+        s=(s*16807)%2147483647;const n=((s/2147483647)-0.5)*34;
+        const v=Math.max(0,Math.min(255,(p[k]*0.3+p[k+1]*0.59+p[k+2]*0.11)+n));
+        p[k]=v;p[k+1]=v;p[k+2]=v;
+      }
+      g.putImageData(d,x,y);
+    }
+    function star(g,w,h){
+      g.fillStyle='#b9b9b6';g.fillRect(0,0,w,h);
+      const cx=w/2,cy=h/2,R=86,n=36;
+      for(let i=0;i<n;i++){
+        g.beginPath();g.moveTo(cx,cy);
+        g.arc(cx,cy,R,i*2*Math.PI/n,(i+1)*2*Math.PI/n);g.closePath();
+        g.fillStyle=i%2?'#f2f2ef':'#111';g.fill();
+      }
+      g.strokeStyle='#222';g.lineWidth=1.5;g.beginPath();g.arc(cx,cy,R+4,0,Math.PI*2);g.stroke();
+      g.fillStyle='#333';g.font='10px sans-serif';g.fillText('ISO 15775',8,h-10);
+    }
+    function steps(g,w,h){
+      g.fillStyle='#8c8c89';g.fillRect(0,0,w,h);
+      const n=11,sw=(w-40)/n;
+      for(let i=0;i<n;i++){
+        const v=Math.round(245-i*(235/(n-1)));
+        g.fillStyle=`rgb(${v},${v},${v})`;g.fillRect(20+i*sw,46,sw+0.5,h-92);
+        g.fillStyle=i<6?'#222':'#ddd';g.font='10px monospace';g.fillText(String(i),20+i*sw+sw/2-3,h-58);
+      }
+    }
+    function brick(g,w,h){
+      g.fillStyle='#d6d4cf';g.fillRect(0,0,w,h);
+      const bh=17,bw=46;let s=7;
+      for(let r=0;r*bh<h+bh;r++){
+        const off=(r%2)*bw/2;
+        for(let x=-bw;x<w+bw;x+=bw){
+          s=(s*48271)%2147483647;const t=0.35+((s%1000)/1000)*0.35;
+          const v=Math.round(255*t);g.fillStyle=`rgb(${v},${v},${v})`;
+          g.fillRect(x+off+1.5,r*bh+1.5,bw-3,bh-3);
+        }
+      }
+      g.fillStyle='rgba(0,0,0,.35)';g.fillRect(0,h-34,w,34);
+    }
+    function flare(g,w,h){
+      const sky=g.createLinearGradient(0,0,0,h);
+      sky.addColorStop(0,'#7a7a78');sky.addColorStop(0.62,'#d9d9d6');sky.addColorStop(0.63,'#2a2a29');sky.addColorStop(1,'#141414');
+      g.fillStyle=sky;g.fillRect(0,0,w,h);
+      const sx=w*0.62,sy=h*0.48;
+      const glow=g.createRadialGradient(sx,sy,4,sx,sy,90);
+      glow.addColorStop(0,'rgba(255,255,255,1)');glow.addColorStop(0.18,'rgba(255,255,255,.85)');glow.addColorStop(1,'rgba(255,255,255,0)');
+      g.fillStyle=glow;g.fillRect(0,0,w,h);
+      g.fillStyle='#fff';g.beginPath();g.arc(sx,sy,13,0,Math.PI*2);g.fill();
+      // 路灯剪影
+      g.fillStyle='#161616';g.fillRect(w*0.24,h*0.18,5,h);g.fillRect(w*0.24,h*0.18,28,4);
+      g.beginPath();g.ellipse(w*0.24+28,h*0.18+6,8,4,0,0,Math.PI*2);g.fill();
+      // 轻微鬼影
+      g.strokeStyle='rgba(255,255,255,.18)';g.lineWidth=2;g.beginPath();g.arc(w-sx+20,h-sy+30,9,0,Math.PI*2);g.stroke();
+    }
+    function grid(g,w,h){
+      g.fillStyle='#ecebe7';g.fillRect(0,0,w,h);
+      g.strokeStyle='#1a1a1a';g.lineWidth=1.6;
+      for(let x=14;x<w;x+=24){g.beginPath();g.moveTo(x,0);g.lineTo(x,h);g.stroke()}
+      for(let y=7;y<h;y+=24){g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke()}
+      g.fillStyle='#111';g.beginPath();g.arc(w/2,h/2,5,0,Math.PI*2);g.fill();
+    }
+  })();
+
+  /* ---------- 关注按钮 ---------- */
+  const watch=document.getElementById('watch');
+  watch.addEventListener('click',()=>{
+    const on=watch.getAttribute('aria-pressed')!=='true';
+    watch.setAttribute('aria-pressed',on);watch.textContent=on?'已关注，降价或有新资料时提醒你':'关注这台';
+  });
+
+  /* ---------- 图谱 ---------- */
+  const LANES=[
+    {id:'slrm',n:'手动单反'},{id:'slraf',n:'自动对焦单反'},{id:'rf',n:'旁轴'},
+    {id:'cp',n:'高端便携'},{id:'mf',n:'中画幅'},{id:'lens',n:'镜头'},{id:'dig',n:'早期数码'}
+  ];
+  const ST={m:'全机械',h:'机械与电子混合',e:'电子控制',l:'镜头'};
+  const D=[
+    [1976,'Canon AE-1','AE-1','slrm','e','最早使用微处理器的单反之一，让自动曝光走进普通家庭。','快门“啾啾”异响，多为反光镜阻尼缺油；需检查测光。'],
+    [1977,'Nikon FM','FM','slrm','m','小巧的全机械尼康，FM 系列的起点。','机械结构，可修性高；检查测光与快门帘。'],
+    [1977,'Minolta XD','XD','slrm','e','最早同时提供光圈优先和快门优先的单反之一。','电子快门，电路老化需逐档检测。'],
+    [1978,'Canon A-1','A-1','slrm','e','早期具备程序自动曝光的单反，佳能 FD 时代的技术代表。','与 AE-1 一样常见快门异响；检查液晶外的 LED 显示。'],
+    [1980,'Nikon F3','F3','slrm','h','尼康专业旗舰，生产超过二十年，长期用于新闻摄影。','取景器内液晶显示会老化褪色；无电时保留 1/60 机械档。'],
+    [1980,'Pentax LX','LX','slrm','h','宾得的专业旗舰，以防尘防潮设计著称。','结构复杂，建议由熟悉此机的师傅检测。'],
+    [1981,'Canon New F-1','New F-1','slrm','h','佳能 FD 时代的专业旗舰，机械与电子快门并存。','机械档和电子档要分别测试。'],
+    [1982,'Nikon FM2','FM2','slrm','m','1/4000 秒全机械快门，八九十年代很多中国摄影记者的随身机。','早期蜂巢纹快门帘版本需单独标注；整体可修性高。'],
+    [1983,'Olympus OM-4','OM-4','slrm','e','多点测光的先驱，延续 OM 体系的小巧。','早期机身有耗电过快的问题，需测静态电流。'],
+    [1986,'Canon T90','T90','slrm','e','手动对焦的电子旗舰，工业设计影响了之后的 EOS。','电子件老化；检查快门与液晶屏。'],
+    [1985,'Minolta α-7000','α-7000','slraf','e','机身驱动自动对焦单反成功普及的标志。','电子件与液晶屏老化。'],
+    [1987,'Canon EOS 650','EOS 650','slraf','e','第一台 EF 卡口机身，全电子卡口沿用至今。','早期 EOS 常见快门阻尼胶老化，俗称“粘快门”。'],
+    [1988,'Nikon F4','F4','slraf','e','尼康第一台自动对焦旗舰，保留了大量手动转盘。','电子件与机身橡胶。'],
+    [1989,'Canon EOS-1','EOS-1','slraf','e','佳能第一台 EOS 专业旗舰。','快门与电子件检测。'],
+    [1996,'Nikon F5','F5','slraf','e','采用 RGB 彩色矩阵测光的专业旗舰，高速连拍。','机身橡胶老化、电池仓触点。'],
+    [1999,'Nikon F100','F100','slraf','e','接近旗舰的性能，价格至今偏低。','后盖橡胶发粘；MS-13 电池盒卡扣易断。'],
+    [2000,'Canon EOS-1V','EOS-1V','slraf','e','佳能最后一台胶片旗舰。','电子件检测，成色是定价关键。'],
+    [2001,'Nikon FM3A','FM3A','slrm','h','机械与电子混合快门，尼康最后一台手动对焦胶片机身。','可修性较好；检查测光。'],
+    [2004,'Nikon F6','F6','slraf','e','尼康最后一台胶片旗舰，2020 年停产。','较新，检测重点为成色与快门。'],
+    [1980,'Minolta CLE','CLE','rf','e','小巧的 M 卡口旁轴，带 TTL 自动曝光。','电子快门，电路维修难度高。'],
+    [1981,'Leica M4-P','M4-P','rf','m','在加拿大生产的 M 机，增加了 28mm 和 75mm 框线。','测距器校准、快门帘。'],
+    [1984,'Leica M6','M6','rf','m','在 M 机身中加入测光，最普及的徕卡胶片机。','测距斑眩光、测距偏差；需辨别改装与仿制。'],
+    [1994,'Contax G1','G1','rf','e','自动对焦旁轴，配蔡司 G 镜头。','电子件；早期机身与部分镜头的兼容需确认。'],
+    [1996,'Contax G2','G2','rf','e','G1 的升级版，对焦与速度更好。','对焦马达与电子件。'],
+    [1998,'Leica M6 TTL','M6 TTL','rf','m','加入 TTL 闪光测光，快门转盘加大。','同 M6：测距器与真伪。'],
+    [1999,'Konica Hexar RF','Hexar RF','rf','e','电子快门、自动卷片的 M 卡口旁轴。','电子件。'],
+    [1999,'Voigtländer Bessa R','Bessa R','rf','m','福伦达品牌复兴后的平价旁轴，带动了一轮旁轴热。','机械结构，可修性好。'],
+    [2002,'Leica M7','M7','rf','e','第一台电子快门、带光圈优先的 M 机。','电子快门；没电时只有两档机械速度。'],
+    [2003,'Leica MP','MP','rf','m','回归全机械的 M 机。','测距器校准，成色与包装影响价格。'],
+    [1979,'Olympus XA','XA','cp','e','带测距的口袋机，滑盖式设计的开端。','电子快门，塑料机身老化。'],
+    [1984,'Contax T','Contax T','cp','e','Contax 高端便携系列的起点。','电子件。'],
+    [1990,'Contax T2','T2','cp','e','钛机身、蔡司 Sonnar 38mm，这一轮便携机热潮的代表。','电子件维修空间小，液晶屏老化；检测与保修最值钱。'],
+    [1993,'Konica Hexar AF','Hexar AF','cp','e','35mm f/2 定焦，以静音快门模式著称。','电子件。'],
+    [1993,'Nikon 35Ti','35Ti','cp','e','顶部模拟指针表盘显示拍摄参数。','指针表盘机构与电子件。'],
+    [1996,'Ricoh GR1','GR1','cp','e','28mm 广角、薄机身，街拍经典。','液晶屏漏液是常见问题。'],
+    [1996,'Minolta TC-1','TC-1','cp','e','极小的钛机身，G-Rokkor 28mm。','电子件。'],
+    [1997,'Olympus μ-II','μ-II','cp','e','35mm f/2.8 的大众便携机，年轻人入门热门。','塑料机身与电路，修复空间小。'],
+    [2001,'Contax T3','T3','cp','e','T 系列最后一代，35mm Sonnar。','同 T2，电子件难修。'],
+    [1982,'Mamiya RZ67','RZ67','mf','e','旋转后背的 6×7 影室机。','镜头快门电子触点、后背。'],
+    [1987,'Rolleiflex 2.8GX','2.8GX','mf','m','禄来双反的现代版本，带 TTL 闪光测光。','镜间快门保养、测光。'],
+    [1995,'Mamiya 7','Mamiya 7','mf','e','可以手持的 6×7 中画幅旁轴。','测距联动、电子快门。'],
+    [1995,'Fujifilm GA645','GA645','mf','e','自动对焦的 645 便携中画幅。','电子件、液晶屏。'],
+    [1996,'Hasselblad 503CW','503CW','mf','m','哈苏 V 系统的后期型号。','镜头快门与后背需定期保养。'],
+    [1998,'Pentax 67II','67II','mf','e','6×7 “大号单反”的最后一代。','快门帘与测光取景器。'],
+    [1976,'Leica Noctilux-M 50mm f/1.0','Noctilux 50/1.0','lens','l','当年最大光圈的量产镜头之一。','霉雾与划痕、对焦顺滑度。'],
+    [1981,'Nikon Ai-S 镜头系列','Ai-S 系列','lens','l','尼康手动镜头最后一套完整体系，今天大量用于转接。','光圈叶片油、霉。'],
+    [1989,'Canon EF 50mm f/1.0L','EF 50/1.0L','lens','l','光圈最大的自动对焦镜头之一。','对焦马达与电子触点。'],
+    [1994,'Leica Summilux-M 35mm f/1.4 ASPH','Summilux 35 ASPH','lens','l','非球面镜片普及的代表作。','需鉴别版本。'],
+    [1997,'Pentax FA 43mm f/1.9 Limited','FA 43','lens','l','按 135 画幅对角线设计的标准镜头。','镜片与对焦。'],
+    [1999,'Nikon D1','D1','dig','e','尼康第一台自主研发的数码单反，数码进入专业领域的起点。','电池、CF 卡、传感器。'],
+    [2000,'Canon EOS D30','D30','dig','e','佳能第一台使用自研 CMOS 的数码单反。','电子件老化。'],
+    [2002,'Fujifilm FinePix S2 Pro','S2 Pro','dig','e','SuperCCD 的色彩，至今有人怀念。','电池与传感器。'],
+    [2003,'Sony DSC-F828','F828','dig','e','2/3 英寸四色 CCD 的高端一体机。','存储卡格式与电池。'],
+    [2004,'Epson R-D1','R-D1','dig','e','第一台数码旁轴，保留快门上弦杆和指针表盘。','屏幕、电池与电子件。'],
+    [2005,'Canon EOS 5D','5D','dig','e','价格相对亲民的全画幅数码单反。','确认早期反光镜脱落问题已维修。'],
+    [2005,'Ricoh GR Digital','GR Digital','dig','e','GR 胶片机的数码延续。','电子件。'],
+    [2006,'Leica M8','M8','dig','e','徕卡第一台数码 M。','对红外敏感，需配合 UV/IR 滤镜。'],
+    [2006,'Fujifilm F31fd','F31fd','dig','e','小尺寸 CCD 卡片机的高光时刻，当下 CCD 热的代表。','电池与 xD 卡。']
+  ].map((r,i)=>({id:i,y:r[0],n:r[1],s:r[2],l:r[3],t:r[4],w:r[5],c:r[6]}));
+  document.getElementById('count').textContent=D.length;
+
+  const svg=document.getElementById('atlas-svg');
+  const Y0=1976,Y1=2006,PX=56,LX=24,AXIS=34,ROW=30,PAD=10;
+  const xOf=y=>LX+(y-Y0)*PX;
+  const tw=s=>{let w=0;for(const ch of s)w+=/[　-鿿＀-￯]/.test(ch)?13:7.1;return w};
+  // 每条泳道内分行，避免标签重叠
+  const laneRows={};
+  LANES.forEach(L=>{
+    const items=D.filter(d=>d.l===L.id).sort((a,b)=>a.y-b.y||tw(a.s)-tw(b.s));
+    const ends=[];
+    items.forEach(d=>{
+      const x0=xOf(d.y)-8,x1=xOf(d.y)+12+tw(d.s)+10;
+      let r=ends.findIndex(e=>e<x0); if(r<0){r=ends.length;ends.push(0)}
+      ends[r]=x1;d.row=r;
+    });
+    laneRows[L.id]=Math.max(1,ends.length);
+  });
+  const W=xOf(Y1)+200;
+  let yCur=AXIS;const laneY={};
+  LANES.forEach(L=>{laneY[L.id]=yCur;yCur+=laneRows[L.id]*ROW+PAD*2});
+  const H=yCur;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.setAttribute('width',W);svg.setAttribute('height',H);
+  // 泳道底色与名称列
+  const names=document.getElementById('lane-names');
+  const head=document.createElement('div');head.style.height=AXIS+'px';head.textContent='YEAR';names.appendChild(head);
+  LANES.forEach((L,i)=>{
+    const h=laneRows[L.id]*ROW+PAD*2;
+    if(i%2===0) svg.appendChild(el('rect',{x:0,y:laneY[L.id],width:W,height:h,class:'f-panel'}));
+    svg.appendChild(el('line',{x1:0,x2:W,y1:laneY[L.id]+h-0.5,y2:laneY[L.id]+h-0.5,class:'s-rule','stroke-width':'1'}));
+    const d=document.createElement('div');d.style.height=h+'px';d.textContent=L.n;names.appendChild(d);
+  });
+  // 年份轴
+  for(let y=Y0;y<=Y1;y++){
+    const x=xOf(y),major=y%5===0;
+    svg.appendChild(el('line',{x1:x,x2:x,y1:major?AXIS-12:AXIS-6,y2:AXIS,class:'s-ink','stroke-width':major?'1.5':'1'}));
+    if(major){
+      svg.appendChild(el('line',{x1:x,x2:x,y1:AXIS,y2:H,class:'s-rule','stroke-width':'1','stroke-dasharray':'2 4'}));
+      svg.appendChild(el('text',{x:x,y:AXIS-16,'text-anchor':'middle','font-size':'14','font-weight':'600','font-family':'Barlow Condensed, Arial Narrow, sans-serif',class:'t-ink'},String(y)));
+    } else if(y===Y0||y===Y1){
+      svg.appendChild(el('text',{x:x,y:AXIS-16,'text-anchor':'middle','font-size':'14','font-weight':'600','font-family':'Barlow Condensed, Arial Narrow, sans-serif',class:'t-ink'},String(y)));
+    }
+  }
+  svg.appendChild(el('line',{x1:0,x2:W,y1:AXIS,y2:AXIS,class:'s-ink','stroke-width':'1.5'}));
+  // 条目
+  const nodes={};
+  D.forEach(d=>{
+    const x=xOf(d.y),y=laneY[d.l]+PAD+d.row*ROW+ROW/2;
+    const g=el('g',{class:'it',tabindex:'0',role:'button','aria-label':`${d.y} 年 ${d.n}`});
+    g.appendChild(el('rect',{x:x-9,y:y-11,width:tw(d.s)+30,height:22,class:'hit',fill:'transparent'}));
+    if(d.t==='m') g.appendChild(el('circle',{cx:x,cy:y,r:5.5,class:'g fill f-ink s-ink','stroke-width':'1.5'}));
+    else if(d.t==='h'){g.appendChild(el('circle',{cx:x,cy:y,r:5.5,class:'g f-paper s-ink','stroke-width':'1.5'}));g.appendChild(el('path',{d:`M${x},${y-5.5} A5.5,5.5 0 0 0 ${x},${y+5.5} Z`,class:'g fill f-ink'}))}
+    else if(d.t==='e') g.appendChild(el('circle',{cx:x,cy:y,r:5,class:'g f-paper s-ink','stroke-width':'1.5'}));
+    else g.appendChild(el('rect',{x:x-5,y:y-5,width:10,height:10,transform:`rotate(45 ${x} ${y})`,class:'g f-paper s-ink','stroke-width':'1.5'}));
+    g.appendChild(el('text',{x:x+12,y:y+4.5,'font-size':'13','font-weight':'500',class:'t-ink'},d.s));
+    g.addEventListener('click',()=>select(d.id,false));
+    g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(d.id,false)}});
+    svg.appendChild(g);nodes[d.id]=g;
+  });
+  // 筛选
+  let lane='all';
+  const chips=document.getElementById('chips');
+  [{id:'all',n:'全部'}].concat(LANES).forEach(L=>{
+    const b=document.createElement('button');b.type='button';b.textContent=L.n;b.dataset.lane=L.id;
+    b.setAttribute('aria-pressed',L.id==='all');
+    b.addEventListener('click',()=>{lane=L.id;chips.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.lane===lane));applyFilter()});
+    chips.appendChild(b);
+  });
+  const tbody=document.getElementById('list');
+  function applyFilter(){
+    D.forEach(d=>nodes[d.id].classList.toggle('dim',lane!=='all'&&d.l!==lane));
+    const rows=D.filter(d=>lane==='all'||d.l===lane).sort((a,b)=>a.y-b.y||a.n.localeCompare(b.n));
+    tbody.innerHTML='';
+    rows.forEach(d=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${d.y}</td><td>${d.n}</td><td>${LANES.find(L=>L.id===d.l).n}</td><td>${ST[d.t]}</td><td>${d.c}</td>`;
+      tr.addEventListener('click',()=>select(d.id,true));
+      tbody.appendChild(tr);
+    });
+  }
+  const detail=document.getElementById('detail');
+  let sel=null;
+  function select(id,scrollTo){
+    if(sel!=null) nodes[sel].classList.remove('sel');
+    sel=id;nodes[id].classList.add('sel');
+    const d=D[id];
+    detail.innerHTML=`<div class="yr">${d.y}</div>
+      <div><h2>${d.n}</h2><div class="meta">${LANES.find(L=>L.id===d.l).n} · ${ST[d.t]}</div><h3 style="margin-top:16px">时代意义</h3><p>${d.w}</p></div>
+      <div><h3>检测关注点</h3><p>${d.c}</p></div>`;
+    if(scrollTo){
+      detail.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+      const sc=document.querySelector('.lane-scroll');sc.scrollLeft=Math.max(0,xOf(d.y)-sc.clientWidth/2);
+    }
+  }
+  applyFilter();
+  select(D.findIndex(d=>d.s==='FM2'),false);
+})();
+</script>
