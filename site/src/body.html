@@ -1,4 +1,6 @@
+<button type="button" class="skip" id="skip">跳到正文</button>
 <header class="top chrome">
+  <i class="screw l" style="--r:35deg"></i><i class="screw r" style="--r:120deg"></i>
   <div class="wrap">
     <a class="logo" href="#home" aria-label="Find 首页"><span class="knob"></span><b>FIND</b></a>
     <nav class="nav" aria-label="主导航">
@@ -11,10 +13,12 @@
   </div>
 </header>
 <div class="filmband" aria-hidden="true"><p>FIND ▸ 预览版 ▸ 页面上的器材、价格与人物均为示例 ▸ 1976–2006 ▸ 每一台附器材护照 ▸ FIND ▸ 预览版 ▸ 页面上的器材、价格与人物均为示例 ▸ 1976–2006 ▸ 每一台附器材护照 ▸</p></div>
-<main id="app"></main>
+<main id="app" tabindex="-1"></main>
 <footer class="wrap foot">
   <div><b>FIND</b><p style="margin-top:6px">1976–2006 年中古相机与镜头 · 寄售 · 代买 · 寻物</p></div>
   <div><a href="#shop">选购</a><a href="#sell">寄售</a><a href="#find">帮我找</a><a href="#history">器材史</a></div>
   <p>预览版：器材、价格、人物与检测数据均为示例</p>
 </footer>
 <div id="drawer" class="drawer" hidden></div>
+<div id="toast" class="toast lcd" role="status" aria-live="polite" hidden></div>
+<div id="curtain" aria-hidden="true"></div>

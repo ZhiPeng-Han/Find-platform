@@ -4,7 +4,49 @@ const load=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const WATCH=new Set(load('find.watch',[]));
 const isWatched=id=>WATCH.has(id);
-function toggleWatch(id,on){on?WATCH.add(id):WATCH.delete(id);save('find.watch',[...WATCH]);$('#fc-n').textContent=WATCH.size}
+function toggleWatch(id,on){on?WATCH.add(id):WATCH.delete(id);save('find.watch',[...WATCH]);const n=$('#fc-n');n.textContent=WATCH.size;
+  const w=n.parentNode;w.classList.remove('bump');void w.offsetWidth;w.classList.add('bump');toast(on?'已加入关注。点右上角的计数窗可以随时查看':'已取消关注')}
+let toastT=0;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;t.classList.remove('out');clearTimeout(toastT);toastT=setTimeout(()=>{t.classList.add('out');setTimeout(()=>{t.hidden=true},260)},2600)}
+const reduceMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+function tilt(stage){
+  if(!stage||reduceMotion()||matchMedia('(hover: none)').matches)return;
+  const cam=stage.querySelector('.cam');
+  stage.addEventListener('pointermove',e=>{const r=stage.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+    cam.style.transform=`perspective(1000px) rotateY(${(x*12).toFixed(2)}deg) rotateX(${(-y*8).toFixed(2)}deg) translateZ(10px)`;
+    stage.style.setProperty('--gx',((x+.5)*100).toFixed(1)+'%');stage.style.setProperty('--gy',((y+.5)*100).toFixed(1)+'%')});
+  stage.addEventListener('pointerleave',()=>{cam.style.transform=''});
+}
+function draft(k,ids,after){
+  const key='find.draft.'+k,d=load(key,null);
+  if(d&&ids.some(id=>d[id])){ids.forEach(id=>{if(d[id])$('#'+id).value=d[id]});after&&after();toast('已恢复你上次没填完的内容')}
+  let t=0;ids.forEach(id=>$('#'+id).addEventListener('input',()=>{clearTimeout(t);t=setTimeout(()=>{const o={};ids.forEach(i=>o[i]=$('#'+i).value);save(key,o)},400)}));
+}
+function hintContact(inp){
+  const h=document.createElement('small');h.className='hint';h.setAttribute('aria-live','polite');inp.after(h);
+  inp.addEventListener('blur',()=>{const v=inp.value.trim();
+    h.textContent=!v||/^1\d{10}$/.test(v.replace(/[\s-]/g,''))||/^[a-zA-Z][-_a-zA-Z0-9]{5,19}$/.test(v)?'':'看起来不像手机号或微信号，提交前再确认一下。'});
+}
+const PRESETS=[
+  {t:'第一台胶片机 · 两千五以内',c:'',s:{hi:p2t(2500)}},
+  {t:'不用电池的全机械',c:'red',s:{mech:true}},
+  {t:'口袋里的便携机',c:'blue',s:{cat:'cp'}},
+  {t:'中画幅',c:'',s:{cat:'mf'}},
+  {t:'老镜头',c:'red',s:{cat:'lens'}},
+  {t:'早期数码 CCD',c:'blue',s:{cat:'dig'}}
+];
+const FAQ=[
+  ['怎么付款？','走第三方担保交易。你收到器材、对照护照验完机，确认收货后款项才会结算给卖家。'],
+  ['怎么寄送？','顺丰保价，防震包装。随机附上器材护照、测试卷印样，以及主人的信或留言原件。'],
+  ['收到后和描述不一样怎么办？','和护照描述不符的，收到后 7 天内可以原样退回，来回运费由 Find 承担。'],
+  ['能先看实物吗？','可以预约看机。不方便的话，告诉我们想看哪里，我们拍细节视频给你。'],
+  ['以后想换一台怎么办？','在 Find 买的器材，180 天内可以按成交价 70% 回购，或者按 80% 抵扣换购下一台。']
+];
+function recentHTML(){
+  const ids=load('find.recent',[]).filter(id=>STOCK.find(s=>s.id===id));if(!ids.length)return '';
+  return `<div class="sec-h"><div><span class="dymo blue">足迹</span><h2>你最近看过</h2></div></div><div class="recent">${ids.map(id=>{const it=STOCK.find(s=>s.id===id);
+    return `<a class="rc chrome" href="#item-${it.id}"><span class="rc-cam velvet">${camSVG(it.r,it.f,{mark:it.mark,wear:it.grade,seed:it.id})}</span><span><b>${esc(it.name)}</b><small>${yuan(it.price)} · ${it.status}</small></span></a>`}).join('')}</div>`;
+}
 const today=()=>{const d=new Date();return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`};
 const refNo=k=>({sell:'JS',find:'XW',buy:'YY'}[k]||'FD')+'-'+Date.now().toString(36).slice(-6).toUpperCase();
 
@@ -68,7 +110,7 @@ function card(it){
   const sold=it.status==='已售',led=it.status==='在售'?'':it.status==='已预订'?'amber':'red';
   return `<a class="card${sold?' is-sold':''}" href="#item-${it.id}">
     <div class="vit velvet"><span class="grade">${it.grade}</span><span class="st"><span class="led ${led}"></span>${it.status}</span>
-      <div class="cam">${camSVG(it.r,it.f,{mark:it.mark,label:it.name})}</div>${sold?'<div class="sold"><span>已售</span></div>':''}</div>
+      <div class="cam">${camSVG(it.r,it.f,{mark:it.mark,label:it.name,wear:it.grade,seed:it.id})}</div>${sold?'<div class="sold"><span>已售</span></div>':''}</div>
     <div class="base chrome"><span class="engr">${it.year} · ${STRUCT[it.struct]} · №${it.no}</span>
       <div><h3>${esc(it.name)}</h3><div class="sub">${esc(it.lens)}</div></div><div class="pr">${yuan(it.price)}</div></div></a>`;
 }
@@ -82,7 +124,7 @@ function renderHome(){
   <h1 class="hero-title foil">三十年的相机，<br>正在等下一任主人。</h1>
   <p class="hero-sub">Find 只收 1976 到 2006 年间有来历的机身和镜头。每一台都由师傅检测，附一本器材护照：检测数据、本机测试卷、历任主人，还有它经历过的事。</p>
   <div class="hero">
-    <div class="hero-stage velvet"><div class="cam reflect" id="hero-cam"></div><div class="cap"><span id="hero-no"></span><span>展柜 · 本周上架</span></div></div>
+    <div class="hero-stage velvet"><div class="cam" id="hero-cam"></div><div class="cap"><span id="hero-no"></span><span>展柜 · 本周上架</span></div></div>
     <div class="hero-panel chrome">${screws()}
       <div class="row"><span class="engr">On the shelf · 在架</span><div class="counter"><span class="engr" style="letter-spacing:.1em">№</span><div class="counter-win"><div class="counter-big" id="hero-n">1</div></div></div></div>
       <div><h2 id="hero-name"></h2><div class="meta" id="hero-meta"></div></div>
@@ -98,30 +140,32 @@ function renderHome(){
     <div class="plaque">${screws()}<b>180 天</b><span>回购与置换</span><p>在 Find 买的器材，180 天内按成交价 70% 回购，或 80% 抵扣换购下一台。</p></div>
     <div class="plaque">${screws()}<b>担保</b><span>验机后再确认</span><p>付款走第三方担保交易，收到器材、验机满意后再确认收货。</p></div>
   </div>
-  <div class="sec-h"><div><h2>在架上</h2><p>本周新上架的几台。每一台都只有一台。</p></div><a class="key" href="#shop">进店看全部 ${STOCK.length} 台</a></div>
+  <div class="presets" aria-label="快速开始"><span class="presets-l">从这里开始</span>${PRESETS.map((p,i)=>`<button type="button" class="dymo ${p.c}" data-preset="${i}">${p.t}</button>`).join('')}</div>
+  <div class="sec-h"><div><span class="dymo">本周上架</span><h2>在架上</h2><p>本周新上架的几台。每一台都只有一台。</p></div><a class="key" href="#shop">进店看全部 ${STOCK.length} 台</a></div>
   <div class="grid">${STOCK.slice(0,6).map(card).join('')}</div>
-  <div class="sec-h"><div><h2>三件事，都可以交给我们</h2><p>不管你是想卖、想买，还是只想知道家里那台老相机值多少钱。</p></div></div>
+  ${recentHTML()}
+  <div class="sec-h"><div><span class="dymo red">服务</span><h2>三件事，都可以交给我们</h2><p>不管你是想卖、想买，还是只想知道家里那台老相机值多少钱。</p></div></div>
   <div class="services">
     <a class="svc" href="#sell"><span class="key big">寄售给 Find<i>CONSIGN</i></span><p>检测、拍摄、建护照、定价、售后都由我们完成。你不用应付砍价，也不用担心调包退货。</p></a>
     <a class="svc" href="#find"><span class="key big">帮我找一台<i>SOURCE</i></span><p>说出型号、成色底线和预算。我们在国内和日本中古渠道找货，先发检测报告，你确认后再付款。</p></a>
     <a class="svc" href="#sell"><span class="key big">估一估<i>APPRAISE</i></span><p>家里抽屉里的老相机值多少？填几项信息，估价表马上给出参考价，再决定要不要寄售。</p></a>
   </div>
-  <div class="sec-h"><div><h2>每一台都有一本护照</h2><p>护照跟着器材走。下一次转手时，检测和履历接着往下写。这是 ${esc(fm.name)} 的那一本。</p></div></div>
+  <div class="sec-h"><div><span class="dymo">护照</span><h2>每一台都有一本护照</h2><p>护照跟着器材走。下一次转手时，检测和履历接着往下写。这是 ${esc(fm.name)} 的那一本。</p></div></div>
   <div class="booklet paper" id="booklet">
-    <div class="bk-page l"><div class="bk-cover"><span class="no">FIND 器材护照 · No.${fm.no}</span><h3>${esc(fm.name)}</h3><p style="font-size:14px;color:#5b5243">${esc(fm.lens)} · ${fm.year} 年产 · ${fm.owners} 位主人</p><div class="cam">${camSVG(fm.r,fm.f,{mark:fm.mark})}</div><div style="display:flex;align-items:center;gap:14px;margin-top:auto"><span class="stamp">${fm.grade}<small>${GRADE_TXT[fm.grade]}</small></span><span style="font-size:13px;color:#5b5243">检测：陈师傅 · ${today()}</span></div></div></div>
+    <div class="bk-page l"><div class="bk-cover"><span class="no">FIND 器材护照 · No.${fm.no}</span><h3>${esc(fm.name)}</h3><p style="font-size:14px;color:#5b5243">${esc(fm.lens)} · ${fm.year} 年产 · ${fm.owners} 位主人</p><div class="cam">${camSVG(fm.r,fm.f,{mark:fm.mark,wear:fm.grade,seed:fm.id})}</div><div style="display:flex;align-items:center;gap:14px;margin-top:auto"><span class="stamp">${fm.grade}<small>${GRADE_TXT[fm.grade]}</small></span><span style="font-size:13px;color:#5b5243">检测：陈师傅 · ${today()}</span></div></div></div>
     <div class="bk-page bk-r" id="bk-r"></div>
     <div class="bk-tabs" role="tablist" aria-label="护照内页">${['检测','测试卷','履历','主人的信'].map((t,i)=>`<button role="tab" type="button" data-tab="${i}" aria-selected="${i===0}">${t}</button>`).join('')}</div>
   </div>
-  <div class="sec-h"><div><h2>三十年的器材史</h2></div></div>
+  <div class="sec-h"><div><span class="dymo blue">1976–2006</span><h2>三十年的器材史</h2></div></div>
   <div class="teaser chrome">${screws()}<div id="mini-dial"></div><div><h3>转动年份，看那一年出了什么</h3><p>1976 到 2006 年，${HIST.length} 台有代表性的机身和镜头，按年份放进展柜。每一台都写了它的时代意义，和买它时该检查的地方。</p><a class="key dark" href="#history" id="to-hist"><span class="dot"></span>打开器材史</a></div></div>
   </div>`;
   const showHero=()=>{const it=list[heroI%list.length];
-    $('#hero-cam').innerHTML=camSVG(it.r,it.f,{mark:it.mark,label:it.name});
+    $('#hero-cam').innerHTML=camSVG(it.r,it.f,{mark:it.mark,label:it.name,wear:it.grade,seed:it.id});
     $('#hero-name').textContent=it.name;$('#hero-meta').textContent=`${it.year} · ${it.grade} ${GRADE_TXT[it.grade]} · ${STRUCT[it.struct]} · ${it.lens}`;
     $('#hero-line').textContent='“'+it.line+'”';$('#hero-price').innerHTML=`<small>¥</small>${Math.round(it.price).toLocaleString('en-US')}`;
     $('#hero-st').textContent=it.status;$('#hero-go').href='#item-'+it.id;$('#hero-no').textContent=`№ ${it.no} · 第 ${heroI%list.length+1} / ${list.length} 台`;
     $('#hero-n').textContent=heroI%list.length+1};
-  showHero();
+  showHero();tilt($('.hero-stage'));
   Lever($('#lever'),()=>{heroI++;showHero()});
   const tabs=$$('.bk-tabs button'),bk=$('#bk-r');
   const tab=i=>{tabs.forEach((b,j)=>b.setAttribute('aria-selected',j===i));
@@ -135,32 +179,45 @@ function renderHome(){
 }
 
 /* ---------- 选购 ---------- */
-const SHOP={cat:'all',lo:0,hi:100,grade:'C',mech:false,watch:false,hideSold:false,sort:'new'};
+const SHOP0={cat:'all',lo:0,hi:100,grade:'C',mech:false,watch:false,hideSold:false,sort:'new',q:''};
+const SHOP=Object.assign({},SHOP0,load('find.shop',{}),{watch:false});
 function renderShop(){
   APP.innerHTML=`<div class="wrap page">${crumb([['首页','#home'],['选购']])}
   <div class="shop">
     <aside class="panel chrome" aria-label="筛选">${screws()}<div class="panel-inner">
-      <div><h4>Category<span>品类</span></h4><div class="dial-box"><div id="cat-dial"></div></div></div>
+      <label class="vf"><span class="vh">搜索型号</span><input type="search" id="q" placeholder="搜型号，例如 FM2　（按 / 键）" value="${esc(SHOP.q)}" autocomplete="off"></label>
+      <div><h4>Category<span>品类</span></h4><div class="dial-box"><div id="cat-dial"></div><p class="dial-hint">拖动转盘，或点刻度</p></div></div>
       <div><h4>Price<span id="pr-txt"></span></h4>${ringHTML('price',SHOP.lo,SHOP.hi,'价格')}</div>
       <div><h4>Grade<span>最低成色</span></h4>${fstopsHTML('gr',GRADES.map(g=>({v:g,t:g,s:GRADE_TXT[g]})),SHOP.grade,'最低成色')}</div>
       <div style="display:grid;gap:4px">${swHTML('f-mech','只看全机械',SHOP.mech,true)}${swHTML('f-watch','只看我关注的',SHOP.watch,true)}${swHTML('f-sold','隐藏已售',SHOP.hideSold,true)}</div>
       <div><h4>Sort<span>排序</span></h4><div class="sortbar" role="group" aria-label="排序">${[['new','新上架'],['asc','价格低'],['desc','价格高']].map(s=>`<button type="button" data-s="${s[0]}" aria-pressed="${SHOP.sort===s[0]}">${s[1]}</button>`).join('')}</div></div>
       <div class="lcd"><span>符合条件</span><b id="cnt">0</b><span>台</span></div>
     </div></aside>
-    <section><div class="shop-head"><div><h1 style="font-family:var(--f-serif);font-size:30px">在架上的器材</h1><p class="crumb" style="margin-top:6px">每一台都附器材护照。点进去可以看检测数据、测试卷和它的经历。</p></div></div><div class="grid" id="shop-grid"></div></section>
+    <section><div class="shop-head"><div><h1 style="font-family:var(--f-serif);font-size:30px">在架上的器材</h1><p class="crumb" style="margin-top:6px">每一台都附器材护照。点进去可以看检测数据、测试卷和它的经历。</p></div></div><div class="active-f" id="af" aria-live="polite"></div><div class="grid" id="shop-grid"></div></section>
   </div></div>`;
   Dial($('#cat-dial'),{options:CATS.map(c=>({v:c.id,t:c.n,cls:'cn'})),value:CATS.findIndex(c=>c.id===SHOP.cat),size:200,arc:300,fs:14,radius:.3,label:'品类',onChange:v=>{SHOP.cat=v;shopGrid()}});
   bindRing('price',(lo,hi)=>{SHOP.lo=p2t(lo);SHOP.hi=p2t(hi);$('#pr-txt').textContent=`${yuan(lo)} – ${hi>=P_MAX*.99?'不限':yuan(hi)}`;shopGrid()});
   $('#gr').addEventListener('pick',e=>{SHOP.grade=e.detail;shopGrid()});
   $('.panel').addEventListener('toggle',e=>{const id=e.target.id;if(id==='f-mech')SHOP.mech=e.detail;if(id==='f-watch')SHOP.watch=e.detail;if(id==='f-sold')SHOP.hideSold=e.detail;shopGrid()});
   $$('.sortbar button').forEach(b=>b.addEventListener('click',()=>{SHOP.sort=b.dataset.s;$$('.sortbar button').forEach(x=>x.setAttribute('aria-pressed',x===b));Sound.play('switch');shopGrid()}));
+  const q=$('#q');q.addEventListener('input',()=>{SHOP.q=q.value;shopGrid()});
+  $('#af').addEventListener('click',e=>{const b=e.target.closest('[data-clear]');if(!b)return;const k=b.dataset.clear;
+    if(k==='all')Object.assign(SHOP,SHOP0);else if(k==='price'){SHOP.lo=0;SHOP.hi=100}else SHOP[k]=SHOP0[k];Sound.play('switch');renderShop()});
   shopGrid();
 }
 function shopGrid(){
   const lo=t2p(SHOP.lo),hi=SHOP.hi>=99.5?Infinity:t2p(SHOP.hi),gi=GRADES.indexOf(SHOP.grade);
-  let rows=STOCK.filter(it=>(SHOP.cat==='all'||it.cat===SHOP.cat)&&it.price>=lo-1&&it.price<=hi+1&&GRADES.indexOf(it.grade)<=gi&&(!SHOP.mech||it.struct==='m')&&(!SHOP.watch||isWatched(it.id))&&(!SHOP.hideSold||it.status!=='已售'));
+  let rows=STOCK.filter(it=>(SHOP.cat==='all'||it.cat===SHOP.cat)&&it.price>=lo-1&&it.price<=hi+1&&GRADES.indexOf(it.grade)<=gi&&(!SHOP.mech||it.struct==='m')&&(!SHOP.watch||isWatched(it.id))&&(!SHOP.hideSold||it.status!=='已售')&&(!SHOP.q.trim()||(it.name+' '+it.cn+' '+it.mark+' '+it.lens).toLowerCase().includes(SHOP.q.trim().toLowerCase())));
   rows.sort((a,b)=>SHOP.sort==='asc'?a.price-b.price:SHOP.sort==='desc'?b.price-a.price:b.added.localeCompare(a.added));
   $('#cnt').textContent=String(rows.length).padStart(2,'0');
+  save('find.shop',Object.assign({},SHOP,{watch:false}));
+  const chips=[];
+  if(SHOP.q.trim())chips.push(['q',`“${SHOP.q.trim()}”`]);
+  if(SHOP.cat!=='all')chips.push(['cat',catName(SHOP.cat)]);
+  if(SHOP.lo>.5||SHOP.hi<99.5)chips.push(['price',`${yuan(t2p(SHOP.lo))}–${SHOP.hi>=99.5?'不限':yuan(t2p(SHOP.hi))}`]);
+  if(SHOP.grade!=='C')chips.push(['grade',`${SHOP.grade} 及以上`]);
+  if(SHOP.mech)chips.push(['mech','全机械']);if(SHOP.watch)chips.push(['watch','我关注的']);if(SHOP.hideSold)chips.push(['hideSold','隐藏已售']);
+  $('#af').innerHTML=chips.length?`<span>当前筛选</span>${chips.map(c=>`<button type="button" class="chip" data-clear="${c[0]}" aria-label="去掉筛选：${esc(c[1])}">${esc(c[1])} ×</button>`).join('')}<button type="button" class="chip clear" data-clear="all">全部清除</button>`:'';
   $('#shop-grid').innerHTML=rows.length?rows.map(card).join(''):`<div class="empty velvet" style="grid-column:1/-1"><p style="font-size:16px;color:var(--text)">没有符合条件的器材</p><p style="margin-top:6px">放宽价格或成色试试，或者让我们<a href="#find" style="color:var(--orange)">帮你找一台</a>。</p></div>`;
 }
 
@@ -170,21 +227,24 @@ function renderItem(id){
   const h=HIST.find(x=>x.n===it.hist),avail=it.status==='在售',led=avail?'':it.status==='已预订'?'amber':'red';
   const film=it.cat!=='dig';
   const writing=it.letter?{t:'第一任主人的信',ps:it.letter,s:it.signer}:it.note?{t:'主人留言',ps:[it.note],s:it.signer}:null;
-  APP.innerHTML=`<div class="wrap page">${crumb([['首页','#home'],['选购','#shop'],[it.name]])}
+  {const rc=load('find.recent',[]).filter(x=>x!==it.id);rc.unshift(it.id);save('find.recent',rc.slice(0,6))}
+  APP.innerHTML=`<div class="wrap page item-page">${crumb([['首页','#home'],['选购','#shop'],[it.name]])}
   <div class="item-top">
-    <div><div class="item-stage velvet"><div class="cam reflect">${camSVG(it.r,it.f,{mark:it.mark,label:it.name})}</div></div>
+    <div><div class="item-stage velvet"><div class="cam reflect">${camSVG(it.r,it.f,{mark:it.mark,label:it.name,wear:it.grade,seed:it.id})}</div></div>
       <dl class="spec-plate chrome">${screws()}<div><dt>Year</dt><dd>${it.year} 年</dd></div><div><dt>Shutter</dt><dd>${STRUCT[it.struct]}</dd></div><div><dt>Owners</dt><dd>${it.owners} 位主人</dd></div><div><dt>Passport</dt><dd>№ ${it.no}</dd></div></dl></div>
     <div class="hangtag paper">
       <div class="no"><span>FIND 器材护照 № ${it.no}</span><span>${catName(it.cat)}</span></div>
       <h1>${esc(it.name)}</h1><p class="lens">${esc(it.lens)}</p>
       <div class="mid"><div class="pr"><small>¥</small>${Math.round(it.price).toLocaleString('en-US')}</div><span class="stamp">${it.grade}<small>${GRADE_TXT[it.grade]}</small></span></div>
       <p class="hand">${esc(it.line)}</p>
+      <div class="pos"><div class="pos-l"><span>同型号近期成交（示例）</span><span>${yuan(round50(it.price*.8))} – ${yuan(round50(it.price*1.15))}</span></div><div class="pos-bar" role="img" aria-label="这台的价格位于同型号成交区间的中上"><i style="left:57%"></i></div><small>定在区间中上，理由写在下面的检测报告和履历里。</small></div>
       <div class="status"><span class="led ${led}"></span>${it.status}${avail?' · 预约后为你保留 24 小时':''}</div>
       <div class="bb"><b>180 天回购</b>：按成交价 70% 回购，或 80% 抵扣换购 Find 的下一台。付款走第三方担保交易，验机满意后再确认收货。</div>
       <div class="acts"><button class="release" id="buy" type="button" aria-label="预约购买" ${avail?'':'disabled'}></button><div><b style="font-size:16px">${avail?'预约购买':it.status}</b><p style="font-size:12.5px;color:var(--paper-ink-2)">${avail?'按下快门，填写联系方式':'可以让我们帮你找一台同型号'}</p></div><span style="margin-left:auto">${swHTML('watch','关注',isWatched(it.id),true)}</span></div>
     </div>
   </div>
-  <div class="sec-h"><div><h2>检测报告</h2><p>由陈师傅检测，${it.parts.length} 个部位分项评级。综合成色取影响使用的最低一项。</p></div></div>
+  <nav class="jump" aria-label="本页内容">${[['rep','检测报告'],['tst',it.cat==='lens'?'镜头灯箱':'快门与灯箱'],film?['roll','测试卷']:null,['life','履历'],['faq','常见问题']].filter(Boolean).map(j=>`<button type="button" data-jump="${j[0]}">${j[1]}</button>`).join('')}</nav>
+  <div class="sec-h" id="j-rep"><div><h2>检测报告</h2><p>由陈师傅检测，${it.parts.length} 个部位分项评级。综合成色取影响使用的最低一项。</p></div></div>
   <div class="bench">
     <div class="clip paper"><div class="clip-top"></div><h3>成色评级</h3><p class="note">Find 五级成色标准</p>
       <div class="gradebar">${GRADES.map(g=>`<div class="${g===it.grade?'on':''}">${g}<small>${GRADE_TXT[g]}</small></div>`).join('')}</div>
@@ -192,7 +252,7 @@ function renderItem(id){
     <div class="clip paper"><div class="clip-top"></div><h3>检查清单</h3><p class="note">打勾为正常，圈号为已处理，三角为需要留意</p>
       <ul class="checks">${it.checks.map(c=>`<li><i class="${c[0]==='warn'?'warn':''}">${c[0]==='ok'?'✓':c[0]==='fix'?'○':'△'}</i><span>${c[1]}${c[2]?`<small>${c[2]}</small>`:''}</span></li>`).join('')}</ul></div>
   </div>
-  <div class="bench" style="margin-top:26px">
+  <div class="bench" style="margin-top:26px" id="j-tst">
     ${it.cat==='lens'?`<div class="brass-note">${screws()}<h3>镜头不做快门测试</h3><p>镜头检测光圈叶片的回弹速度、对焦行程和阻尼，以及卡口磨损。结果写在左边的检查清单里。</p></div>`:
     `<div class="instr"><h3 style="color:var(--text)">快门测试仪</h3><p class="note">转动速度盘，看这台机身每一档的实测值。指针停在绿区，说明偏差小于 1/3 档。</p>
       <div class="instr-body"><div id="spd-dial"></div><div><div class="gauge" id="gauge">${gaugeSVG({labels:[[-1,'−½'],[-.667,'−⅓'],[0,'0'],[.667,'+⅓'],[1,'+½']],unit:'EV',zone:.667,aria:'快门偏差表'})}</div><div class="lcd" id="spd-lcd"></div></div></div></div>`}
@@ -201,19 +261,22 @@ function renderItem(id){
       <div class="light-foot">${swHTML('lb-sw','打开灯箱',false,true)}<dl><dt>霉</dt><dd>无</dd><dt>雾</dt><dd>无</dd><dt>划痕</dt><dd>无</dd><dt>微尘</dt><dd>${it.dust.length?it.dust.length+' 处':'无'}</dd></dl></div>
       ${it.dust.length?`<p style="font-size:12.5px;color:#a8a49c;margin-top:10px">${it.dust.map((d,i)=>`${i+1}. ${d[2]}`).join('　')}，都不影响成像。</p>`:''}</div>
   </div>
-  ${film?`<div class="lighttable" style="margin-top:34px"><h3>本机测试卷</h3><p class="note">检测时用这台${it.cat==='lens'?'镜头':'机身'}拍一卷黑白测试卷，冲洗后做成印样附在护照里。红笔圈出的那张用来判读锐度。</p>
+  ${film?`<div class="lighttable" style="margin-top:34px" id="j-roll"><h3>本机测试卷</h3><p class="note">检测时用这台${it.cat==='lens'?'镜头':'机身'}拍一卷黑白测试卷，冲洗后做成印样附在护照里。红笔圈出的那张用来判读锐度。</p>
     <div class="roll"><div class="roll-in"><canvas id="roll" width="1642" height="300" aria-label="测试卷印样"></canvas><svg viewBox="0 0 1642 300" preserveAspectRatio="none" aria-hidden="true"><path d="M22,44 C110,36 250,38 333,46 C340,110 338,190 330,262 C230,268 110,266 20,258 C14,180 16,110 26,40 L60,38"/></svg></div></div>
     <div class="frames" id="frames"></div></div>`:''}
-  <div class="sec-h"><div><h2>它的履历</h2><p>护照里的经历由主人讲述，Find 按序列号和票据核对。</p></div></div>
+  <div class="sec-h" id="j-life"><div><h2>它的履历</h2><p>护照里的经历由主人讲述，Find 按序列号和票据核对。</p></div></div>
   <div class="bench">
     <div class="cards-life">${it.life.map(l=>`<div class="icard"><span class="y">${l[0]}</span><div><b>${l[1]}</b><p>${l[2]}</p></div></div>`).join('')}<div class="icard next"><span class="y">下一页</span><div><b>等下一任主人来写</b><p>买下它以后，你可以在护照里补上自己拍的照片和去过的地方。</p></div></div></div>
     ${writing?`<div><div class="letter paper"><p style="font-family:var(--f-cn);font-size:12px;color:#6a6152;letter-spacing:.1em">${writing.t}</p>${writing.ps.map(p=>`<p>${esc(p)}</p>`).join('')}<p class="sig">${esc(writing.s)}</p><p class="note">原件随机附赠 · 预览版为示例文本</p></div></div>`:
       `<div class="brass-note">${screws()}<h3>还没有主人留言</h3><p>寄售时主人可以写一段话给下一任，原件随机附赠。</p></div>`}
   </div>
   ${h?`<div class="brass-note" style="margin-top:30px">${screws()}<h3>关于这个型号 · ${h.y} 年</h3><p>${h.w}</p><p><b>买它时要看：</b>${h.k}</p><p style="margin-top:10px"><a href="#history" data-year="${h.y}" style="color:#35270b;font-weight:700">在器材史里看 ${h.y} 年 →</a></p></div>`:''}
+  <div class="sec-h" id="j-faq"><div><span class="dymo">问答</span><h2>买之前常问的</h2></div></div>
+  <div class="faq">${FAQ.map((q,i)=>`<details class="paper"${i===0?' open':''}><summary>${q[0]}</summary><p>${q[1]}</p></details>`).join('')}</div>
   <div class="sec-h"><div><h2>也许你也会喜欢</h2></div></div>
   <div class="grid">${STOCK.filter(s=>s.id!==it.id&&s.status!=='已售').sort((a,b)=>(b.cat===it.cat)-(a.cat===it.cat)).slice(0,3).map(card).join('')}</div>
-  </div>`;
+  </div>
+  <div class="buybar chrome" id="buybar" aria-hidden="true"><div class="wrap"><span class="bb-cam velvet">${camSVG(it.r,it.f,{mark:it.mark,wear:it.grade,seed:it.id})}</span><span class="bb-t"><b>${esc(it.name)}</b><small><span class="led ${led}"></span>${it.grade} ${GRADE_TXT[it.grade]} · ${it.status}</small></span><span class="bb-p">${yuan(it.price)}</span>${avail?'<button class="key dark" type="button" id="buy2" tabindex="-1"><span class="dot"></span>预约购买</button>':'<a class="key" href="#find" tabindex="-1">帮我找同款</a>'}</div></div>`;
   if(it.cat!=='lens'){
     const lcd=$('#spd-lcd'),gauge=$('#gauge');
     const show=i=>{const d=it.dev[i],t=SPEED_SEC[i]*Math.pow(2,d),f=x=>x>=.5?x.toFixed(2)+' s':'1/'+Math.round(1/x);
@@ -227,6 +290,12 @@ function renderItem(id){
   $('#watch').addEventListener('toggle',e=>toggleWatch(it.id,e.detail));
   if(avail)$('#buy').addEventListener('click',()=>{Sound.play('shutter');openBuy(it)});
   const hy=$('[data-year]');if(hy)hy.addEventListener('click',()=>{HY=+hy.dataset.year;HSEL=null});
+  tilt($('.item-stage'));
+  $$('.jump button').forEach(b=>b.addEventListener('click',()=>{const t=$('#j-'+b.dataset.jump);if(t)t.scrollIntoView({behavior:reduceMotion()?'auto':'smooth',block:'start'})}));
+  const bar=$('#buybar'),tag=$('.hangtag');
+  if('IntersectionObserver' in window)new IntersectionObserver(([en])=>{const show=!en.isIntersecting&&en.boundingClientRect.top<0;
+    bar.classList.toggle('show',show);bar.setAttribute('aria-hidden',String(!show));$$('a,button',bar).forEach(x=>x.tabIndex=show?0:-1)}).observe(tag);
+  const b2=$('#buy2');if(b2)b2.addEventListener('click',()=>{Sound.play('shutter');openBuy(it)});
 }
 function openBuy(it){
   const d=$('#drawer');d.hidden=false;
@@ -240,7 +309,7 @@ function openBuy(it){
       <div class="submit-row"><p id="b-err">提交后这台会为你保留 24 小时。</p><button class="key dark" type="submit"><span class="dot"></span>提交预约</button></div>
     </form><div id="buy-receipt"></div>
     <div style="margin-top:16px;text-align:right"><button class="key" type="button" id="buy-close">关闭</button></div></div>`;
-  $('#b-name').focus();
+  $('#b-name').focus();hintContact($('#b-contact'));
   $('#buy-close').addEventListener('click',closeDrawer);
   $('#buy-form').addEventListener('submit',async e=>{e.preventDefault();
     const name=$('#b-name').value.trim(),contact=$('#b-contact').value.trim();
@@ -305,6 +374,7 @@ function renderSell(){
     setNeedle($('#s-gauge'),e.conf);return e};
   $('#s-model').addEventListener('input',upd);$('#s-grade').addEventListener('pick',upd);$('#sell-form').addEventListener('toggle',upd);
   requestAnimationFrame(upd);
+  draft('sell',['s-model','s-story','s-name','s-contact'],upd);hintContact($('#s-contact'));
   $('#s-photos').addEventListener('change',e=>{const t=$('#thumbs');t.innerHTML='';[...e.target.files].slice(0,8).forEach(f=>{const img=document.createElement('img');img.alt=f.name;img.src=URL.createObjectURL(f);t.appendChild(img)})});
   $('#sell-form').addEventListener('submit',async e=>{e.preventDefault();
     const model=$('#s-model').value.trim(),contact=$('#s-contact').value.trim();
@@ -314,7 +384,7 @@ function renderSell(){
     const acc=[['原包装',swOn('s-a1')],['说明书',swOn('s-a2')],['购买凭证',swOn('s-a3')]].filter(x=>x[1]).map(x=>x[0]).join('、')||'无';
     const res=await submit('sell',{model,cat,grade:g,way,name,contact,story,estimate:[round50(est.lo),round50(est.hi)],
       summary:`寄售登记：${model}（${catName(cat)}）\n成色自评：${g}\n功能：${fn}\n附件：${acc}\n出手方式：${way}\n参考价：${yuan(round50(est.lo))}–${yuan(round50(est.hi))}\n故事：${story||'未填'}\n称呼：${name||'未填'}\n联系方式：${contact}`});
-    $('#s-receipt').innerHTML=receiptHTML(res,'寄售回执');$('#s-err').textContent='登记卡已提交。';$('#s-receipt').scrollIntoView({block:'center',behavior:'smooth'})});
+    $('#s-receipt').innerHTML=receiptHTML(res,'寄售回执');save('find.draft.sell',null);$('#s-err').textContent='登记卡已提交。';$('#s-receipt').scrollIntoView({block:'center',behavior:'smooth'})});
 }
 
 /* ---------- 帮我找 ---------- */
@@ -351,6 +421,7 @@ function renderFind(){
     const rows=q?STOCK.filter(s=>s.status!=='已售'&&(s.name.toLowerCase().includes(q)||q.includes(s.mark.toLowerCase())||s.cn.includes(q))):[];
     $('#q-match').innerHTML=rows.length?rows.map(s=>`<a href="#item-${s.id}" class="lcd" style="text-decoration:none;display:flex;justify-content:space-between"><span>${esc(s.name)} · ${s.grade}</span><b style="font-weight:400">${yuan(s.price)}</b></a>`).join(''):`<p style="font-size:13px;color:#4a4e52">${q?'在架上暂时没有，交给我们去找。':'输入型号后，这里会显示在架上的同型号。'}</p>`};
   $('#q-model').addEventListener('input',match);match();
+  draft('find',['q-model','q-note','q-name','q-contact'],match);hintContact($('#q-contact'));
   $('#find-form').addEventListener('submit',async e=>{e.preventDefault();
     const model=$('#q-model').value.trim(),contact=$('#q-contact').value.trim();
     if(!model||!contact){$('#q-err').innerHTML=`<b style="color:var(--red)">${!model?'请填写想找的型号。':'请留下微信或手机，我们才能联系你。'}</b>`;(!model?$('#q-model'):$('#q-contact')).focus();return}
@@ -361,7 +432,7 @@ function renderFind(){
     const name=$('#q-name').value.trim(),note=$('#q-note').value.trim();
     const res=await submit('find',{model,budget:[lo,hi],grade:g,wait,channels:ch,req,note,name,contact,
       summary:`寻物委托：${model}\n预算：${yuan(lo)}–${hi?yuan(hi):'不限'}\n成色底线：${g}\n期限：${wait}\n渠道：${ch}\n要求：${req}\n备注：${note||'无'}\n称呼：${name||'未填'}\n联系方式：${contact}`});
-    $('#q-receipt').innerHTML=receiptHTML(res,'委托回执');$('#q-err').textContent='委托已发出。';$('#q-receipt').scrollIntoView({block:'center',behavior:'smooth'})});
+    $('#q-receipt').innerHTML=receiptHTML(res,'委托回执');save('find.draft.find',null);$('#q-err').textContent='委托已发出。';$('#q-receipt').scrollIntoView({block:'center',behavior:'smooth'})});
 }
 
 /* ---------- 器材史 ---------- */
@@ -425,16 +496,35 @@ function renderInbox(){
 }
 
 /* ---------- 路由 ---------- */
-function route(){
-  const h=location.hash.slice(1)||'home';
+let PREV=null;const SCROLL={};
+function render(h){
   if(unsubInbox&&h!=='inbox'){unsubInbox();unsubInbox=null}
   closeDrawer();
   if(h.startsWith('item-'))renderItem(h.slice(5));
   else ({home:renderHome,shop:renderShop,sell:renderSell,find:renderFind,history:renderHistory,inbox:renderInbox}[h]||renderHome)();
   const key=h.startsWith('item-')?'shop':h;
   $$('.nav a').forEach(a=>a.getAttribute('href')==='#'+key?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
-  window.scrollTo(0,0);
 }
+async function shutter(fn){
+  const c=$('#curtain');
+  if(reduceMotion()||!c.animate){fn();return}
+  c.style.visibility='visible';Sound.play('shutter');
+  try{await c.animate([{transform:'translateY(-101%)'},{transform:'translateY(0)'}],{duration:140,easing:'cubic-bezier(.55,0,.9,.55)',fill:'forwards'}).finished}catch(e){}
+  fn();
+  try{await c.animate([{transform:'translateY(0)'},{transform:'translateY(101%)'}],{duration:190,easing:'cubic-bezier(.15,.55,.35,1)',fill:'forwards'}).finished}catch(e){}
+  c.style.visibility='hidden';
+}
+function route(){
+  const h=location.hash.slice(1)||'home',from=PREV,first=from===null;
+  if(!first)SCROLL[from]=scrollY;
+  PREV=h;
+  const go=()=>{render(h);const y=h==='shop'&&from&&from.startsWith('item-')?SCROLL.shop||0:0;window.scrollTo(0,y);if(!first)APP.focus({preventScroll:true})};
+  first?go():shutter(go);
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-preset]');if(!b)return;
+  Object.assign(SHOP,SHOP0,PRESETS[+b.dataset.preset].s);Sound.play('switch');if(location.hash==='#shop')renderShop();else location.hash='#shop'});
+document.addEventListener('keydown',e=>{if(e.key==='/'&&!/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)){const q=$('#q');if(q){e.preventDefault();q.focus()}}});
+$('#skip').addEventListener('click',()=>{APP.focus();APP.scrollIntoView()});
 $('#fc').addEventListener('click',e=>{SHOP.watch=true;SHOP.hideSold=false;if(location.hash==='#shop'){e.preventDefault();renderShop()}});
 $('#snd').addEventListener('toggle',e=>{Sound.on=e.detail;save('find.sound',e.detail);if(e.detail){Sound.init();Sound.play('shutter')}});
 window.addEventListener('hashchange',route);

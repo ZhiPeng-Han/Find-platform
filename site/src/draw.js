@@ -102,6 +102,10 @@ function lensFront(u,cx,cy,R,o){
   s+=`<ellipse cx="${(cx-G*.32).toFixed(1)}" cy="${(cy-G*.36).toFixed(1)}" rx="${(G*.27).toFixed(1)}" ry="${(G*.14).toFixed(1)}" fill="#fff" opacity=".55" transform="rotate(-35 ${(cx-G*.32).toFixed(1)} ${(cy-G*.36).toFixed(1)})"/>`;
   s+=`<path d="M${(cx+G*.55).toFixed(1)},${(cy+G*.2).toFixed(1)} A${(G*.62).toFixed(1)},${(G*.62).toFixed(1)} 0 0 1 ${(cx+G*.05).toFixed(1)},${(cy+G*.6).toFixed(1)}" fill="none" stroke="#fff" stroke-width="${(G*.06).toFixed(1)}" opacity=".22" stroke-linecap="round"/>`;
   s+=`<circle cx="${(cx+G*.2).toFixed(1)}" cy="${(cy+G*.22).toFixed(1)}" r="${(G*.05).toFixed(1)}" fill="#ffd9a8" opacity=".55"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${(R*.79).toFixed(1)}" fill="none" stroke="rgba(255,255,255,.09)" stroke-width=".5"/><circle cx="${cx}" cy="${cy}" r="${(R*.82).toFixed(1)}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width=".5"/>`;
+  s+=`<path d="M${(cx-G*.62).toFixed(1)},${(cy+G*.1).toFixed(1)} A${(G*.66).toFixed(1)},${(G*.66).toFixed(1)} 0 0 1 ${(cx-G*.1).toFixed(1)},${(cy-G*.62).toFixed(1)}" fill="none" stroke="rgba(255,190,90,.3)" stroke-width="${(G*.05).toFixed(1)}" stroke-linecap="round"/>`;
+  const wx=cx+G*.12,wy=cy-G*.52;
+  s+=`<path d="M${wx.toFixed(1)},${wy.toFixed(1)} l${(G*.24).toFixed(1)},${(G*.06).toFixed(1)} l${(-G*.05).toFixed(1)},${(G*.15).toFixed(1)} l${(-G*.24).toFixed(1)},${(-G*.06).toFixed(1)} Z" fill="#fff" opacity=".17"/>`;
   return s;
 }
 const tx=(x,y,t,size,fill,anchor)=>`<text x="${x}" y="${y}" text-anchor="${anchor||'middle'}" font-size="${size}" fill="${fill}" font-family="Jost, sans-serif" letter-spacing="2.2">${t||''}</text>`;
@@ -219,9 +223,83 @@ const BODY={
     return s;
   }
 };
+const scr=(x,y,r,a)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#c9cbca" stroke="rgba(0,0,0,.5)" stroke-width=".4"/><line x1="${x-r*.7}" y1="${y}" x2="${x+r*.7}" y2="${y}" stroke="#45484a" stroke-width=".6" transform="rotate(${a||30} ${x} ${y})"/>`;
+const DETAIL={
+  slr(u,f){
+    let s=`<path d="M146,98 L162,48 Q164,42 170,42 L176,42 L165,98 Z" fill="#fff" opacity=".13"/><path d="M254,98 L238,48 Q236,42 230,42 L224,42 L235,98 Z" fill="#000" opacity=".17"/>`;
+    s+=scr(46,103,2.2,20)+scr(354,103,2.2,70)+scr(46,207,2.2,110)+scr(354,207,2.2,150);
+    s+=`<rect x="76" y="68" width="32" height="4" rx="2" fill="url(#c${u})" stroke="rgba(0,0,0,.3)" stroke-width=".4"/><circle cx="92" cy="70" r="2.4" fill="url(#c${u})" stroke="rgba(0,0,0,.4)" stroke-width=".4"/>`;
+    s+=`<circle cx="64" cy="140" r="4.6" fill="url(#c${u})" stroke="#222" stroke-width=".6"/><circle cx="64" cy="140" r="1.7" fill="#0d0d0d"/>`;
+    s+=`<circle cx="270" cy="178" r="6.2" fill="url(#c${u})" stroke="#222" stroke-width=".6"/><circle cx="268.8" cy="176.6" r="2.2" fill="#fff" opacity=".55"/>`;
+    s+=`<rect x="262" y="124" width="7" height="22" rx="3" fill="url(#k${u})" stroke="#000" stroke-width=".4"/>`;
+    s+=`<circle cx="200" cy="101.5" r="1.9" fill="#d0301f"/>`;
+    s+=`<circle cx="26" cy="116" r="5" fill="none" stroke="url(#c${u})" stroke-width="1.6"/><circle cx="374" cy="116" r="5" fill="none" stroke="url(#c${u})" stroke-width="1.6"/>`;
+    s+=`<line x1="272" y1="83" x2="328" y2="83" stroke="rgba(255,255,255,.35)" stroke-width=".5"/><line x1="66" y1="83" x2="116" y2="83" stroke="rgba(255,255,255,.35)" stroke-width=".5"/>`;
+    return s;
+  },
+  slraf(u,f){
+    let s=`<circle cx="282" cy="150" r="6.5" fill="#151617" stroke="#000"/><circle cx="280.5" cy="148.5" r="2.4" fill="#fff" opacity=".2"/>`;
+    s+=`<circle cx="210" cy="104.5" r="2" fill="#d0301f"/><rect x="300" y="104" width="30" height="3" rx="1.5" fill="#000" opacity=".5"/>`;
+    for(let i=0;i<7;i++)s+=`<line x1="${36+i*1.5}" y1="${120+i*12}" x2="${44+i*1.5}" y2="${118+i*12}" stroke="rgba(255,255,255,.07)"/>`;
+    s+=`<circle cx="356" cy="112" r="4.5" fill="none" stroke="url(#c${u})" stroke-width="1.5"/><circle cx="44" cy="100" r="4.5" fill="none" stroke="url(#c${u})" stroke-width="1.5"/>`;
+    return s;
+  },
+  rf(u,f){
+    let s=scr(40,94,2,20)+scr(360,94,2,80)+scr(44,204,2,140)+scr(356,204,2,40);
+    s+=`<path d="M188,206 Q196,201 204,206 L202,214 L190,214 Z" fill="url(#c${u})" stroke="rgba(0,0,0,.45)" stroke-width=".5"/>`;
+    s+=`<circle cx="248" cy="168" r="5.4" fill="url(#c${u})" stroke="#222" stroke-width=".6"/><circle cx="247" cy="167" r="2" fill="#fff" opacity=".5"/>`;
+    s+=`<circle cx="56" cy="138" r="4" fill="url(#c${u})" stroke="#222" stroke-width=".6"/><circle cx="56" cy="138" r="1.4" fill="#0d0d0d"/>`;
+    s+=`<circle cx="196" cy="111.5" r="1.7" fill="#d0301f"/><line x1="276" y1="77" x2="320" y2="77" stroke="rgba(255,255,255,.35)" stroke-width=".5"/>`;
+    return s;
+  },
+  cp(u,f){
+    let s=`<circle cx="166" cy="92" r="4.2" fill="#e2852b" stroke="rgba(0,0,0,.5)" stroke-width=".5"/><circle cx="165" cy="91" r="1.4" fill="#fff" opacity=".7"/>`;
+    s+=`<text x="223" y="105" text-anchor="middle" font-size="5.5" fill="${f==='black'?'#cfcbc2':'#4a4d50'}" font-family="Jost, sans-serif" letter-spacing="1">AF</text>`;
+    s+=`<path d="M300,118 L300,190" stroke="rgba(255,255,255,.25)"/><path d="M302,118 L302,190" stroke="rgba(0,0,0,.18)"/>`;
+    s+=`<circle cx="176" cy="150" r="52" fill="none" stroke="rgba(0,0,0,.25)" stroke-width=".6" stroke-dasharray="1 1.4"/>`;
+    s+=`<ellipse cx="200" cy="72" rx="110" ry="3" fill="#fff" opacity=".18"/>`;
+    return s;
+  },
+  tlr(u,f){
+    let s=`<path d="M266,92 L286,86 Q290,85 291,89 L292,92 Q292,95 288,96 L268,101 Z" fill="url(#c${u})" stroke="rgba(0,0,0,.4)" stroke-width=".5"/><circle cx="289" cy="90" r="3" fill="#151617"/>`;
+    s+=`<rect x="160" y="142" width="18" height="9" rx="1.5" fill="#f1eee5" stroke="#555" stroke-width=".5"/><text x="169" y="149" text-anchor="middle" font-size="6" fill="#222" font-family="Barlow Condensed, sans-serif" font-weight="600">125</text>`;
+    s+=`<rect x="222" y="142" width="18" height="9" rx="1.5" fill="#f1eee5" stroke="#555" stroke-width=".5"/><text x="231" y="149" text-anchor="middle" font-size="6" fill="#222" font-family="Barlow Condensed, sans-serif" font-weight="600">8</text>`;
+    s+=scr(142,40,1.8)+scr(258,40,1.8,80)+scr(142,238,1.8,130)+scr(258,238,1.8,10);
+    return s;
+  },
+  box(u,f){
+    let s=scr(122,62,2,30)+scr(278,62,2,100)+scr(122,226,2,60)+scr(278,226,2,160);
+    ['1','4','15','60','250','500'].forEach((t,i)=>{const a=(-150+i*24)*Math.PI/180,x=200+75*Math.cos(a),y=146+75*Math.sin(a);
+      s+=`<text x="${x.toFixed(1)}" y="${(y+2).toFixed(1)}" text-anchor="middle" font-size="6.5" fill="${t==='60'?'#d0301f':'#2a2c2f'}" font-family="Barlow Condensed, sans-serif" font-weight="600" transform="rotate(${(-150+i*24+90).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})">${t}</text>`});
+    s+=`<circle cx="200" cy="77.5" r="1.8" fill="#d0301f"/>`;
+    return s;
+  },
+  lens(u,f){
+    let s=`<circle cx="66" cy="102" r="2" fill="#d0301f"/>`;
+    for(let i=0;i<6;i++)s+=`<rect x="${99+i*8.4}" y="77" width="5" height="5" rx="2" fill="#1a1b1d" stroke="#000" stroke-width=".4"/><rect x="${99+i*8.4}" y="178" width="5" height="5" rx="2" fill="#1a1b1d" stroke="#000" stroke-width=".4"/>`;
+    s+=`<line x1="150" y1="118" x2="162" y2="118" stroke="#e98a2c" stroke-width=".8"/><line x1="150" y1="142" x2="162" y2="142" stroke="#e98a2c" stroke-width=".8"/>`;
+    return s;
+  }
+};
+const EDGES={slr:[[40,100],[360,100],[148,95],[252,95],[66,74],[118,74],[270,74],[330,74],[42,212],[358,212],[163,47],[237,47]],
+  slraf:[[52,96],[348,96],[60,218],[340,218],[178,49],[222,49],[30,150]],
+  rf:[[32,96],[368,96],[56,70],[100,70],[274,70],[322,70],[34,206],[366,206],[200,86]],
+  cp:[[74,80],[326,80],[72,200],[328,200],[200,67],[176,98]],tlr:[[136,30],[264,30],[136,248],[264,248],[140,12],[260,12]],
+  box:[[118,58],[282,58],[118,230],[282,230],[126,31],[274,31]],lens:[[80,90],[94,172],[164,78],[264,182],[332,78],[332,182]]};
+function wear(r,f,grade,seed){
+  const n={'A+':0,'A':1,'AB':3,'B':6,'C':10}[grade]||0;if(!n)return '';
+  const R=rng(seed),pts=EDGES[r]||[],col=f==='black'?'#b8955a':f==='ti'?'#8f856f':'#7c8081';let s='';
+  for(let i=0;i<n;i++){const p=pts[Math.floor(R()*pts.length)],x=p[0]+(R()-.5)*8,y=p[1]+(R()-.5)*3;
+    s+=`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${(1.5+R()*3.5).toFixed(1)}" ry="${(.8+R()*1.2).toFixed(1)}" fill="${col}" opacity="${(.55+R()*.35).toFixed(2)}"/>`}
+  for(let i=0;i<n;i++){const p=pts[Math.floor(R()*pts.length)],dir=p[0]<200?1:-1,x=p[0]+dir*(4+R()*14),y=p[1]+(p[1]<150?4:-4)+(R()-.5)*4,l=(4+R()*10)*dir,a=(R()-.5)*.5;
+    s+=`<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x+l*Math.cos(a)).toFixed(1)}" y2="${(y+l*Math.sin(a)).toFixed(1)}" stroke="${f==='black'?'#8a8a86':'#ffffff'}" stroke-width=".5" opacity=".45"/>`}
+  return s;
+}
+const GROUND={slr:[200,216,168],slraf:[200,220,160],rf:[200,212,174],cp:[200,212,140],tlr:[200,250,72],box:[200,232,90],lens:[196,184,150]};
 function camSVG(r,f,o){
-  const u=++UID;o=o||{};
-  return `<svg viewBox="0 0 400 260" role="img" aria-label="${o.label||''}" xmlns="http://www.w3.org/2000/svg">${camDefs(u,f||'chrome')}${(BODY[r]||BODY.slr)(u,f||'chrome',o)}</svg>`;
+  const u=++UID;o=o||{};f=f||'chrome';const B=BODY[r]?r:'slr',G=GROUND[B];
+  const shadow=`<filter id="sb${u}" x="-30%" y="-300%" width="160%" height="700%"><feGaussianBlur stdDeviation="5"/></filter><ellipse cx="${G[0]}" cy="${G[1]+3}" rx="${G[2]}" ry="6" fill="#000" opacity=".55" filter="url(#sb${u})"/>`;
+  return `<svg viewBox="0 0 400 260" role="img" aria-label="${o.label||''}" xmlns="http://www.w3.org/2000/svg">${camDefs(u,f)}${shadow}${BODY[B](u,f,o)}${DETAIL[B](u,f,o)}${wear(B,f,o.wear,o.seed||B)}</svg>`;
 }
 
 /* ---------- 测试卷印样 ---------- */
