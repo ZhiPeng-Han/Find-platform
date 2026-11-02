@@ -1,0 +1,1543 @@
+<title>Find 中古相机</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Jost:wght@500;600&family=Long+Cang&family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@400;600;700&family=Share+Tech+Mono&display=swap">
+<style>
+/* 版式概念：一台相机的机身。页面底是颗粒蒙皮，导航是镀铬顶盖，内容放在拉丝铝板、纸质吊牌、丝绒展柜和仪器面板上；所有控件都是相机上真实存在的机构：滚花转盘、卷片拨杆、光圈环、对焦环、拨动开关。整页只有一种外观（深色机身）。 */
+:root{
+  color-scheme:dark;
+  --leather:#1c1b19; --leather-2:#25231f; --velvet:#151214;
+  --chrome-hi:#fbfbf9; --chrome:#d4d6d3; --chrome-mid:#a8abaa; --chrome-lo:#767a7b;
+  --paint:#161718; --paint-hi:#3c3e41;
+  --engrave:#25272a; --engrave-light:#efede6;
+  --red:#d0301f; --orange:#e98a2c; --green:#3fa66b;
+  --paper:#ece5d2; --paper-2:#e2d9c1; --paper-ink:#2a261f; --paper-ink-2:#6a6152; --paper-rule:#cbbfa3;
+  --led-green:#71ff95; --led-amber:#ffb53f; --led-red:#ff4b3a;
+  --lcd:#a9b499; --lcd-ink:#1d2718;
+  --brass:#c9a85f; --brass-lo:#806633;
+  --text:#ebe8e0; --text-2:#b6b0a5; --text-3:#827c72;
+  --g-chrome:linear-gradient(180deg,#fcfcfa 0%,#e2e3e0 16%,#bfc2c1 44%,#a2a6a6 52%,#d4d6d4 72%,#f0f0ee 100%);
+  --g-paint:linear-gradient(180deg,#46484c 0%,#232427 22%,#151618 60%,#1e1f22 100%);
+  --f-cn:"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --f-serif:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-eng:"Jost","Futura","Century Gothic",sans-serif;
+  --f-num:"Barlow Condensed","Roboto Condensed","Arial Narrow",sans-serif;
+  --f-lcd:"Share Tech Mono",ui-monospace,Menlo,monospace;
+  --f-hand:"Long Cang","Kaiti SC","STKaiti",cursive;
+}
+*{box-sizing:border-box}
+html{background:var(--leather)}
+body{margin:0;min-height:100%;color:var(--text);font-family:var(--f-cn);font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased;
+  background-color:var(--leather);
+  background-image:radial-gradient(ellipse 120% 60% at 50% -10%,rgba(255,250,240,.07),transparent 60%),var(--leather-tex,none);
+  background-attachment:fixed,scroll}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:#cfd1ce}
+a{color:inherit}
+button{font:inherit;color:inherit}
+h1,h2,h3,h4{margin:0;text-wrap:balance}
+p{margin:0}
+img{display:block}
+:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+.wrap{max-width:1200px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- 材质 ---------- */
+.chrome{position:relative;color:var(--engrave);background-image:var(--brushed,none),var(--g-chrome);background-blend-mode:soft-light,normal;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -1px 0 rgba(0,0,0,.25),0 2px 0 #4b4e4f,0 3px 0 #111,0 14px 30px rgba(0,0,0,.55)}
+.paint{position:relative;color:var(--engrave-light);background-image:var(--brushed-dark,none),var(--g-paint);background-blend-mode:soft-light,normal;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.6),0 3px 0 #050505,0 14px 30px rgba(0,0,0,.6)}
+.paper{position:relative;color:var(--paper-ink);background-image:var(--paper-tex,none),linear-gradient(180deg,#f0e9d7,#e6ddc6);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 3px rgba(0,0,0,.35),0 16px 30px rgba(0,0,0,.45)}
+.velvet{position:relative;background-color:var(--velvet);background-image:radial-gradient(ellipse 70% 62% at 50% 34%,rgba(255,236,214,.17),rgba(255,236,214,.04) 55%,transparent 75%),var(--velvet-tex,none);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.6),inset 0 18px 30px rgba(0,0,0,.6),inset 0 -10px 24px rgba(0,0,0,.5)}
+.engr{font-family:var(--f-eng);text-transform:uppercase;letter-spacing:.18em;font-weight:500;font-size:11px;color:#3a3d40;text-shadow:0 1px 0 rgba(255,255,255,.85)}
+.paint .engr,.engr.light{color:#e9e7df;text-shadow:0 -1px 0 rgba(0,0,0,.8)}
+.deboss{color:#141311;text-shadow:0 1px 0 rgba(255,255,255,.09),0 -1px 0 rgba(0,0,0,.75)}
+.foil{background:linear-gradient(180deg,#fbfaf6 0%,#cfd0cc 38%,#8f9291 52%,#e9e9e6 70%,#b9bbba 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 rgba(0,0,0,.85))}
+.screw{position:absolute;width:11px;height:11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffffff,#c4c6c5 42%,#6c7071 100%);box-shadow:inset 0 0 0 1px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.55);pointer-events:none}
+.screw::after{content:"";position:absolute;left:1.5px;right:1.5px;top:50%;height:1.8px;margin-top:-.9px;border-radius:1px;background:#4f5253;box-shadow:0 1px 0 rgba(255,255,255,.55);transform:rotate(var(--r,28deg))}
+.screw.tl{top:8px;left:8px}.screw.tr{top:8px;right:8px}.screw.bl{bottom:8px;left:8px}.screw.br{bottom:8px;right:8px}
+.paint .screw{background:radial-gradient(circle at 35% 30%,#9a9c9d,#4a4c4e 45%,#1a1b1c 100%)}
+.paint .screw::after{background:#0b0b0b;box-shadow:0 1px 0 rgba(255,255,255,.15)}
+
+/* ---------- 顶盖导航 ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;border-radius:0 0 4px 4px}
+.top .wrap{display:flex;align-items:center;gap:18px;height:62px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo .knob{width:30px;height:30px;border-radius:50%;background:repeating-conic-gradient(#f0f0ed 0 4deg,#7d8182 4deg 8deg);box-shadow:0 2px 3px rgba(0,0,0,.45),inset 0 0 0 1px rgba(0,0,0,.25);position:relative}
+.logo .knob::after{content:"";position:absolute;inset:5px;border-radius:50%;background:conic-gradient(from 30deg,#c7c9c8,#fbfbf9,#a8abaa,#ececea,#b3b6b5,#f7f7f5,#c7c9c8);box-shadow:inset 0 0 0 1px rgba(0,0,0,.3)}
+.logo b{font-family:var(--f-eng);font-weight:600;font-size:21px;letter-spacing:.34em;color:#2a2c2f;text-shadow:0 1px 0 rgba(255,255,255,.9),0 -1px 0 rgba(0,0,0,.18)}
+.nav{display:flex;gap:2px;margin-left:8px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{position:relative;text-decoration:none;padding:6px 12px 10px;font-size:14px;font-weight:500;color:#34373a;text-shadow:0 1px 0 rgba(255,255,255,.85);white-space:nowrap}
+.nav a::after{content:"";position:absolute;left:50%;bottom:2px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:transparent}
+.nav a[aria-current="page"]{color:#111}
+.nav a[aria-current="page"]::after{background:var(--red);box-shadow:inset 0 -1px 1px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.7)}
+.nav a[hidden]{display:none}
+.top-r{margin-left:auto;display:flex;align-items:center;gap:14px}
+.fc{display:flex;align-items:center;gap:8px;text-decoration:none;color:#34373a}
+.fc-win{width:38px;height:38px;border-radius:50%;background:#0c0c0c;display:grid;place-items:center;box-shadow:0 0 0 3px #b9bcbb,0 0 0 4px #6f7374,inset 0 3px 6px #000;position:relative;overflow:hidden}
+.fc-win span{font-family:var(--f-num);font-weight:600;font-size:17px;color:#f2f0ea;line-height:1}
+.fc-win::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(150deg,rgba(255,255,255,.28),transparent 45%)}
+.fc small{font-size:12px;line-height:1.25;text-shadow:0 1px 0 rgba(255,255,255,.8)}
+@media (max-width:760px){.fc small{display:none}.top .wrap{gap:10px}.logo b{font-size:18px;letter-spacing:.26em}.nav a{padding:6px 8px 10px;font-size:13px}}
+@media (max-width:520px){.logo b{display:none}.top-r .snd{display:none}}
+
+.filmband{background:#191512;border-top:1px solid #000;border-bottom:1px solid #000;overflow:hidden;height:34px;position:relative}
+.filmband::before,.filmband::after{content:"";position:absolute;left:0;right:0;height:4px;background:repeating-linear-gradient(90deg,transparent 0 7px,#d9d2c4 7px 14px,transparent 14px 21px);opacity:.75}
+.filmband::before{top:2px}.filmband::after{bottom:2px}
+.filmband p{font-family:var(--f-lcd);font-size:11px;color:#e39b55;white-space:nowrap;line-height:34px;letter-spacing:.08em;padding-left:16px}
+
+/* ---------- 机械按键 ---------- */
+.key{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f-cn);font-weight:700;font-size:15px;letter-spacing:.06em;color:#24262a;
+  padding:12px 22px;border-radius:7px;text-decoration:none;
+  background-image:var(--brushed,none),linear-gradient(180deg,#fefefc,#e0e1de 52%,#c6c8c6);background-blend-mode:soft-light,normal;
+  text-shadow:0 1px 0 rgba(255,255,255,.85);
+  box-shadow:inset 0 1px 0 #fff,inset 0 -2px 0 rgba(0,0,0,.12),0 4px 0 #6d7172,0 5px 0 #202122,0 11px 18px rgba(0,0,0,.55);
+  transform:translateY(0);transition:transform .06s,box-shadow .06s}
+.key:active,.key.is-down{transform:translateY(3px);box-shadow:inset 0 1px 0 #fff,inset 0 -2px 0 rgba(0,0,0,.12),0 1px 0 #6d7172,0 2px 0 #202122,0 4px 8px rgba(0,0,0,.5)}
+.key.dark{color:var(--engrave-light);text-shadow:0 -1px 0 #000;background-image:var(--brushed-dark,none),linear-gradient(180deg,#4a4c50,#232427 50%,#16171a);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -2px 0 rgba(0,0,0,.4),0 4px 0 #0a0a0a,0 5px 0 #000,0 11px 18px rgba(0,0,0,.6)}
+.key.dark:active,.key.dark.is-down{box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 1px 0 #0a0a0a,0 2px 0 #000,0 4px 8px rgba(0,0,0,.5)}
+.key .dot{width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8a7a,var(--red) 55%,#7b160c);box-shadow:0 0 0 1.5px rgba(0,0,0,.35)}
+.key.big{padding:16px 26px;font-size:16px}
+.key[disabled]{opacity:.5;cursor:not-allowed}
+
+/* 快门按钮 */
+.release{appearance:none;border:0;cursor:pointer;width:58px;height:58px;border-radius:50%;flex:none;position:relative;
+  background:radial-gradient(circle at 50% 50%,#2a2b2e 0 44%,transparent 45%),radial-gradient(circle at 38% 30%,#ffffff,#cfd1cf 40%,#7c8081 100%);
+  box-shadow:0 4px 0 #3c3f40,0 5px 0 #000,0 10px 16px rgba(0,0,0,.6),inset 0 1px 0 #fff}
+.release::after{content:"";position:absolute;inset:16px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#ff9c8c,var(--red) 55%,#6e140b);box-shadow:inset 0 -2px 3px rgba(0,0,0,.4),0 0 0 2px #111}
+.release:active{transform:translateY(3px);box-shadow:0 1px 0 #3c3f40,0 2px 0 #000,0 4px 8px rgba(0,0,0,.5),inset 0 1px 0 #fff}
+
+/* 拨动开关 */
+.sw{appearance:none;background:none;border:0;padding:4px 0;display:inline-flex;align-items:center;gap:12px;cursor:pointer;text-align:left;color:inherit}
+.sw-track{position:relative;flex:none;width:50px;height:24px;border-radius:5px;background:linear-gradient(180deg,#070707,#262626);box-shadow:inset 0 2px 4px #000,0 1px 0 rgba(255,255,255,.35)}
+.sw-track::before,.sw-track::after{position:absolute;top:50%;transform:translateY(-50%);font-family:var(--f-eng);font-size:7px;letter-spacing:.1em;color:#8b8b85}
+.sw-track::before{content:"OFF";right:4px}.sw-track::after{content:"ON";left:5px}
+.sw-knob{position:absolute;z-index:1;top:2px;left:2px;width:24px;height:20px;border-radius:3px;transition:left .12s cubic-bezier(.3,1.5,.6,1);
+  background:repeating-linear-gradient(90deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px),linear-gradient(180deg,#ffffff,#c9cbca 55%,#8f9394);box-shadow:0 1px 2px rgba(0,0,0,.7),inset 0 1px 0 #fff}
+.sw[aria-checked="true"] .sw-knob{left:24px}
+.sw .led{flex:none}
+.sw-label{font-size:14px;line-height:1.4}
+.led{display:inline-block;width:9px;height:9px;border-radius:50%;--c:var(--led-green);background:radial-gradient(circle at 35% 30%,#ffffff 0 12%,var(--c) 45%,#0a2a12 100%);box-shadow:0 0 0 2px #0e0e0e,0 0 10px var(--c)}
+.led.off{background:radial-gradient(circle at 35% 30%,#666 0 10%,#2a2d2a 60%);box-shadow:0 0 0 2px #0e0e0e}
+.led.amber{--c:var(--led-amber);background:radial-gradient(circle at 35% 30%,#fff 0 12%,var(--c) 45%,#3a2200 100%)}
+.led.red{--c:var(--led-red);background:radial-gradient(circle at 35% 30%,#fff 0 12%,var(--c) 45%,#3a0a00 100%)}
+
+/* 滚花转盘 */
+.dial{position:relative;width:var(--size,180px);height:var(--size,180px);touch-action:none;user-select:none;-webkit-user-select:none;flex:none}
+.dial-shadow{position:absolute;inset:-4%;border-radius:50%;background:radial-gradient(circle,rgba(0,0,0,.55) 58%,transparent 72%);transform:translateY(6%)}
+.dial-knob{position:absolute;inset:0;border-radius:50%;cursor:grab;outline:none;
+  background:repeating-conic-gradient(from 0deg,#f1f2ef 0deg 2.4deg,#5f6364 2.4deg 4.8deg);
+  box-shadow:0 0 0 1px #2a2c2d,inset 0 0 0 2px rgba(0,0,0,.25);transform:rotate(var(--rot,0deg));transition:transform .22s cubic-bezier(.25,1.45,.5,1)}
+.dial.dragging .dial-knob{transition:none;cursor:grabbing}
+.dial-face{position:absolute;inset:8%;border-radius:50%;background:conic-gradient(from 15deg,#c8cac9,#f8f8f6 12%,#a6a9a8 26%,#ececea 40%,#b2b5b4 55%,#f7f7f5 70%,#a9acab 84%,#c8cac9);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.45),inset 0 2px 3px rgba(255,255,255,.8),inset 0 -4px 8px rgba(0,0,0,.25)}
+.dial-cap{position:absolute;inset:38%;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#c6c8c7 50%,#8a8e8f);box-shadow:0 1px 2px rgba(0,0,0,.5),inset 0 0 0 1px rgba(0,0,0,.25)}
+.dial-lab{position:absolute;left:50%;top:50%;width:0;height:0}
+.dial-lab span{position:absolute;left:0;top:0;transform:translate(-50%,-50%);white-space:nowrap;font-family:var(--f-num);font-weight:600;font-size:var(--fs,13px);color:#26282b;text-shadow:0 1px 0 rgba(255,255,255,.75);cursor:pointer;line-height:1}
+.dial-lab span.cn{font-family:var(--f-cn);font-weight:700;font-size:calc(var(--fs,13px) - 1px)}
+.dial-lab span.tick{font-size:6px;color:#55595b}
+.dial-index{position:absolute;left:50%;top:-14px;width:0;height:0;margin-left:-7px;border-left:7px solid transparent;border-right:7px solid transparent;border-top:11px solid var(--red);filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}
+.dial.black .dial-knob{background:repeating-conic-gradient(from 0deg,#4a4c4f 0deg 2.4deg,#0c0c0d 2.4deg 4.8deg)}
+.dial.black .dial-face{background:conic-gradient(from 15deg,#1a1b1d,#3b3d40 12%,#121314 26%,#2f3134 40%,#141516 55%,#36383b 70%,#111213 84%,#1a1b1d);box-shadow:inset 0 0 0 1px #000,inset 0 2px 2px rgba(255,255,255,.12)}
+.dial.black .dial-lab span{color:#f1efe8;text-shadow:0 -1px 0 #000}
+.dial.black .dial-lab span.hot{color:var(--orange)}
+.dial.black .dial-cap{background:radial-gradient(circle at 40% 35%,#55585b,#1c1d1f 60%,#0b0b0c)}
+
+/* 卷片拨杆 */
+.advance{position:relative;width:250px;height:132px;touch-action:none;user-select:none;-webkit-user-select:none}
+.adv-hub{position:absolute;left:18px;top:28px;width:76px;height:76px;border-radius:50%;background:repeating-conic-gradient(#eeefec 0 3deg,#6a6e6f 3deg 6deg);box-shadow:0 6px 12px rgba(0,0,0,.6),0 0 0 1px #222}
+.adv-hub::after{content:"";position:absolute;inset:9px;border-radius:50%;background:conic-gradient(from 10deg,#c9cbca,#fafaf8,#a5a8a7,#ebebe9,#b0b3b2,#f6f6f4,#c9cbca);box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}
+.adv-arm{position:absolute;left:56px;top:56px;width:178px;height:20px;margin-top:-10px;transform-origin:0 50%;transform:rotate(var(--a,0deg));cursor:grab;outline:none;transition:transform .32s cubic-bezier(.2,1.6,.4,1)}
+.advance.dragging .adv-arm{transition:none;cursor:grabbing}
+.adv-arm::before{content:"";position:absolute;left:0;top:3px;right:30px;height:14px;border-radius:7px;background:var(--g-chrome);box-shadow:0 4px 8px rgba(0,0,0,.55),inset 0 1px 0 #fff,inset 0 -1px 0 rgba(0,0,0,.3)}
+.adv-arm::after{content:"";position:absolute;right:0;top:0;width:44px;height:20px;border-radius:9px;background:linear-gradient(180deg,#3c3e41,#121314 60%,#202124);box-shadow:0 4px 8px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.2)}
+.adv-cap{position:absolute;left:43px;top:53px;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#c3c5c4 50%,#7e8283);box-shadow:0 2px 3px rgba(0,0,0,.6);pointer-events:none;z-index:2}
+.adv-hint{position:absolute;right:4px;bottom:0;font-size:12px;color:var(--text-2)}
+
+/* 光圈环（分段选择） */
+.fstops{position:relative;display:grid;grid-template-columns:repeat(var(--n,5),minmax(0,1fr));padding:14px 6px 10px;border-radius:6px;
+  background:linear-gradient(180deg,#2b2c2f,#0f1011 45%,#1c1d1f);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 3px 0 #050505,0 8px 16px rgba(0,0,0,.5)}
+.fstops::before{content:"";position:absolute;left:0;right:0;top:0;height:9px;border-radius:6px 6px 0 0;background:repeating-linear-gradient(90deg,#3d3f42 0 3px,#0c0c0d 3px 7px);box-shadow:inset 0 -1px 0 #000}
+.fstops button{appearance:none;background:none;border:0;cursor:pointer;padding:6px 0 12px;font-family:var(--f-num);font-weight:600;font-size:17px;color:#e9e7df;text-shadow:0 -1px 0 #000;position:relative;line-height:1.1}
+.fstops button small{display:block;font-family:var(--f-cn);font-weight:400;font-size:10px;color:#8d8a83;margin-top:3px;letter-spacing:.04em}
+.fstops button::after{content:"";position:absolute;left:50%;bottom:0;width:2px;height:6px;margin-left:-1px;background:#77736b}
+.fstops button[aria-checked="true"]{color:var(--orange)}
+.fstops button[aria-checked="true"]::after{bottom:-6px;width:0;height:0;margin-left:-6px;background:none;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:8px solid var(--red)}
+
+/* 对焦环滑块 */
+.ring{position:relative;height:74px;border-radius:6px;background:linear-gradient(180deg,#303134,#111214 40%,#1d1e20);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 3px 0 #050505,0 8px 16px rgba(0,0,0,.5);overflow:hidden}
+.ring::before{content:"";position:absolute;left:0;right:0;top:0;height:16px;background:repeating-linear-gradient(90deg,#45474a 0 2px,#0c0c0d 2px 5px);box-shadow:inset 0 -1px 0 #000}
+.ring-scale{position:absolute;left:14px;right:14px;top:22px;bottom:8px}
+.ring-scale i{position:absolute;top:0;width:1px;height:7px;background:#cfcbc2}
+.ring-scale i.major{height:11px}
+.ring-scale b{position:absolute;top:14px;transform:translateX(-50%);font-family:var(--f-num);font-weight:600;font-size:12px;color:#ebe8df;white-space:nowrap}
+.ring-scale b.o{color:var(--orange)}
+.ring input{position:absolute;left:7px;right:7px;width:calc(100% - 14px);top:16px;height:54px;margin:0;background:none;-webkit-appearance:none;appearance:none;pointer-events:none}
+.ring input::-webkit-slider-runnable-track{background:none;height:54px}
+.ring input::-moz-range-track{background:none;height:54px}
+.ring input::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:16px;height:52px;border:0;border-radius:3px;cursor:grab;
+  background:linear-gradient(90deg,transparent 7px,var(--red) 7px 9px,transparent 9px),linear-gradient(180deg,#fff,#c9cbca 50%,#8e9293);box-shadow:0 2px 5px rgba(0,0,0,.8)}
+.ring input::-moz-range-thumb{pointer-events:auto;width:16px;height:52px;border:0;border-radius:3px;cursor:grab;
+  background:linear-gradient(90deg,transparent 7px,var(--red) 7px 9px,transparent 9px),linear-gradient(180deg,#fff,#c9cbca 50%,#8e9293);box-shadow:0 2px 5px rgba(0,0,0,.8)}
+.ring input:focus-visible::-webkit-slider-thumb{outline:2px solid var(--orange)}
+
+/* 液晶 */
+.lcd{font-family:var(--f-lcd);color:var(--lcd-ink);background:linear-gradient(180deg,#b6c1a6,#9ca88a);border-radius:4px;padding:8px 12px;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.4),0 0 0 3px #101010,0 0 0 4px #4a4c4e;text-shadow:1px 1px 0 rgba(0,0,0,.13);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+
+/* 纸吊牌 */
+.tag{position:relative;border-radius:4px 4px 6px 6px;padding:26px 18px 16px}
+.tag::before{content:"";position:absolute;top:9px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:radial-gradient(circle,#1d1c1a 0 3px,#b7b3a8 3.5px 5px,#77736a 6px);box-shadow:0 1px 0 rgba(255,255,255,.6)}
+.stamp{display:inline-grid;place-items:center;width:62px;height:62px;border-radius:50%;border:2.5px solid var(--red);color:var(--red);font-family:var(--f-num);font-weight:700;font-size:26px;line-height:1;transform:rotate(-12deg);
+  box-shadow:0 0 0 3px transparent,inset 0 0 0 3px transparent;position:relative;opacity:.88}
+.stamp::after{content:"";position:absolute;inset:4px;border-radius:50%;border:1px solid var(--red)}
+.stamp small{display:block;font-family:var(--f-cn);font-size:8px;font-weight:700;letter-spacing:.1em;margin-top:-6px}
+
+/* ---------- 通用版块 ---------- */
+.page{padding-block:34px 70px}
+.sec-h{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:64px 0 22px}
+.sec-h h2{font-family:var(--f-serif);font-weight:700;font-size:clamp(24px,3vw,32px);line-height:1.3}
+.sec-h p{color:var(--text-2);max-width:36em;margin-top:6px}
+.crumb{font-size:13px;color:var(--text-3)}
+.crumb a{text-decoration:none;color:var(--text-2)}
+.crumb a:hover{color:var(--text)}
+
+/* ---------- 首页 ---------- */
+.hero-title{font-family:var(--f-serif);font-weight:700;font-size:clamp(30px,5vw,58px);line-height:1.25;letter-spacing:.02em;max-width:15em}
+.hero-sub{color:var(--text-2);font-size:16px;max-width:34em;margin-top:14px}
+.hero{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:26px;margin-top:34px;align-items:stretch}
+.hero-stage{border-radius:10px;min-height:420px;display:flex;flex-direction:column;justify-content:center;padding:28px 20px 18px;overflow:hidden}
+.hero-stage .cam{width:100%;max-width:560px;margin:0 auto}
+.hero-stage .cap{display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:12px;color:#8f877e;padding-inline:8px}
+.cam svg{display:block;width:100%;height:auto;filter:drop-shadow(0 26px 22px rgba(0,0,0,.65)) drop-shadow(0 4px 4px rgba(0,0,0,.6))}
+.cam.reflect svg{-webkit-box-reflect:below -14px linear-gradient(transparent 62%,rgba(255,255,255,.16))}
+.hero-panel{border-radius:10px;padding:26px 26px 24px;display:flex;flex-direction:column;gap:14px}
+.hero-panel .row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.hero-panel h2{font-family:var(--f-cn);font-weight:900;font-size:clamp(24px,2.6vw,32px);line-height:1.2;color:#1f2124;text-shadow:0 1px 0 rgba(255,255,255,.9)}
+.hero-panel .meta{font-size:13px;color:#4a4e52}
+.hero-panel .line{font-family:var(--f-serif);font-size:16px;color:#2b2e31;line-height:1.8}
+.hero-panel .price{font-family:var(--f-num);font-weight:600;font-size:40px;line-height:1;color:#1d1f22}
+.hero-panel .price small{font-size:20px;margin-right:2px}
+.hero-panel .acts{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.hero-panel .adv-wrap{margin-top:auto;border-top:1px solid rgba(0,0,0,.18);box-shadow:0 1px 0 rgba(255,255,255,.7) inset;padding-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.counter{display:flex;align-items:center;gap:10px}
+.counter-win{width:58px;height:58px;border-radius:50%;background:#0b0b0b;position:relative;overflow:hidden;box-shadow:0 0 0 4px #b6b9b8,0 0 0 5px #5e6263,inset 0 4px 8px #000}
+.counter-disc{position:absolute;inset:0;transition:transform .45s cubic-bezier(.3,1.3,.5,1)}
+.counter-disc span{position:absolute;left:50%;top:50%;font-family:var(--f-num);font-weight:600;font-size:13px;color:#e9e6de;transform-origin:0 0}
+.counter-win::before{content:"";position:absolute;left:50%;top:5px;width:0;height:0;margin-left:-4px;border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--red);z-index:2}
+.counter-win::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(150deg,rgba(255,255,255,.3),transparent 50%);z-index:3}
+.counter-big{position:absolute;inset:0;display:grid;place-items:center;z-index:1;font-family:var(--f-num);font-weight:700;font-size:24px;color:#fff}
+@media (max-width:900px){.hero{grid-template-columns:minmax(0,1fr)}.hero-stage{min-height:300px}}
+
+.plaques{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:26px}
+.plaque{border-radius:6px;padding:18px 18px 16px 18px;background-image:var(--brushed,none),linear-gradient(180deg,#e7cf93,#c4a35d 45%,#a98a45 55%,#d8bd7c);background-blend-mode:soft-light,normal;color:#3b2c0e;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(0,0,0,.25),0 3px 0 #4d3c17,0 10px 20px rgba(0,0,0,.5);position:relative}
+.plaque b{display:block;font-family:var(--f-num);font-weight:700;font-size:30px;line-height:1;text-shadow:0 1px 0 rgba(255,255,255,.55)}
+.plaque span{display:block;font-weight:700;font-size:14px;margin-top:6px;text-shadow:0 1px 0 rgba(255,255,255,.45)}
+.plaque p{font-size:12.5px;line-height:1.6;margin-top:4px;color:#5a4518}
+.plaque .screw{width:9px;height:9px;background:radial-gradient(circle at 35% 30%,#fff3cf,#c9a964 45%,#6b5222)}
+@media (max-width:900px){.plaques{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* 商品卡 */
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 22px}
+@media (max-width:980px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{display:flex;flex-direction:column;text-decoration:none;color:inherit;position:relative;transition:transform .2s}
+.card:hover{transform:translateY(-3px)}
+.card .vit{border-radius:8px 8px 0 0;aspect-ratio:4/3;max-width:100%;display:grid;place-items:center;padding:12px 18px 20px;overflow:hidden}
+.card .vit .cam{width:100%}
+.card .base{border-radius:0 0 8px 8px;padding:14px 16px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:end}
+.card .base h3{font-size:16px;font-weight:700;line-height:1.35;color:#1f2124;text-shadow:0 1px 0 rgba(255,255,255,.85)}
+.card .base .engr{grid-column:1/-1}
+.card .base .sub{font-size:12.5px;color:#4b4f53}
+.card .base .pr{font-family:var(--f-num);font-weight:600;font-size:24px;line-height:1;color:#1c1e21;text-shadow:0 1px 0 rgba(255,255,255,.8)}
+.card .grade{position:absolute;top:12px;left:12px;z-index:2;min-width:38px;height:28px;padding:0 8px;border-radius:4px;display:grid;place-items:center;font-family:var(--f-num);font-weight:700;font-size:17px;color:#1d1f22;
+  background:linear-gradient(180deg,#fff,#d6d8d6 55%,#b4b7b6);box-shadow:0 2px 0 #4f5354,0 4px 8px rgba(0,0,0,.5),inset 0 1px 0 #fff}
+.card .st{position:absolute;top:14px;right:14px;z-index:2;display:flex;align-items:center;gap:7px;font-size:12px;color:#e7e2d8;text-shadow:0 1px 1px #000}
+.card .sold{position:absolute;inset:0;z-index:3;display:grid;place-items:center;pointer-events:none}
+.card .sold span{border:3px solid var(--red);color:var(--red);font-weight:900;font-size:26px;letter-spacing:.3em;padding:4px 10px 4px 18px;transform:rotate(-14deg);background:rgba(20,10,8,.35);opacity:.9}
+.card.is-sold .vit .cam{opacity:.55;filter:grayscale(.5)}
+
+/* 服务按键 */
+.services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.svc{display:flex;flex-direction:column;gap:14px;text-decoration:none;color:inherit}
+.svc .key{justify-content:space-between;width:100%;padding:22px 22px;font-size:19px;border-radius:9px}
+.svc .key i{font-style:normal;font-family:var(--f-eng);font-size:11px;letter-spacing:.2em;color:#666b6f;font-weight:500}
+.svc p{color:var(--text-2);font-size:14px;padding-inline:4px}
+@media (max-width:860px){.services{grid-template-columns:minmax(0,1fr)}}
+
+/* 护照小册子 */
+.booklet{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-radius:6px;position:relative;margin-right:42px}
+.booklet::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:30px;margin-left:-15px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.22) 45%,rgba(0,0,0,.32) 50%,rgba(0,0,0,.22) 55%,transparent);pointer-events:none}
+.bk-page{padding:30px 32px 28px;min-height:400px;min-width:0}
+.bk-page.l{border-right:1px dashed rgba(0,0,0,.18)}
+.bk-cover{display:flex;flex-direction:column;gap:12px;height:100%}
+.bk-cover .no{font-family:var(--f-lcd);font-size:13px;color:var(--paper-ink-2)}
+.bk-cover h3{font-family:var(--f-serif);font-size:24px}
+.bk-cover .cam{max-width:320px}
+.bk-cover .cam svg{filter:drop-shadow(0 8px 8px rgba(60,40,10,.35))}
+.bk-tabs{position:absolute;right:-42px;top:26px;display:flex;flex-direction:column;gap:6px}
+.bk-tabs button{appearance:none;border:0;cursor:pointer;width:44px;padding:12px 0 12px 6px;border-radius:0 6px 6px 0;writing-mode:vertical-rl;letter-spacing:.2em;font-size:13px;font-weight:700;color:#3a2f1d;
+  background:linear-gradient(90deg,#c9b98f,#e1d3ad);box-shadow:2px 2px 4px rgba(0,0,0,.45)}
+.bk-tabs button[aria-selected="true"]{background:linear-gradient(90deg,#efe7d2,#f3ecda);color:#1d1810;transform:translateX(-4px)}
+.bk-r h4{font-family:var(--f-serif);font-size:20px;margin-bottom:12px}
+.bk-r p{font-size:14px;line-height:1.85;color:#3f382b}
+.bk-r .hand{font-family:var(--f-hand);font-size:22px;line-height:1.6;color:#20314f}
+.bk-list{list-style:none;margin:0;padding:0}
+.bk-list li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--paper-rule);font-size:14px}
+.bk-list li b{font-family:var(--f-num);font-size:16px}
+@media (max-width:820px){.booklet{grid-template-columns:minmax(0,1fr);margin-right:0;margin-top:52px}.booklet::after{display:none}.bk-page.l{border-right:0;border-bottom:1px dashed rgba(0,0,0,.18)}.bk-page{min-height:0}.bk-tabs{position:absolute;right:auto;left:0;top:-46px;flex-direction:row}.bk-tabs button{writing-mode:horizontal-tb;width:auto;padding:8px 14px;border-radius:6px 6px 0 0}.bk-tabs button[aria-selected="true"]{transform:translateY(4px)}}
+
+.teaser{display:grid;grid-template-columns:auto minmax(0,1fr);gap:40px;align-items:center;border-radius:10px;padding:30px 34px}
+.teaser h3{font-family:var(--f-serif);font-size:24px;color:#1f2124;text-shadow:0 1px 0 rgba(255,255,255,.85)}
+.teaser p{color:#45494d;margin:8px 0 18px;max-width:30em}
+@media (max-width:700px){.teaser{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center}}
+
+.foot{margin-top:80px;padding-block:28px 40px;border-top:1px solid #000;box-shadow:0 1px 0 rgba(255,255,255,.05) inset;display:flex;flex-wrap:wrap;gap:12px 32px;justify-content:space-between;font-size:13px;color:var(--text-3)}
+.foot b{font-family:var(--f-eng);letter-spacing:.3em;color:var(--text-2);font-weight:500}
+.foot a{color:var(--text-2);text-decoration:none;margin-right:16px}
+
+/* ---------- 选购 ---------- */
+.shop{display:grid;grid-template-columns:300px minmax(0,1fr);gap:28px;align-items:start;margin-top:20px}
+.panel{border-radius:10px;padding:26px 22px 24px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 82px);display:flex;flex-direction:column;gap:22px}
+.panel h4{font-family:var(--f-eng);font-weight:500;font-size:11px;letter-spacing:.2em;color:#3d4043;text-shadow:0 1px 0 rgba(255,255,255,.85);margin-bottom:10px;display:flex;justify-content:space-between}
+.panel h4 span{font-family:var(--f-cn);letter-spacing:.05em;font-size:12px;text-transform:none;color:#55595d}
+.panel .dial-box{display:grid;place-items:center;padding-top:18px}
+.panel .sw{color:#25272a}
+.panel .sw-label{text-shadow:0 1px 0 rgba(255,255,255,.8)}
+.panel .lcd{display:flex;justify-content:space-between;align-items:baseline}
+.panel .lcd b{font-size:26px;font-weight:400}
+.sortbar{display:grid;grid-template-columns:repeat(3,1fr);border-radius:6px;overflow:hidden;box-shadow:0 2px 0 #3c3f40,0 6px 10px rgba(0,0,0,.35)}
+.sortbar button{appearance:none;border:0;cursor:pointer;padding:9px 0;font-size:13px;font-weight:700;color:#2a2c2f;background:linear-gradient(180deg,#fdfdfb,#d5d7d4);border-right:1px solid #9a9e9e;text-shadow:0 1px 0 #fff}
+.sortbar button:last-child{border-right:0}
+.sortbar button[aria-pressed="true"]{background:linear-gradient(180deg,#a9acab,#cfd1cf);box-shadow:inset 0 3px 5px rgba(0,0,0,.35);color:#000}
+.shop-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.shop-head h1{font-family:var(--f-serif);font-size:30px}
+.empty{border-radius:10px;padding:40px 24px;text-align:center;color:var(--text-2)}
+@media (max-width:900px){.shop{grid-template-columns:minmax(0,1fr)}.panel{position:static}.panel-inner{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}}
+@media (max-width:560px){.panel-inner{grid-template-columns:minmax(0,1fr)}}
+.panel-inner{display:flex;flex-direction:column;gap:22px}
+
+/* ---------- 商品详情 ---------- */
+.item-top{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:26px;margin-top:18px;align-items:start}
+.item-stage{border-radius:10px;padding:34px 24px 22px;min-height:440px;display:flex;flex-direction:column;justify-content:center}
+.item-stage .cam{max-width:620px;margin:0 auto;width:100%}
+.spec-plate{margin-top:18px;border-radius:8px;padding:18px 22px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.spec-plate dt{font-family:var(--f-eng);font-size:10px;letter-spacing:.18em;color:#55595d;text-transform:uppercase;text-shadow:0 1px 0 rgba(255,255,255,.8)}
+.spec-plate dd{margin:2px 0 0;font-weight:700;font-size:14px;color:#1f2124;text-shadow:0 1px 0 rgba(255,255,255,.8)}
+@media (max-width:640px){.spec-plate{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.hangtag{border-radius:6px 6px 10px 10px;padding:36px 26px 26px;transform:rotate(.6deg);margin-top:4px}
+.hangtag::before{content:"";position:absolute;top:13px;left:50%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle,#1c1b19 0 4px,#bdb8ab 4.5px 6.5px,#77736a 7.5px);box-shadow:0 1px 0 rgba(255,255,255,.6)}
+.hangtag::after{content:"";position:absolute;top:-60px;left:50%;width:2px;height:76px;margin-left:-1px;background:linear-gradient(180deg,transparent,#b9ab8a 20%,#9b8d6c);transform:rotate(-8deg);transform-origin:bottom}
+.hangtag .no{font-family:var(--f-lcd);font-size:12px;color:var(--paper-ink-2);display:flex;justify-content:space-between}
+.hangtag h1{font-family:var(--f-serif);font-weight:700;font-size:28px;line-height:1.25;margin-top:10px}
+.hangtag .lens{font-size:14px;color:var(--paper-ink-2);margin-top:4px}
+.hangtag .mid{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 10px;padding:14px 0;border-top:1px dashed var(--paper-rule);border-bottom:1px dashed var(--paper-rule)}
+.hangtag .pr{font-family:var(--f-num);font-weight:600;font-size:46px;line-height:1}
+.hangtag .pr small{font-size:22px;margin-right:2px}
+.hangtag .hand{font-family:var(--f-hand);font-size:21px;line-height:1.5;color:#1f3150}
+.hangtag .status{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;margin-top:12px}
+.hangtag .bb{font-size:13px;line-height:1.7;margin-top:12px;padding:10px 12px;background:rgba(120,100,60,.1);border-radius:4px}
+.hangtag .acts{display:flex;align-items:center;gap:16px;margin-top:18px;flex-wrap:wrap}
+.hangtag .sw{color:var(--paper-ink)}
+@media (max-width:900px){.item-top{grid-template-columns:minmax(0,1fr)}.item-stage{min-height:300px}.hangtag{transform:none}}
+
+.bench{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px}
+@media (max-width:900px){.bench{grid-template-columns:minmax(0,1fr)}}
+.clip{border-radius:10px;padding:52px 26px 24px;position:relative}
+.clip-top{position:absolute;top:-14px;left:50%;width:150px;height:40px;margin-left:-75px;border-radius:8px 8px 14px 14px;background-image:var(--brushed,none),var(--g-chrome);background-blend-mode:soft-light,normal;box-shadow:0 4px 8px rgba(0,0,0,.55),inset 0 1px 0 #fff,inset 0 -2px 0 rgba(0,0,0,.2)}
+.clip-top::after{content:"";position:absolute;left:50%;top:9px;width:40px;height:10px;margin-left:-20px;border-radius:5px;background:#1b1b1b;box-shadow:inset 0 2px 3px #000,0 1px 0 rgba(255,255,255,.7)}
+.clip h3,.instr h3,.light h3{font-family:var(--f-serif);font-size:20px;line-height:1.3}
+.clip .note{font-size:13px;color:var(--paper-ink-2);margin-top:4px}
+.gradebar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:14px;border:1.5px solid var(--paper-ink);border-radius:3px}
+.gradebar div{padding:6px 4px;text-align:center;font-family:var(--f-num);font-weight:700;font-size:18px;border-right:1px solid var(--paper-rule)}
+.gradebar div:last-child{border-right:0}
+.gradebar div.on{background:var(--paper-ink);color:var(--paper)}
+.gradebar small{display:block;font-family:var(--f-cn);font-weight:400;font-size:10.5px;opacity:.75}
+.parts{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+.parts td{padding:8px 8px 8px 0;border-bottom:1px solid var(--paper-rule);vertical-align:top}
+.parts td:first-child{width:76px;color:var(--paper-ink-2);white-space:nowrap}
+.parts td.g{width:36px;font-family:var(--f-num);font-weight:700;font-size:17px;line-height:1.3}
+.checks{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 22px}
+.checks li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;padding:7px 0;border-bottom:1px solid var(--paper-rule);font-size:13.5px;line-height:1.5}
+.checks li i{font-style:normal;font-family:var(--f-hand);font-size:22px;line-height:1;color:var(--red)}
+.checks li i.warn{color:#b57400}
+.checks li small{display:block;color:var(--paper-ink-2);font-size:12px}
+@media (max-width:560px){.checks{grid-template-columns:minmax(0,1fr)}}
+
+.instr{border-radius:12px;padding:28px 26px 24px;background-color:#222326;background-image:var(--crackle,none),linear-gradient(180deg,#2c2d30,#18191b);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 3px 0 #000,0 16px 30px rgba(0,0,0,.6)}
+.instr .note{font-size:13px;color:#a8a49c;margin-top:4px}
+.instr-body{display:grid;grid-template-columns:auto minmax(0,1fr);gap:26px;align-items:center;margin-top:18px}
+.gauge{border-radius:8px;padding:8px;background:#0e0e0f;box-shadow:inset 0 2px 8px #000,0 1px 0 rgba(255,255,255,.12)}
+.gauge svg{display:block;width:100%;height:auto}
+.instr .lcd{margin-top:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;font-size:13px}
+.instr .lcd span{display:block;font-size:10px;opacity:.75}
+.instr .lcd b{font-weight:400;font-size:17px}
+@media (max-width:640px){.instr-body{grid-template-columns:minmax(0,1fr);justify-items:center}.instr-body>div{width:100%}}
+
+.light{border-radius:12px;padding:28px 26px 24px}
+.lightbox{margin-top:18px;border-radius:8px;padding:20px;display:grid;place-items:center;transition:background .3s,box-shadow .3s;
+  background:#1a1b1c;box-shadow:inset 0 3px 10px #000,0 0 0 6px #3a3c3e,0 0 0 7px #111}
+.lightbox.on{background:radial-gradient(circle at 50% 50%,#ffffff,#f4f6f8 45%,#dfe4ea);box-shadow:inset 0 0 30px rgba(255,255,255,.9),0 0 0 6px #3a3c3e,0 0 0 7px #111,0 0 40px rgba(220,235,255,.35)}
+.lightbox svg{width:100%;max-width:300px;height:auto;display:block}
+.light-foot{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px}
+.light dl{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:4px 12px;margin:0;font-size:13px;color:#a8a49c}
+.light dd{margin:0;color:var(--text)}
+
+.lighttable{border-radius:10px;padding:22px;background:linear-gradient(180deg,#f7f8f6,#e7ebe8);box-shadow:inset 0 0 40px rgba(255,255,255,.9),0 0 0 8px #2b2c2e,0 0 0 9px #000,0 18px 30px rgba(0,0,0,.6);color:#222}
+.lighttable h3{font-family:var(--f-serif);font-size:20px}
+.lighttable .note{font-size:13px;color:#555;margin-top:4px}
+.roll{position:relative;margin-top:16px;overflow-x:auto;box-shadow:0 6px 12px rgba(0,0,0,.35)}
+.roll-in{position:relative;min-width:720px}
+.roll canvas{display:block;width:100%;height:auto}
+.roll svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.roll svg path{fill:none;stroke:#d52b18;stroke-width:3.2;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+.frames{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:10px;font-size:12.5px;color:#444}
+.frames b{font-family:var(--f-lcd);font-weight:400;margin-right:6px;color:#000}
+@media (max-width:640px){.frames{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.cards-life{display:grid;gap:14px}
+.icard{display:grid;grid-template-columns:110px minmax(0,1fr);gap:16px;padding:16px 20px;border-radius:3px;background-image:var(--paper-tex,none),repeating-linear-gradient(180deg,transparent 0 25px,rgba(70,110,170,.22) 25px 26px),linear-gradient(180deg,#f6f1e3,#ece4cf);color:var(--paper-ink);box-shadow:0 2px 3px rgba(0,0,0,.35),0 10px 18px rgba(0,0,0,.35)}
+.icard:nth-child(odd){transform:rotate(-.4deg)}.icard:nth-child(even){transform:rotate(.35deg)}
+.icard .y{font-family:var(--f-num);font-weight:700;font-size:24px;color:#8f1d10;line-height:1.1}
+.icard b{display:block;font-size:15px}
+.icard p{font-size:13.5px;color:var(--paper-ink-2)}
+.icard.next{background:none;border:2px dashed #6f6a60;box-shadow:none;color:var(--text)}
+.icard.next .y{color:var(--orange)}
+.icard.next p{color:var(--text-2)}
+.letter{border-radius:2px;padding:34px clamp(22px,5vw,46px) 28px;font-family:var(--f-serif);font-size:16.5px;line-height:2.15;color:#2c2a26;transform:rotate(-.6deg);
+  background-image:var(--paper-tex,none),repeating-linear-gradient(180deg,transparent 0 calc(2.15em - 1px),rgba(160,60,40,.22) calc(2.15em - 1px) 2.15em),linear-gradient(180deg,#f7f2e4,#eee6d0);background-position:0 0,0 33px,0 0;
+  box-shadow:0 2px 3px rgba(0,0,0,.35),0 18px 30px rgba(0,0,0,.45)}
+.letter .sig{text-align:right;font-family:var(--f-hand);font-size:22px;color:#1f3150}
+.letter .note{font-family:var(--f-cn);font-size:12px;color:#6a6152;text-align:right;line-height:1.6}
+.brass-note{border-radius:6px;padding:22px 24px;background-image:var(--brushed,none),linear-gradient(180deg,#e9d39a,#c6a660 45%,#ae8f4a 55%,#dbc183);background-blend-mode:soft-light,normal;color:#35270b;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 3px 0 #4d3c17,0 12px 22px rgba(0,0,0,.5);position:relative}
+.brass-note h3{font-family:var(--f-serif);font-size:19px;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+.brass-note p{font-size:14px;margin-top:8px;color:#4a3712}
+.brass-note .screw{background:radial-gradient(circle at 35% 30%,#fff3cf,#c9a964 45%,#6b5222)}
+
+/* 订购抽屉 */
+.drawer{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:20px max(16px,env(safe-area-inset-right,0px)) 20px max(16px,env(safe-area-inset-left,0px));background:rgba(8,7,6,.72);backdrop-filter:blur(3px)}
+.drawer .slip{width:min(520px,100%);max-height:calc(100% - 20px);overflow:auto;border-radius:4px;padding:30px 28px 24px}
+
+/* ---------- 表单（登记卡 / 委托单） ---------- */
+.form-wrap{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:30px;align-items:start;margin-top:20px}
+@media (max-width:940px){.form-wrap{grid-template-columns:minmax(0,1fr)}}
+.card-form{border-radius:4px;padding:34px clamp(20px,4vw,40px) 30px}
+.card-form .head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:2px solid var(--paper-ink);padding-bottom:12px}
+.card-form .head h1{font-family:var(--f-serif);font-size:26px;line-height:1.25}
+.card-form .head .no{font-family:var(--f-lcd);font-size:12px;color:var(--paper-ink-2);text-align:right;line-height:1.6}
+.fld{display:grid;grid-template-columns:112px minmax(0,1fr);gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--paper-rule)}
+.fld>label,.fld>.lab{font-size:13px;font-weight:700;color:var(--paper-ink-2)}
+.fld input[type=text],.fld input[type=tel],.fld textarea{width:100%;border:0;border-bottom:1.5px solid #8a7f68;background:transparent;font-family:var(--f-hand);font-size:22px;color:#1f3150;padding:2px 2px 4px;outline:none;border-radius:0}
+.fld textarea{font-size:20px;line-height:1.6;resize:vertical;min-height:70px;background:repeating-linear-gradient(180deg,transparent 0 31px,#cbbfa3 31px 32px);border-bottom:0}
+.fld input::placeholder,.fld textarea::placeholder{color:#a69a80;font-family:var(--f-cn);font-size:14px}
+.fld input:focus,.fld textarea:focus{border-color:#1f3150}
+.fld .row{display:flex;flex-wrap:wrap;gap:8px 22px}
+.fld .sw{color:var(--paper-ink)}
+.fld .sw-label{font-size:13.5px}
+@media (max-width:560px){.fld{grid-template-columns:minmax(0,1fr);gap:8px}}
+.drop{display:flex;align-items:center;gap:16px;padding:14px;border:2px dashed #9b8f74;border-radius:6px;cursor:pointer;position:relative}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.canister{width:46px;height:62px;flex:none;border-radius:6px;background:linear-gradient(90deg,#1b1b1b,#4a4b4d 30%,#1d1e20 70%,#0d0d0e);position:relative;box-shadow:0 3px 6px rgba(0,0,0,.4)}
+.canister::before{content:"";position:absolute;left:4px;right:4px;top:12px;bottom:12px;background:linear-gradient(180deg,#f2c230,#e1a41b);border-radius:2px}
+.canister::after{content:"";position:absolute;left:14px;top:-7px;width:18px;height:9px;border-radius:2px 2px 0 0;background:linear-gradient(90deg,#666,#ccc,#666)}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.thumbs img{width:64px;height:64px;object-fit:cover;border:4px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.submit-row{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-top:22px}
+.submit-row p{font-size:12.5px;color:var(--paper-ink-2);max-width:26em}
+.meter-panel{border-radius:12px;padding:26px 24px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 82px)}
+.meter-panel h3{font-family:var(--f-serif);font-size:20px}
+.meter-panel .note{font-size:12.5px;color:#a8a49c;margin-top:4px}
+.ways{display:grid;gap:10px;margin-top:16px}
+.ways .lcd{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.ways .lcd span{font-size:12px}
+.ways .lcd b{font-weight:400;font-size:19px}
+.receipt{margin-top:22px;padding:18px 20px;border:2px solid var(--paper-ink);border-radius:3px;position:relative}
+.receipt h4{font-size:16px}
+.receipt p{font-size:13.5px;margin-top:6px;color:var(--paper-ink-2)}
+.receipt .stamp{position:absolute;right:14px;top:-18px;width:72px;height:72px;font-size:13px;font-family:var(--f-cn);background:rgba(240,233,215,.6)}
+.copybox{margin-top:10px;font-family:var(--f-lcd);font-size:12px;white-space:pre-wrap;background:rgba(0,0,0,.05);padding:10px;border-radius:3px;user-select:all;max-height:160px;overflow:auto}
+.telegram .grid-boxes{display:flex;gap:4px;flex-wrap:wrap}
+
+/* ---------- 器材史 ---------- */
+.hist-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:34px;align-items:center;margin-top:24px}
+.dial-plate{border-radius:50%;padding:34px;display:grid;place-items:center;position:relative}
+.dial-plate .lcd{position:absolute;left:50%;bottom:-22px;transform:translateX(-50%);font-size:22px;padding:4px 14px}
+.era{border-radius:8px;padding:22px 24px}
+.era .tag-era{font-family:var(--f-eng);font-size:11px;letter-spacing:.2em;color:#55595d;text-transform:uppercase;text-shadow:0 1px 0 rgba(255,255,255,.8)}
+.era h2{font-family:var(--f-serif);font-size:28px;color:#1f2124;text-shadow:0 1px 0 rgba(255,255,255,.85);margin-top:4px}
+.era p{color:#3f4347;margin-top:8px;max-width:34em}
+.era .nav-y{display:flex;gap:12px;margin-top:16px}
+@media (max-width:820px){.hist-top{grid-template-columns:minmax(0,1fr);justify-items:center}.era{width:100%}}
+.cabinet{margin-top:44px;border-radius:12px;padding:16px;background-image:var(--wood,none),linear-gradient(180deg,#4a2f1c,#2d1b0f);box-shadow:0 3px 0 #120a05,0 18px 36px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,220,180,.18)}
+.cab-in{position:relative;border-radius:6px;padding:28px 22px 0;background-color:var(--velvet);background-image:radial-gradient(ellipse 80% 70% at 50% 20%,rgba(255,236,214,.16),transparent 70%),var(--velvet-tex,none);box-shadow:inset 0 0 0 2px #0a0605,inset 0 20px 40px rgba(0,0,0,.6)}
+.cab-in::after{content:"";position:absolute;inset:0;border-radius:6px;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.09) 0%,rgba(255,255,255,0) 28%,rgba(255,255,255,0) 60%,rgba(255,255,255,.05) 70%,rgba(255,255,255,0) 80%)}
+.shelf{display:grid;grid-template-columns:repeat(var(--n,3),minmax(0,1fr));gap:22px;align-items:end;min-height:300px}
+@media (max-width:820px){.shelf{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.shelf{grid-template-columns:minmax(0,1fr)}}
+.exhibit{display:flex;flex-direction:column;align-items:center;gap:14px;padding-bottom:22px;cursor:pointer;text-align:center;appearance:none;background:none;border:0;color:inherit}
+.exhibit .cam{width:100%;max-width:300px}
+.exhibit .bp{border-radius:3px;padding:8px 14px;min-width:70%;background-image:var(--brushed,none),linear-gradient(180deg,#e8d29a,#c4a35e 45%,#a98b47 55%,#d6bc7d);background-blend-mode:soft-light,normal;color:#35270b;box-shadow:inset 0 1px 0 rgba(255,255,255,.65),0 2px 0 #3d2f12,0 6px 10px rgba(0,0,0,.5)}
+.exhibit .bp b{display:block;font-size:14px;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+.exhibit .bp span{display:block;font-size:11.5px;color:#5a4518}
+.exhibit[aria-pressed="true"] .bp{box-shadow:inset 0 1px 0 rgba(255,255,255,.65),0 2px 0 #3d2f12,0 0 0 2px var(--orange),0 6px 14px rgba(0,0,0,.5)}
+.shelf-board{height:18px;margin:0 -22px;border-radius:0 0 4px 4px;background-image:var(--wood,none),linear-gradient(180deg,#6b4527,#3d2614);box-shadow:0 -1px 0 rgba(255,210,170,.25),0 6px 10px rgba(0,0,0,.5)}
+.cab-empty{grid-column:1/-1;display:grid;place-items:center;min-height:260px;color:#9d948a;text-align:center;font-size:15px}
+.exhibit-info{margin-top:22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:20px 30px;padding:22px 24px;border-radius:4px;align-items:start}
+.exhibit-info h3{font-family:var(--f-serif);font-size:22px}
+.exhibit-info h4{font-size:12px;font-weight:700;color:var(--paper-ink-2);letter-spacing:.1em}
+.exhibit-info p{font-size:14px;margin-top:4px}
+@media (max-width:820px){.exhibit-info{grid-template-columns:minmax(0,1fr)}}
+.strip{margin-top:34px;overflow-x:auto;padding-bottom:6px}
+.strip-in{display:flex;min-width:max-content;background:#181411;padding:34px 8px 22px;position:relative;box-shadow:0 8px 16px rgba(0,0,0,.5)}
+.strip-in::before,.strip-in::after{content:"";position:absolute;left:0;right:0;height:9px;background:repeating-linear-gradient(90deg,transparent 0 6px,#d6cfc1 6px 14px,transparent 14px 20px);opacity:.85}
+.strip-in::before{top:5px}.strip-in::after{bottom:5px}
+.fr{appearance:none;border:0;cursor:pointer;width:78px;height:62px;margin:0 3px;border-radius:2px;background:#2b2622;color:#c9bfb2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;position:relative;box-shadow:inset 0 0 0 1px #000}
+.fr b{font-family:var(--f-num);font-weight:600;font-size:17px;line-height:1}
+.fr .dots{display:flex;gap:3px}
+.fr .dots i{width:5px;height:5px;border-radius:50%;background:#e39b55}
+.fr[aria-current="true"]{background:#efe9dc;color:#1a1a1a;box-shadow:0 0 0 2px var(--orange)}
+.fr[aria-current="true"] .dots i{background:var(--red)}
+.fr .era-mark{position:absolute;top:-16px;left:0;font-family:var(--f-lcd);font-size:9px;color:#e39b55;white-space:nowrap;letter-spacing:.08em}
+
+/* ---------- 收件箱 ---------- */
+.ledger{border-radius:4px;padding:28px clamp(18px,4vw,34px)}
+.ledger h1{font-family:var(--f-serif);font-size:26px}
+.ledger table{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px}
+.ledger th{text-align:left;font-size:12px;color:var(--paper-ink-2);border-bottom:2px solid var(--paper-ink);padding:6px 10px 6px 0}
+.ledger td{border-bottom:1px solid var(--paper-rule);padding:9px 10px 9px 0;vertical-align:top}
+.ledger .tblwrap{overflow-x:auto}
+.ledger .tblwrap table{min-width:640px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* 灯箱开关状态 */
+.lightbox .lb-dust{opacity:0;transition:opacity .3s}
+.lightbox.on .lb-dust{opacity:1}
+.lightbox .lb-g0,.lightbox .lb-g1{transition:stop-color .3s}
+.lightbox.on .lb-g0{stop-color:#f5f8ff}
+.lightbox.on .lb-g1{stop-color:#b7c2d3}
+.lightbox.on .lb-ring{stroke:rgba(80,60,150,.35)}
+.lightbox.on .lb-hi{opacity:.6}
+.release[disabled]{opacity:.45;cursor:not-allowed}
+</style>
+<header class="top chrome">
+  <div class="wrap">
+    <a class="logo" href="#home" aria-label="Find 首页"><span class="knob"></span><b>FIND</b></a>
+    <nav class="nav" aria-label="主导航">
+      <a href="#home">首页</a><a href="#shop">选购</a><a href="#sell">寄售</a><a href="#find">帮我找</a><a href="#history">器材史</a><a href="#inbox" id="nav-inbox" hidden>收件箱</a>
+    </nav>
+    <div class="top-r">
+      <button type="button" class="sw snd" id="snd" role="switch" aria-checked="false"><span class="sw-track"><span class="sw-knob"></span></span><span class="sw-label" style="font-size:12px;color:#34373a">快门声</span></button>
+      <a class="fc" href="#shop" id="fc" aria-label="我关注的器材"><span class="fc-win"><span id="fc-n">0</span></span><small>关注<br>的器材</small></a>
+    </div>
+  </div>
+</header>
+<div class="filmband" aria-hidden="true"><p>FIND ▸ 预览版 ▸ 页面上的器材、价格与人物均为示例 ▸ 1976–2006 ▸ 每一台附器材护照 ▸ FIND ▸ 预览版 ▸ 页面上的器材、价格与人物均为示例 ▸ 1976–2006 ▸ 每一台附器材护照 ▸</p></div>
+<main id="app"></main>
+<footer class="wrap foot">
+  <div><b>FIND</b><p style="margin-top:6px">1976–2006 年中古相机与镜头 · 寄售 · 代买 · 寻物</p></div>
+  <div><a href="#shop">选购</a><a href="#sell">寄售</a><a href="#find">帮我找</a><a href="#history">器材史</a></div>
+  <p>预览版：器材、价格、人物与检测数据均为示例</p>
+</footer>
+<div id="drawer" class="drawer" hidden></div>
+<script>
+/* ---------- 在架器材（预览版示例） ---------- */
+const CATS=[
+  {id:'all',n:'全部'},{id:'slr',n:'单反'},{id:'rf',n:'旁轴'},{id:'cp',n:'便携'},
+  {id:'mf',n:'中画幅'},{id:'lens',n:'镜头'},{id:'dig',n:'数码'}
+];
+const GRADES=['A+','A','AB','B','C'];
+const GRADE_TXT={'A+':'近新','A':'美品','AB':'良品','B':'普通','C':'实用'};
+const STRUCT={m:'全机械',h:'机械与电子混合',e:'电子控制',l:'手动镜头'};
+const SPEEDS=['1s','2','4','8','15','30','60','125','250','500','1000','2000','4000'];
+const SPEED_SEC=[1,1/2,1/4,1/8,1/15,1/30,1/60,1/125,1/250,1/500,1/1000,1/2000,1/4000];
+
+const STOCK=[
+ {id:'fm2n-0137',no:'26-0137',name:'Nikon FM2N',cn:'尼康 FM2N',cat:'slr',r:'slr',f:'chrome',mark:'FM2N',year:1986,grade:'AB',price:4680,status:'在售',struct:'m',
+  lens:'配 Ai-S Nikkor 50mm f/1.4',owners:1,added:'2026-10-26',hist:'Nikon FM2',
+  line:'报社里用了十五年，快门一直很脆，冬天也不卡。',
+  parts:[['外观','AB','顶盖两侧边角轻微掉漆，露出黄铜底色；无凹陷'],['取景器','A','对焦屏轻微尘点，裂像清晰'],['快门','A','13 档实测都在 ±1/3 EV 以内'],['测光','A','EV 12 时偏差 −0.2 EV'],['卷片与计数','A','卷片顺畅，计数器归零正常'],['镜头光学','A','无霉、无雾、无划痕，3 处微尘'],['镜头机械','AB','对焦顺滑，阻尼略轻']],
+  dev:[0.04,0.02,-0.03,0,0.05,0.03,-0.02,-0.04,-0.07,-0.11,-0.16,-0.21,-0.29],
+  dust:[[0.30,-0.34,'微尘 · 第 2 片'],[-0.26,0.24,'微尘 · 第 4 片'],[0.40,0.30,'微尘 · 后组内侧']],
+  life:[['1986','出厂','按序列号段推定。'],['1988','第一任主人在广州买下','攒了大半年工资，原包装盒和说明书都还在。'],['1988–2003','跟着主人在报社工作','拍过旧城改造、修桥和 1998 年的洪水，也拍了家里两代人。'],['2003','收进防潮箱','主人换用数码相机，每年拿出来空拍几次。'],['2026.10','Find 检测建档','更换遮光海绵，清洁电池仓，拍测试卷。']],
+  letter:['它跟了我三十八年。','八八年在广州买的，那时候一个月工资不到两百块，攒了很久。后来在报社用了十几年，拆迁、修桥、发大水，都是它拍的。','快门一直很脆，冬天也不卡。镜头里那几粒灰，大概是九八年在江边落下的，我一直没舍得拆。','现在年纪大了，背不动了。希望下一位多带它出门，别让它待在柜子里。'],signer:'周先生',
+  checks:[['ok','快门帘外观'],['ok','反光镜与阻尼'],['fix','遮光海绵','原海绵已粉化，已更换'],['ok','测光 LED（+ ○ −）'],['fix','电池仓','轻微氧化，已清洁'],['ok','自拍杆'],['ok','热靴触点'],['ok','后盖锁扣'],['warn','镜头对焦环','阻尼偏轻，不影响使用'],['ok','光圈叶片','干净，无油'],['ok','铭牌与序列号','与机身记录一致'],['ok','改装与非原厂零件','未发现']]},
+ {id:'m6-1990',no:'26-0141',name:'Leica M6',cn:'徕卡 M6',cat:'rf',r:'rf',f:'black',mark:'M6',year:1990,grade:'A',price:21500,status:'在售',struct:'m',
+  lens:'仅机身 · 0.72 取景器',owners:2,added:'2026-10-24',hist:'Leica M6',
+  line:'测距器刚校准过，取景器明亮，测距斑没有眩光。',
+  life:[['1990','出厂','按序列号推定。'],['1995','第一任主人在香港购入','用于旅行，三十年里只出过五次远门。'],['2014','转给第二任主人','一位建筑师，主要拍黑白胶片。'],['2026.10','Find 检测建档','校准测距，确认非改装、非仿制。']],
+  note:'这台陪我拍完了两个城市的老街。它不需要电池也能拍，这一点让我很安心。',signer:'第二任主人'},
+ {id:'t2-1992',no:'26-0129',name:'Contax T2',cn:'康泰时 T2',cat:'cp',r:'cp',f:'ti',mark:'T2',year:1992,grade:'A',price:8600,status:'已预订',struct:'e',
+  lens:'Carl Zeiss Sonnar 38mm f/2.8（一体）',owners:1,added:'2026-10-20',hist:'Contax T2',
+  line:'液晶屏完好，没有漏液，这是买 T2 最该看的地方。',
+  life:[['1992','出厂','按序列号推定。'],['1993','第一任主人在东京购入','出差时买的，一直放在原装皮套里。'],['2026.10','Find 检测建档','液晶、闪光、对焦逐项测试。']],
+  note:'它是我去日本出差时给自己的礼物。那几年的家庭照片，几乎都是它拍的。',signer:'林女士'},
+ {id:'503cw-1998',no:'26-0133',name:'Hasselblad 503CW',cn:'哈苏 503CW',cat:'mf',r:'box',f:'chrome',mark:'503CW',year:1998,grade:'AB',price:16800,status:'在售',struct:'m',
+  lens:'配 Planar CFi 80mm f/2.8 · A12 后背',owners:1,added:'2026-10-22',hist:'Hasselblad 503CW',
+  line:'机身、镜头、后背都做过保养，镜间快门走时准确。',
+  life:[['1998','出厂','按序列号推定。'],['1999–2015','影楼用机','一家开了十几年的人像影楼，拍过很多结婚照。'],['2026.10','Find 检测建档','镜间快门逐档测试，后背片夹检查。']]},
+ {id:'ae1p-1983',no:'26-0145',name:'Canon AE-1 Program',cn:'佳能 AE-1 Program',cat:'slr',r:'slr',f:'black',mark:'AE-1 P',year:1983,grade:'B',price:1680,status:'在售',struct:'e',
+  lens:'配 New FD 50mm f/1.8',owners:2,added:'2026-10-27',
+  line:'没有快门异响，外观有使用痕迹，适合第一次拍胶片。',
+  life:[['1983','出厂','按序列号推定。'],['1985','第一任主人购入','家庭用机，拍过三个孩子长大。'],['2026.10','Find 检测建档','确认没有常见的快门“啾啾”异响。']]},
+ {id:'gr1-1997',no:'26-0138',name:'Ricoh GR1',cn:'理光 GR1',cat:'cp',r:'cp',f:'black',mark:'GR1',year:1997,grade:'AB',price:5200,status:'在售',struct:'e',
+  lens:'GR Lens 28mm f/2.8（一体）',owners:1,added:'2026-10-25',hist:'Ricoh GR1',
+  line:'液晶屏没有漏液，转盘清晰，是少见的好品。',
+  life:[['1997','出厂','按序列号推定。'],['1998–2010','街头随身机','主人每天上下班都带着。'],['2026.10','Find 检测建档','液晶、对焦、快门逐项测试。']]},
+ {id:'mamiya7-1996',no:'26-0131',name:'Mamiya 7',cn:'玛米亚 7',cat:'mf',r:'rf',f:'black',mark:'MAMIYA 7',year:1996,grade:'A',price:16200,status:'在售',struct:'e',
+  lens:'配 N 80mm f/4 L',owners:1,added:'2026-10-21',hist:'Mamiya 7',
+  line:'测距联动准确，没有漏光，可以直接带去拍风景。',
+  life:[['1996','出厂','按序列号推定。'],['1997–2019','风光摄影师的随身机','走过川西和新疆。'],['2026.10','Find 检测建档','测距联动校准，全片幅漏光测试。']]},
+ {id:'f3hp-1985',no:'26-0144',name:'Nikon F3 HP',cn:'尼康 F3 HP',cat:'slr',r:'slr',f:'black',mark:'F3',year:1985,grade:'AB',price:3600,status:'在售',struct:'h',
+  lens:'仅机身 · HP 高眼点取景器',owners:2,added:'2026-10-27',hist:'Nikon F3',
+  line:'取景器里的液晶显示清楚，没有褪色。',
+  life:[['1985','出厂','按序列号推定。'],['1986–2004','杂志社器材库','多位摄影记者轮流使用。'],['2026.10','Find 检测建档','液晶显示、电子快门与 1/60 机械档测试。']]},
+ {id:'rollei-1989',no:'26-0127',name:'Rolleiflex 2.8GX',cn:'禄来 2.8GX',cat:'mf',r:'tlr',f:'black',mark:'2.8GX',year:1989,grade:'A',price:13800,status:'在售',struct:'m',
+  lens:'Planar 80mm f/2.8 HFT',owners:1,added:'2026-10-19',hist:'Rolleiflex 2.8GX',
+  line:'取景屏明亮，快门各档都准，几乎没怎么用过。',
+  life:[['1989','出厂','按序列号推定。'],['1990','第一任主人购入','收藏为主，拍过的胶卷不到二十卷。'],['2026.10','Find 检测建档','镜间快门逐档测试，取景屏清洁。']]},
+ {id:'planar50-1990',no:'26-0146',name:'Contax Planar T* 50mm f/1.4 MMJ',cn:'蔡司 Planar 50/1.4',cat:'lens',r:'lens',f:'black',mark:'Planar 1.4/50',year:1990,grade:'A',price:2600,status:'在售',struct:'l',
+  lens:'C/Y 卡口 · 日本产',owners:2,added:'2026-10-28',
+  line:'镜片通透，转接无反相机也很好用。',
+  life:[['1990','出厂','按序列号推定。'],['2026.10','Find 检测建档','背光检查与光圈叶片测试。']]},
+ {id:'mju2-1998',no:'26-0122',name:'Olympus μ-II',cn:'奥林巴斯 μ-II',cat:'cp',r:'cp',f:'black',mark:'μ-II',year:1998,grade:'A',price:1980,status:'已售',struct:'e',
+  lens:'35mm f/2.8（一体）',owners:1,added:'2026-10-12',hist:'Olympus μ-II',
+  line:'外壳没有裂纹，闪光灯正常。',
+  life:[['1998','出厂','按序列号推定。'],['2026.10','Find 检测建档','已于 10 月 18 日售出。']]},
+ {id:'f31fd-2006',no:'26-0147',name:'Fujifilm FinePix F31fd',cn:'富士 F31fd',cat:'dig',r:'cp',f:'silver',mark:'F31fd',year:2006,grade:'A',price:1880,status:'在售',struct:'e',
+  lens:'原装电池 · xD 卡',owners:1,added:'2026-10-28',hist:'Fujifilm F31fd',
+  line:'原装电池和 xD 卡都在，CCD 的颜色。',
+  life:[['2006','出厂','按序列号推定。'],['2026.10','Find 检测建档','传感器坏点、屏幕和电池续航测试。']]}
+];
+
+/* ---------- 器材史（1976–2006） ---------- */
+// [年份, 名称, 分类, 结构, 渲染类型, 表面, 时代意义, 检测关注点]
+const HIST=[
+ [1976,'Canon AE-1','slr','e','slr','chrome','最早使用微处理器的单反之一，让自动曝光走进普通家庭。','快门“啾啾”异响，多为反光镜阻尼缺油。'],
+ [1976,'Leica Noctilux-M 50mm f/1.0','lens','l','lens','black','当年最大光圈的量产镜头之一。','霉雾、划痕与对焦顺滑度。'],
+ [1977,'Nikon FM','slr','m','slr','chrome','小巧的全机械尼康，FM 系列的起点。','机械结构，可修性高；检查测光与快门帘。'],
+ [1977,'Minolta XD','slr','e','slr','black','最早同时提供光圈优先和快门优先的单反之一。','电子快门，电路老化需逐档检测。'],
+ [1978,'Canon A-1','slr','e','slr','black','早期具备程序自动曝光的单反。','与 AE-1 一样常见快门异响。'],
+ [1979,'Olympus XA','cp','e','cp','black','带测距的口袋机，滑盖式设计的开端。','电子快门，塑料机身老化。'],
+ [1980,'Nikon F3','slr','h','slr','black','尼康专业旗舰，生产超过二十年。','取景器内液晶显示会老化褪色。'],
+ [1980,'Pentax LX','slr','h','slr','black','宾得的专业旗舰，以防尘防潮设计著称。','结构复杂，需熟悉此机的师傅检测。'],
+ [1980,'Minolta CLE','rf','e','rf','black','小巧的 M 卡口旁轴，带 TTL 自动曝光。','电子快门，电路维修难度高。'],
+ [1981,'Canon New F-1','slr','h','slr','black','佳能 FD 时代的专业旗舰。','机械档和电子档要分别测试。'],
+ [1981,'Leica M4-P','rf','m','rf','black','在加拿大生产的 M 机，增加了 28mm 和 75mm 框线。','测距器校准、快门帘。'],
+ [1981,'Nikon Ai-S 镜头系列','lens','l','lens','black','尼康手动镜头最后一套完整体系，今天大量用于转接。','光圈叶片油、霉。'],
+ [1982,'Nikon FM2','slr','m','slr','chrome','1/4000 秒全机械快门，八九十年代很多中国摄影记者的随身机。','早期蜂巢纹快门帘版本需单独标注。'],
+ [1982,'Mamiya RZ67','mf','e','box','black','旋转后背的 6×7 影室机。','镜头快门电子触点、后背。'],
+ [1983,'Olympus OM-4','slr','e','slr','chrome','多点测光的先驱，延续 OM 体系的小巧。','早期机身有耗电过快的问题。'],
+ [1984,'Leica M6','rf','m','rf','black','在 M 机身中加入测光，最普及的徕卡胶片机。','测距斑眩光、测距偏差；需辨别改装与仿制。'],
+ [1984,'Contax T','cp','e','cp','chrome','Contax 高端便携系列的起点。','电子件。'],
+ [1985,'Minolta α-7000','slr','e','slraf','black','机身驱动自动对焦单反成功普及的标志。','电子件与液晶屏老化。'],
+ [1986,'Canon T90','slr','e','slraf','black','手动对焦的电子旗舰，工业设计影响了之后的 EOS。','电子件老化，检查快门与液晶屏。'],
+ [1987,'Canon EOS 650','slr','e','slraf','black','第一台 EF 卡口机身，全电子卡口沿用至今。','早期 EOS 常见快门阻尼胶老化。'],
+ [1987,'Rolleiflex 2.8GX','mf','m','tlr','black','禄来双反的现代版本，带 TTL 闪光测光。','镜间快门保养、测光。'],
+ [1988,'Nikon F4','slr','e','slraf','black','尼康第一台自动对焦旗舰，保留大量手动转盘。','电子件与机身橡胶。'],
+ [1989,'Canon EOS-1','slr','e','slraf','black','佳能第一台 EOS 专业旗舰。','快门与电子件检测。'],
+ [1989,'Canon EF 50mm f/1.0L','lens','l','lens','black','光圈最大的自动对焦镜头之一。','对焦马达与电子触点。'],
+ [1990,'Contax T2','cp','e','cp','ti','钛机身、蔡司 Sonnar 38mm，这一轮便携机热潮的代表。','电子件维修空间小，液晶屏老化。'],
+ [1993,'Konica Hexar AF','cp','e','cp','black','35mm f/2 定焦，以静音快门模式著称。','电子件。'],
+ [1993,'Nikon 35Ti','cp','e','cp','ti','顶部用模拟指针表盘显示拍摄参数。','指针表盘机构与电子件。'],
+ [1994,'Contax G1','rf','e','rf','ti','自动对焦旁轴，配蔡司 G 镜头。','电子件；早期机身与部分镜头的兼容需确认。'],
+ [1994,'Leica Summilux-M 35mm f/1.4 ASPH','lens','l','lens','black','非球面镜片普及的代表作。','需鉴别版本。'],
+ [1995,'Mamiya 7','mf','e','rf','black','可以手持的 6×7 中画幅旁轴。','测距联动、电子快门。'],
+ [1995,'Fujifilm GA645','mf','e','cp','black','自动对焦的 645 便携中画幅。','电子件、液晶屏。'],
+ [1996,'Contax G2','rf','e','rf','ti','G1 的升级版，对焦与速度更好。','对焦马达与电子件。'],
+ [1996,'Ricoh GR1','cp','e','cp','black','28mm 广角、薄机身，街拍经典。','液晶屏漏液是常见问题。'],
+ [1996,'Minolta TC-1','cp','e','cp','chrome','极小的钛机身，G-Rokkor 28mm。','电子件。'],
+ [1996,'Hasselblad 503CW','mf','m','box','chrome','哈苏 V 系统的后期型号。','镜头快门与后背需定期保养。'],
+ [1996,'Nikon F5','slr','e','slraf','black','采用 RGB 彩色矩阵测光的专业旗舰。','机身橡胶老化、电池仓触点。'],
+ [1997,'Olympus μ-II','cp','e','cp','black','35mm f/2.8 的大众便携机，年轻人入门热门。','塑料机身与电路，修复空间小。'],
+ [1997,'Pentax FA 43mm f/1.9 Limited','lens','l','lens','chrome','按 135 画幅对角线设计的标准镜头。','镜片与对焦。'],
+ [1998,'Leica M6 TTL','rf','m','rf','chrome','加入 TTL 闪光测光，快门转盘加大。','测距器与真伪。'],
+ [1998,'Pentax 67II','mf','e','slr','black','6×7 “大号单反”的最后一代。','快门帘与测光取景器。'],
+ [1999,'Nikon F100','slr','e','slraf','black','接近旗舰的性能，价格至今偏低。','后盖橡胶发粘；电池盒卡扣易断。'],
+ [1999,'Konica Hexar RF','rf','e','rf','black','电子快门、自动卷片的 M 卡口旁轴。','电子件。'],
+ [1999,'Voigtländer Bessa R','rf','m','rf','black','福伦达品牌复兴后的平价旁轴。','机械结构，可修性好。'],
+ [1999,'Nikon D1','dig','e','slraf','black','尼康第一台自主研发的数码单反。','电池、CF 卡、传感器。'],
+ [2000,'Canon EOS-1V','slr','e','slraf','black','佳能最后一台胶片旗舰。','电子件，成色是定价关键。'],
+ [2000,'Canon EOS D30','dig','e','slraf','black','佳能第一台使用自研 CMOS 的数码单反。','电子件老化。'],
+ [2001,'Nikon FM3A','slr','h','slr','chrome','尼康最后一台手动对焦胶片机身。','可修性较好；检查测光。'],
+ [2001,'Contax T3','cp','e','cp','ti','T 系列最后一代，35mm Sonnar。','同 T2，电子件难修。'],
+ [2002,'Leica M7','rf','e','rf','chrome','第一台电子快门、带光圈优先的 M 机。','没电时只有两档机械速度。'],
+ [2002,'Fujifilm FinePix S2 Pro','dig','e','slraf','black','SuperCCD 的色彩，至今有人怀念。','电池与传感器。'],
+ [2003,'Leica MP','rf','m','rf','chrome','回归全机械的 M 机。','测距器校准，成色与包装影响价格。'],
+ [2003,'Sony DSC-F828','dig','e','slraf','black','2/3 英寸四色 CCD 的高端一体机。','存储卡格式与电池。'],
+ [2004,'Nikon F6','slr','e','slraf','black','尼康最后一台胶片旗舰，2020 年停产。','较新，检测重点为成色与快门。'],
+ [2004,'Epson R-D1','dig','e','rf','black','第一台数码旁轴，保留快门上弦杆和指针表盘。','屏幕、电池与电子件。'],
+ [2005,'Canon EOS 5D','dig','e','slraf','black','价格相对亲民的全画幅数码单反。','确认早期反光镜脱落问题已维修。'],
+ [2005,'Ricoh GR Digital','dig','e','cp','black','GR 胶片机的数码延续。','电子件。'],
+ [2006,'Leica M8','dig','e','rf','black','徕卡第一台数码 M。','对红外敏感，需配合 UV/IR 滤镜。'],
+ [2006,'Fujifilm F31fd','dig','e','cp','silver','小尺寸 CCD 卡片机的高光时刻。','电池与 xD 卡。']
+].map((r,i)=>({id:i,y:r[0],n:r[1],c:r[2],t:r[3],r:r[4],f:r[5],w:r[6],k:r[7]}));
+
+const ERAS=[
+ {from:1976,to:1984,name:'电子化起步',d:'微处理器进入机身，自动曝光走进普通家庭；同时全机械相机仍是专业摄影师信赖的工具。'},
+ {from:1985,to:1994,name:'自动对焦的十年',d:'机身驱动自动对焦普及，卡口全面电子化；高端便携机开始用上蔡司镜头和钛机身。'},
+ {from:1995,to:2001,name:'胶片的黄金年代',d:'胶片相机的性能和工艺都到了顶点，中画幅可以手持，便携机做到了口袋大小。'},
+ {from:2002,to:2006,name:'数码过渡',d:'数码单反价格下探，第一代数码旁轴出现；胶片旗舰陆续成为最后一代。'}
+];
+
+/* ---------- 估价参考（示例，用于“估一估”） ---------- */
+const REF=[
+ ['fm2',3200],['fm3a',6500],['fm ',1600],['f3',2800],['f100',1800],['f5',2600],['f6',12000],['fe2',2000],
+ ['ae-1',1200],['a-1',1500],['f-1',2800],['eos-1v',4500],['t90',1500],
+ ['m6',19000],['mp',38000],['m7',22000],['m4-p',13000],['bessa',3200],['hexar rf',6500],['cle',6000],['g2',7500],['g1',4500],
+ ['t2',8000],['t3',13000],['gr1',4800],['tc-1',6500],['hexar af',6800],['35ti',6000],['28ti',6200],['μ-ii',1800],['mju',1800],['xa',1200],
+ ['503cw',15000],['rolleiflex',12000],['2.8gx',12500],['mamiya 7',15500],['rz67',5500],['67ii',9000],['ga645',4800],
+ ['d1',1200],['5d',1800],['r-d1',9000],['m8',12000],['f31',1800],['gr digital',1600],['s2 pro',1400],
+ ['om-4',2200],['om-1',1500],['x-700',1100],['xd',1300],['lx',4200],
+ ['planar',2400],['noctilux',90000],['summilux',26000],['ai-s',1500],['fa 43',3200],['海鸥',600],['凤凰',500]
+];
+const CAT_BASE={slr:1500,rf:6000,cp:2500,mf:9000,lens:1800,dig:1200};
+
+/* ---------- 材质贴图（运行时生成） ---------- */
+function rng(seed){let h=1779033703^String(seed).length;for(const ch of String(seed)){h=Math.imul(h^ch.charCodeAt(0),3432918353);h=h<<13|h>>>19}
+  return function(){h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);h^=h>>>16;return (h>>>0)/4294967296}}
+function cv(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return [c,c.getContext('2d')]}
+
+function texLeather(){
+  const S=240,C=6,N=S/C,R=rng('leather'),pts=[];
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++)pts.push([i*C+R()*C,j*C+R()*C]);
+  const H=new Float32Array(S*S);
+  for(let y=0;y<S;y++)for(let x=0;x<S;x++){
+    const ci=Math.floor(x/C),cj=Math.floor(y/C);let d1=1e9,d2=1e9;
+    for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){
+      const ii=ci+di,jj=cj+dj,p=pts[((jj+N)%N)*N+((ii+N)%N)];
+      const px=p[0]+(ii<0?-S:ii>=N?S:0),py=p[1]+(jj<0?-S:jj>=N?S:0);
+      const d=Math.hypot(px-x,py-y);if(d<d1){d2=d1;d1=d}else if(d<d2)d2=d;
+    }
+    H[y*S+x]=Math.min(1,(d2-d1)/2.4);
+  }
+  const [c,g]=cv(S,S),im=g.createImageData(S,S),D=im.data;
+  for(let y=0;y<S;y++)for(let x=0;x<S;x++){
+    const h=H[y*S+x],hx=H[y*S+(x+1)%S]-H[y*S+(x-1+S)%S],hy=H[((y+1)%S)*S+x]-H[((y-1+S)%S)*S+x];
+    const v=25+h*8+(-hx-hy)*20+(R()-.5)*3,k=(y*S+x)*4;
+    D[k]=v+1.5;D[k+1]=v;D[k+2]=v-2;D[k+3]=255;
+  }
+  g.putImageData(im,0,0);return c.toDataURL('image/png');
+}
+function texBrushed(seed){
+  const W=520,H=140,R=rng(seed),[c,g]=cv(W,H);
+  g.fillStyle='rgb(128,128,128)';g.fillRect(0,0,W,H);
+  for(let i=0;i<2200;i++){
+    const y=R()*H,x=R()*W,len=30+R()*300,v=R()<.5?255:0;
+    g.strokeStyle=`rgba(${v},${v},${v},${.03+R()*.09})`;g.lineWidth=R()<.85?.6:1.3;
+    g.beginPath();g.moveTo(x,y);g.lineTo(x+len,y);g.moveTo(x-W,y);g.lineTo(x-W+len,y);g.stroke();
+  }
+  return c.toDataURL('image/png');
+}
+function texPaper(){
+  const S=220,R=rng('paper'),[c,g]=cv(S,S);
+  for(let i=0;i<2600;i++){g.fillStyle=`rgba(${90+R()*40},${70+R()*30},${40},${.03+R()*.08})`;g.fillRect(R()*S,R()*S,R()<.9?1:2,R()<.9?1:2)}
+  g.lineWidth=.6;
+  for(let i=0;i<70;i++){const x=R()*S,y=R()*S,a=R()*Math.PI*2,l=4+R()*12;g.strokeStyle=`rgba(120,95,55,${.06+R()*.08})`;g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x+Math.cos(a+1)*l/2,y+Math.sin(a+1)*l/2,x+Math.cos(a)*l,y+Math.sin(a)*l);g.stroke()}
+  return c.toDataURL('image/png');
+}
+function texGrain(seed,alpha){
+  const S=140,R=rng(seed),[c,g]=cv(S,S),im=g.createImageData(S,S),D=im.data;
+  for(let k=0;k<D.length;k+=4){const v=R()<.5?255:0;D[k]=D[k+1]=D[k+2]=v;D[k+3]=R()*alpha}
+  g.putImageData(im,0,0);return c.toDataURL('image/png');
+}
+function texWood(){
+  const W=600,H=160,R=rng('wood'),[c,g]=cv(W,H);
+  for(let y=0;y<H;y++){
+    const w=Math.sin(y*.09+Math.sin(y*.013)*3)*.5+Math.sin(y*.37)*.25;
+    g.fillStyle=`rgba(${w>0?255:0},${w>0?200:0},${w>0?150:0},${Math.abs(w)*.09})`;g.fillRect(0,y,W,1);
+  }
+  for(let i=0;i<260;i++){const y=R()*H,x=R()*W,l=60+R()*260;g.strokeStyle=`rgba(20,8,0,${.08+R()*.14})`;g.lineWidth=.5+R()*.9;g.beginPath();g.moveTo(x,y);g.bezierCurveTo(x+l/3,y+(R()-.5)*4,x+2*l/3,y+(R()-.5)*4,x+l,y+(R()-.5)*3);g.stroke()}
+  return c.toDataURL('image/png');
+}
+function applyTextures(){
+  const s=document.documentElement.style,t=(k,f)=>{try{s.setProperty(k,`url(${f()})`)}catch(e){}};
+  t('--leather-tex',texLeather);t('--brushed',()=>texBrushed('b1'));t('--brushed-dark',()=>texBrushed('b2'));
+  t('--paper-tex',texPaper);t('--velvet-tex',()=>texGrain('v',10));t('--crackle',()=>texGrain('c',22));t('--wood',texWood);
+}
+
+/* ---------- 相机绘制（SVG，正面视角） ---------- */
+let UID=0;
+const FIN={
+  chrome:[[0,'#fbfbf9'],[.16,'#e2e3e0'],[.44,'#bfc2c1'],[.52,'#9fa3a3'],[.72,'#d4d6d4'],[1,'#eeeeec']],
+  black:[[0,'#55575b'],[.14,'#2a2b2e'],[.55,'#141517'],[1,'#26272a']],
+  ti:[[0,'#f5efe1'],[.2,'#ded5c0'],[.46,'#b6ab92'],[.54,'#cdc1a6'],[.8,'#e9e1ce'],[1,'#cbbfa6']],
+  silver:[[0,'#f5f6f7'],[.25,'#dadde0'],[.5,'#aab0b5'],[.75,'#d6d9dc'],[1,'#c0c4c8']]
+};
+const st=a=>a.map(s=>`<stop offset="${s[0]}" stop-color="${s[1]}"/>`).join('');
+function camDefs(u,f){
+  return `<defs>
+<linearGradient id="p${u}" x1="0" y1="0" x2="0" y2="1">${st(FIN[f]||FIN.chrome)}</linearGradient>
+<linearGradient id="c${u}" x1="0" y1="0" x2="0" y2="1">${st(FIN.chrome)}</linearGradient>
+<linearGradient id="k${u}" x1="0" y1="0" x2="0" y2="1">${st(FIN.black)}</linearGradient>
+<linearGradient id="d${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8f8f6"/><stop offset=".35" stop-color="#a5a8a7"/><stop offset=".55" stop-color="#ebebe9"/><stop offset="1" stop-color="#6c7071"/></linearGradient>
+<linearGradient id="e${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5d6064"/><stop offset=".4" stop-color="#151617"/><stop offset=".62" stop-color="#303236"/><stop offset="1" stop-color="#09090a"/></linearGradient>
+<pattern id="l${u}" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#1a1a19"/><circle cx="1.6" cy="1.6" r="1.35" fill="#2c2b29"/><circle cx="4.6" cy="4.3" r="1.2" fill="#272624"/><circle cx="4.5" cy="1.2" r=".7" fill="#232220"/></pattern>
+<pattern id="n${u}" width="3.2" height="30" patternUnits="userSpaceOnUse"><rect width="3.2" height="30" fill="#8b8f90"/><rect width="1.5" height="30" fill="#f3f4f1"/></pattern>
+<pattern id="m${u}" width="3.2" height="30" patternUnits="userSpaceOnUse"><rect width="3.2" height="30" fill="#0c0c0d"/><rect width="1.4" height="30" fill="#505255"/></pattern>
+<radialGradient id="g${u}" cx=".4" cy=".36" r=".72"><stop offset="0" stop-color="#4d607f"/><stop offset=".35" stop-color="#18213a"/><stop offset=".75" stop-color="#070a12"/><stop offset="1" stop-color="#020306"/></radialGradient>
+<radialGradient id="h${u}" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#f4f4f0"/><stop offset="1" stop-color="#bcbcb4"/></radialGradient>
+<linearGradient id="y${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#232426"/><stop offset=".15" stop-color="#6e7074"/><stop offset=".3" stop-color="#28292b"/><stop offset=".7" stop-color="#0a0a0b"/><stop offset="1" stop-color="#1c1c1e"/></linearGradient>
+<linearGradient id="z${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7d8182"/><stop offset=".15" stop-color="#ffffff"/><stop offset=".32" stop-color="#b9bcbb"/><stop offset=".7" stop-color="#6c7071"/><stop offset="1" stop-color="#a4a7a7"/></linearGradient>
+</defs>`;
+}
+function lensFront(u,cx,cy,R,o){
+  o=o||{};
+  let s=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#${o.chrome?'d':'e'}${u})" stroke="#070707"/>`;
+  if(o.knurl!==false)s+=`<circle cx="${cx}" cy="${cy}" r="${(R*.88).toFixed(1)}" fill="none" stroke="${o.chrome?'#5a5e5f':'#2e3033'}" stroke-width="${(R*.13).toFixed(1)}" stroke-dasharray="1.3 1.7"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${(R*.76).toFixed(1)}" fill="#0f0f10" stroke="#3b3d40"/>`;
+  if(o.text){const rr=R*.68,id='tp'+u;
+    s+=`<path id="${id}" d="M${cx-rr},${cy} a${rr},${rr} 0 1,1 ${2*rr},0 a${rr},${rr} 0 1,1 ${-2*rr},0" fill="none"/><text font-size="${Math.max(4.5,R*.085).toFixed(1)}" fill="#e6e3da" font-family="Jost, sans-serif" letter-spacing="1.1"><textPath href="#${id}" startOffset="3%">${o.text}</textPath></text>`}
+  const G=R*.6;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${G.toFixed(1)}" fill="url(#g${u})"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${(G*.72).toFixed(1)}" fill="none" stroke="rgba(175,125,255,.3)" stroke-width="1.2"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="${(G*.45).toFixed(1)}" fill="none" stroke="rgba(110,230,170,.24)"/>`;
+  let hx='';for(let i=0;i<6;i++){const a=i*Math.PI/3+.3;hx+=(i?'L':'M')+(cx+G*.26*Math.cos(a)).toFixed(1)+','+(cy+G*.26*Math.sin(a)).toFixed(1)}
+  s+=`<path d="${hx}Z" fill="#000" opacity=".55"/>`;
+  s+=`<ellipse cx="${(cx-G*.32).toFixed(1)}" cy="${(cy-G*.36).toFixed(1)}" rx="${(G*.27).toFixed(1)}" ry="${(G*.14).toFixed(1)}" fill="#fff" opacity=".55" transform="rotate(-35 ${(cx-G*.32).toFixed(1)} ${(cy-G*.36).toFixed(1)})"/>`;
+  s+=`<path d="M${(cx+G*.55).toFixed(1)},${(cy+G*.2).toFixed(1)} A${(G*.62).toFixed(1)},${(G*.62).toFixed(1)} 0 0 1 ${(cx+G*.05).toFixed(1)},${(cy+G*.6).toFixed(1)}" fill="none" stroke="#fff" stroke-width="${(G*.06).toFixed(1)}" opacity=".22" stroke-linecap="round"/>`;
+  s+=`<circle cx="${(cx+G*.2).toFixed(1)}" cy="${(cy+G*.22).toFixed(1)}" r="${(G*.05).toFixed(1)}" fill="#ffd9a8" opacity=".55"/>`;
+  return s;
+}
+const tx=(x,y,t,size,fill,anchor)=>`<text x="${x}" y="${y}" text-anchor="${anchor||'middle'}" font-size="${size}" fill="${fill}" font-family="Jost, sans-serif" letter-spacing="2.2">${t||''}</text>`;
+const BODY={
+  slr(u,f,o){
+    const P=`url(#p${u})`,K=f==='black'?`url(#m${u})`:`url(#n${u})`,ink=f==='black'?'#ece9e1':'#2b2d30';
+    let s=`<rect x="28" y="108" width="10" height="12" rx="2" fill="url(#c${u})"/><rect x="362" y="108" width="10" height="12" rx="2" fill="url(#c${u})"/>`;
+    s+=`<rect x="66" y="78" width="50" height="20" rx="2" fill="${K}"/><rect x="64" y="73" width="54" height="7" rx="2" fill="${P}" stroke="rgba(0,0,0,.35)" stroke-width=".6"/>`;
+    s+=`<rect x="272" y="78" width="56" height="20" rx="2" fill="${K}"/><rect x="270" y="73" width="60" height="7" rx="2" fill="${P}" stroke="rgba(0,0,0,.35)" stroke-width=".6"/>`;
+    s+=`<path d="M300,70 L356,63 Q362,62 362,67 L362,69 Q362,72 356,72 L300,76 Z" fill="url(#c${u})" stroke="rgba(0,0,0,.35)" stroke-width=".6"/><rect x="346" y="61" width="18" height="12" rx="5" fill="#161718"/>`;
+    s+=`<rect x="290" y="62" width="16" height="9" rx="3" fill="url(#c${u})" stroke="rgba(0,0,0,.4)" stroke-width=".6"/>`;
+    s+=`<rect x="36" y="96" width="328" height="120" rx="9" fill="${P}" stroke="rgba(0,0,0,.55)"/>`;
+    s+=`<path d="M146,98 L162,48 Q164,42 170,42 L230,42 Q236,42 238,48 L254,98 Z" fill="${P}" stroke="rgba(0,0,0,.5)"/>`;
+    s+=`<path d="M165,54 L235,54" stroke="rgba(255,255,255,.55)"/>`;
+    s+=`<rect x="181" y="34" width="38" height="9" rx="1.5" fill="url(#k${u})"/>`;
+    s+=`<rect x="168" y="64" width="64" height="17" rx="2" fill="#141516" stroke="rgba(255,255,255,.25)" stroke-width=".6"/>`+tx(200,76,o.mark,8,'#ece9e1');
+    s+=`<rect x="38" y="124" width="324" height="74" fill="url(#l${u})"/>`;
+    s+=`<line x1="38" y1="124" x2="362" y2="124" stroke="rgba(0,0,0,.6)"/><line x1="38" y1="198" x2="362" y2="198" stroke="rgba(0,0,0,.6)"/><line x1="44" y1="97.5" x2="356" y2="97.5" stroke="rgba(255,255,255,.6)"/>`;
+    s+=`<rect x="92" y="136" width="12" height="38" rx="5" fill="url(#c${u})" transform="rotate(-18 98 155)"/>`;
+    s+=`<circle cx="296" cy="112" r="4" fill="${ink}" opacity=".0"/>`;
+    s+=`<circle cx="200" cy="158" r="60" fill="url(#d${u})" stroke="#2a2b2c"/>`;
+    s+=lensFront(u,200,158,55,{text:o.lt||'1:1.4 f=50mm ∅52'});
+    return s;
+  },
+  slraf(u,f,o){
+    let s=`<path d="M48,112 Q48,94 66,92 L148,90 Q156,56 176,48 L224,48 Q244,56 252,90 L334,92 Q352,94 352,112 L352,208 Q352,220 338,220 L62,220 Q48,220 48,206 Z" fill="url(#k${u})" stroke="#000"/>`;
+    s+=`<path d="M150,90 Q158,58 178,51 L222,51 Q242,58 250,90" fill="none" stroke="rgba(255,255,255,.18)"/>`;
+    s+=`<path d="M48,104 Q26,108 28,150 Q26,206 50,216 L92,218 L96,98 Z" fill="url(#l${u})" stroke="#000"/>`;
+    s+=`<path d="M50,110 Q34,114 34,150" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="2"/>`;
+    s+=`<rect x="48" y="86" width="28" height="8" rx="2" fill="#0e0e0f"/><ellipse cx="62" cy="86" rx="13" ry="4.5" fill="url(#c${u})"/>`;
+    s+=`<rect x="272" y="80" width="56" height="12" rx="3" fill="#0f1011"/><rect x="276" y="82" width="48" height="8" rx="2" fill="#87926f" opacity=".7"/>`;
+    s+=`<rect x="104" y="80" width="40" height="12" rx="3" fill="url(#m${u})"/>`;
+    s+=tx(200,76,o.mark,9,'#e8e6de');
+    s+=`<circle cx="210" cy="162" r="59" fill="#0c0c0d" stroke="#2a2a2c"/><circle cx="210" cy="162" r="57" fill="none" stroke="url(#d${u})" stroke-width="2.5"/>`;
+    s+=lensFront(u,210,162,54,{text:o.lt||'AF 1:1.8 50mm ∅52'});
+    s+=`<circle cx="120" cy="118" r="6" fill="#3a1410" stroke="#000"/>`;
+    return s;
+  },
+  rf(u,f,o){
+    const P=`url(#p${u})`,K=f==='black'?`url(#m${u})`:`url(#n${u})`,ink=f==='black'?'#ece9e1':'#2b2d30';
+    let s=`<rect x="58" y="72" width="40" height="16" rx="2" fill="${K}"/><rect x="56" y="68" width="44" height="6" rx="2" fill="${P}" stroke="rgba(0,0,0,.35)" stroke-width=".6"/>`;
+    s+=`<rect x="276" y="72" width="44" height="16" rx="2" fill="${K}"/><rect x="274" y="68" width="48" height="6" rx="2" fill="${P}" stroke="rgba(0,0,0,.35)" stroke-width=".6"/>`;
+    s+=`<rect x="326" y="66" width="13" height="9" rx="3" fill="url(#c${u})"/><rect x="178" y="75" width="44" height="10" rx="1.5" fill="url(#k${u})"/>`;
+    s+=`<clipPath id="b${u}"><rect x="28" y="84" width="344" height="128" rx="20"/></clipPath>`;
+    s+=`<g clip-path="url(#b${u})"><rect x="28" y="84" width="344" height="128" fill="${P}"/><rect x="28" y="120" width="344" height="76" fill="url(#l${u})"/>`;
+    s+=`<line x1="28" y1="120" x2="372" y2="120" stroke="rgba(0,0,0,.55)"/><line x1="28" y1="196" x2="372" y2="196" stroke="rgba(0,0,0,.55)"/><line x1="40" y1="85.5" x2="360" y2="85.5" stroke="rgba(255,255,255,.6)"/></g>`;
+    s+=`<rect x="28" y="84" width="344" height="128" rx="20" fill="none" stroke="rgba(0,0,0,.6)"/>`;
+    s+=`<rect x="58" y="92" width="28" height="20" rx="2.5" fill="url(#g${u})" stroke="#0a0a0a"/>`;
+    s+=`<rect x="214" y="93" width="40" height="18" rx="2" fill="url(#h${u})" stroke="#555"/>`;
+    for(let i=0;i<6;i++)s+=`<line x1="${217+i*6}" y1="95" x2="${217+i*6}" y2="109" stroke="rgba(0,0,0,.08)"/>`;
+    s+=`<rect x="276" y="90" width="54" height="24" rx="3" fill="url(#g${u})" stroke="#0a0a0a"/><rect x="280" y="93" width="16" height="6" rx="2" fill="#fff" opacity=".35"/>`;
+    s+=tx(148,107,o.mark,8.5,ink);
+    s+=`<rect x="126" y="130" width="9" height="28" rx="3" fill="url(#c${u})"/>`;
+    s+=`<circle cx="196" cy="160" r="50" fill="url(#d${u})" stroke="#2a2b2c"/>`;
+    s+=lensFront(u,196,160,46,{text:o.lt||'1:2 f=35mm ∅39'});
+    s+=`<rect x="22" y="104" width="8" height="12" rx="2" fill="url(#c${u})"/><rect x="370" y="104" width="8" height="12" rx="2" fill="url(#c${u})"/>`;
+    return s;
+  },
+  cp(u,f,o){
+    const P=`url(#p${u})`,ink=f==='black'?'#ece9e1':'#2b2d30';
+    let s=`<rect x="266" y="60" width="30" height="10" rx="4" fill="url(#c${u})"/>`;
+    s+=`<rect x="66" y="66" width="268" height="146" rx="28" fill="${P}" stroke="rgba(0,0,0,.6)"/>`;
+    s+=`<path d="M94,68.5 L306,68.5" stroke="rgba(255,255,255,.55)" stroke-width="1.2"/>`;
+    s+=`<rect x="88" y="82" width="54" height="22" rx="4" fill="url(#h${u})" stroke="rgba(0,0,0,.4)"/>`;
+    for(let i=0;i<8;i++)s+=`<line x1="${92+i*6.4}" y1="84" x2="${92+i*6.4}" y2="102" stroke="rgba(0,0,0,.09)"/>`;
+    s+=`<rect x="204" y="85" width="14" height="10" rx="2" fill="#140d14"/><rect x="226" y="85" width="14" height="10" rx="2" fill="#140d14"/>`;
+    s+=`<rect x="262" y="82" width="38" height="24" rx="4" fill="url(#g${u})" stroke="rgba(0,0,0,.6)"/><rect x="266" y="85" width="12" height="5" rx="2" fill="#fff" opacity=".35"/>`;
+    s+=`<circle cx="176" cy="150" r="53" fill="${P}" stroke="rgba(0,0,0,.4)"/><circle cx="176" cy="150" r="48" fill="none" stroke="rgba(255,255,255,.5)"/>`;
+    s+=lensFront(u,176,150,40,{knurl:false,text:o.lt||'1:2.8 f=35mm'});
+    s+=tx(296,196,o.mark,9,ink,'end');
+    s+=`<rect x="58" y="120" width="8" height="12" rx="2" fill="url(#c${u})"/>`;
+    return s;
+  },
+  tlr(u,f,o){
+    let s=`<rect x="138" y="10" width="124" height="20" rx="3" fill="url(#k${u})" stroke="#000"/><rect x="141" y="12" width="118" height="3" fill="rgba(255,255,255,.18)"/>`;
+    s+=`<rect x="118" y="88" width="18" height="50" rx="7" fill="url(#n${u})"/>`;
+    s+=`<rect x="134" y="28" width="132" height="222" rx="6" fill="url(#c${u})" stroke="rgba(0,0,0,.6)"/><rect x="140" y="34" width="120" height="210" rx="3" fill="url(#l${u})"/>`;
+    s+=`<rect x="150" y="44" width="100" height="70" rx="6" fill="url(#c${u})" stroke="rgba(0,0,0,.35)"/>`;
+    s+=lensFront(u,200,79,30,{text:'1:2.8 f=80'});
+    s+=`<rect x="156" y="118" width="88" height="16" rx="2" fill="#0c0c0d" stroke="rgba(255,255,255,.3)" stroke-width=".6"/>`+tx(200,129.5,o.mark,8,'#ece9e1');
+    s+=`<rect x="146" y="138" width="108" height="102" rx="10" fill="url(#c${u})" stroke="rgba(0,0,0,.4)"/>`;
+    s+=`<rect x="146" y="176" width="10" height="26" rx="3" fill="url(#n${u})"/><rect x="244" y="176" width="10" height="26" rx="3" fill="url(#n${u})"/>`;
+    s+=lensFront(u,200,189,36,{text:'1:2.8 f=80mm HFT'});
+    return s;
+  },
+  box(u,f,o){
+    let s=`<rect x="124" y="30" width="152" height="28" rx="3" fill="url(#k${u})" stroke="#000"/><rect x="128" y="33" width="144" height="3" fill="rgba(255,255,255,.18)"/>`;
+    s+=`<rect x="276" y="112" width="16" height="42" rx="4" fill="url(#n${u})"/>`;
+    s+=`<rect x="116" y="56" width="168" height="176" rx="7" fill="url(#p${u})" stroke="rgba(0,0,0,.6)"/><rect x="124" y="64" width="152" height="160" rx="3" fill="url(#l${u})"/>`;
+    s+=`<line x1="121" y1="57.5" x2="279" y2="57.5" stroke="rgba(255,255,255,.6)"/>`+tx(250,78,o.mark,7,'#ddd9cf');
+    s+=`<circle cx="262" cy="208" r="7" fill="url(#c${u})" stroke="#000"/>`;
+    s+=`<circle cx="200" cy="146" r="68" fill="url(#d${u})" stroke="#1a1a1a"/><circle cx="200" cy="146" r="63" fill="none" stroke="#5d6162" stroke-width="5" stroke-dasharray="1 2.6"/>`;
+    s+=lensFront(u,200,146,57,{text:'1:2.8 f=80mm T*'});
+    return s;
+  },
+  lens(u,f,o){
+    const ch=f==='chrome',Y=`url(#${ch?'z':'y'}${u})`;
+    let s=`<rect x="54" y="96" width="24" height="68" rx="3" fill="url(#z${u})" stroke="#222"/>`;
+    s+=`<rect x="78" y="88" width="18" height="84" fill="${Y}" stroke="#000"/>`;
+    s+=`<rect x="96" y="80" width="54" height="100" fill="url(#y${u})" stroke="#000"/>`;
+    const ap=['16','11','8','5.6','4','2.8','2','1.4'];
+    ap.forEach((t,i)=>{const th=(i-3)*17*Math.PI/180;if(Math.abs(th)>1.4)return;const y=130+48*Math.sin(th),sz=9*Math.cos(th);
+      s+=`<text x="123" y="${(y+sz*.35).toFixed(1)}" text-anchor="middle" font-size="${sz.toFixed(1)}" fill="${t==='1.4'?'#e98a2c':'#efede6'}" font-family="Barlow Condensed, sans-serif" font-weight="600">${t}</text>`});
+    for(let i=0;i<9;i++){const th=(i-4)*19*Math.PI/180,y=130+50*Math.sin(th);s+=`<line x1="96" y1="${y.toFixed(1)}" x2="104" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,.18)"/>`}
+    s+=`<rect x="150" y="82" width="12" height="96" fill="${Y}" stroke="#000"/><line x1="150" y1="130" x2="162" y2="130" stroke="#efede6" stroke-width="1.4"/><circle cx="156" cy="124" r="1.6" fill="#d0301f"/>`;
+    s+=`<rect x="162" y="76" width="104" height="108" rx="2" fill="url(#y${u})" stroke="#000"/>`;
+    for(let i=-14;i<=14;i++){const th=i*6*Math.PI/180,y=130+54*Math.sin(th);s+=`<line x1="164" y1="${y.toFixed(1)}" x2="264" y2="${y.toFixed(1)}" stroke="${i%2?'#000':'rgba(255,255,255,.1)'}" stroke-width="${(1.4*Math.cos(th)).toFixed(2)}"/>`}
+    s+=`<rect x="266" y="80" width="28" height="100" fill="${Y}" stroke="#000"/>`;
+    ['∞','10','5','3','2','1.5','1'].forEach((t,i)=>{const th=(i-3)*17*Math.PI/180,y=130+48*Math.sin(th),sz=8.5*Math.cos(th);
+      s+=`<text x="280" y="${(y+sz*.35).toFixed(1)}" text-anchor="middle" font-size="${sz.toFixed(1)}" fill="${ch?'#2a2c2f':'#efede6'}" font-family="Barlow Condensed, sans-serif" font-weight="600">${t}</text>`});
+    s+=`<rect x="294" y="82" width="36" height="96" fill="${Y}" stroke="#000"/><line x1="296" y1="82" x2="296" y2="178" stroke="rgba(255,255,255,.2)"/>`;
+    s+=`<rect x="330" y="76" width="9" height="108" rx="2" fill="${Y}" stroke="#000"/>`;
+    s+=`<ellipse cx="341" cy="130" rx="9" ry="46" fill="url(#g${u})" stroke="#000"/><ellipse cx="338" cy="112" rx="3" ry="14" fill="#fff" opacity=".35"/>`;
+    s+=tx(312,214,o.mark,9,'#cfcbc2');
+    return s;
+  }
+};
+function camSVG(r,f,o){
+  const u=++UID;o=o||{};
+  return `<svg viewBox="0 0 400 260" role="img" aria-label="${o.label||''}" xmlns="http://www.w3.org/2000/svg">${camDefs(u,f||'chrome')}${(BODY[r]||BODY.slr)(u,f||'chrome',o)}</svg>`;
+}
+
+/* ---------- 测试卷印样 ---------- */
+function drawRoll(c,seed){
+  const g=c.getContext('2d'),W=c.width,H=c.height,FW=308,FH=206,GAP=17,FY=47,R=rng(seed);
+  g.fillStyle='#1b1815';g.fillRect(0,0,W,H);
+  g.fillStyle='rgba(255,240,220,.04)';g.fillRect(0,0,W,40);g.fillRect(0,H-40,W,40);
+  const rr=(x,y,w,h,r)=>{g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();g.fill()};
+  g.fillStyle='#ece6db';for(let x=10;x<W;x+=40.7){rr(x,13,24,17,3);rr(x,H-30,24,17,3)}
+  const n0=10+Math.floor(R()*12);
+  g.fillStyle='#e39b55';g.font='600 13px "Share Tech Mono", monospace';g.textBaseline='middle';
+  for(let i=0;i<5;i++){const fx=GAP+i*(FW+GAP);g.fillText(String(n0+i),fx+4,H-8);g.fillText((n0+i)+'A',fx+FW/2+6,H-8);if(i%2===0)g.fillText('FIND TEST 400',fx+FW/2-40,8)}
+  const frames=[star,steps,brick,flare,grid];
+  frames.forEach((fn,i)=>{const fx=GAP+i*(FW+GAP);g.save();g.beginPath();g.rect(fx,FY,FW,FH);g.clip();g.translate(fx,FY);fn(FW,FH);
+    const v=g.createRadialGradient(FW/2,FH/2,FH*.35,FW/2,FH/2,FW*.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.42)');g.fillStyle=v;g.fillRect(0,0,FW,FH);g.restore();grain(fx,FY,FW,FH)});
+  function grain(x,y,w,h){const d=g.getImageData(x,y,w,h),p=d.data;for(let k=0;k<p.length;k+=4){const n=(R()-.5)*34,v=Math.max(0,Math.min(255,p[k]*.3+p[k+1]*.59+p[k+2]*.11+n));p[k]=p[k+1]=p[k+2]=v}g.putImageData(d,x,y)}
+  function star(w,h){g.fillStyle='#b9b9b6';g.fillRect(0,0,w,h);const cx=w/2,cy=h/2,Rr=86,n=36;for(let i=0;i<n;i++){g.beginPath();g.moveTo(cx,cy);g.arc(cx,cy,Rr,i*2*Math.PI/n,(i+1)*2*Math.PI/n);g.closePath();g.fillStyle=i%2?'#f2f2ef':'#111';g.fill()}g.strokeStyle='#222';g.lineWidth=1.5;g.beginPath();g.arc(cx,cy,Rr+4,0,Math.PI*2);g.stroke()}
+  function steps(w,h){g.fillStyle='#8c8c89';g.fillRect(0,0,w,h);const n=11,sw=(w-40)/n;for(let i=0;i<n;i++){const v=Math.round(245-i*23.5);g.fillStyle=`rgb(${v},${v},${v})`;g.fillRect(20+i*sw,46,sw+.5,h-92);g.fillStyle=i<6?'#222':'#ddd';g.font='10px monospace';g.fillText(String(i),20+i*sw+sw/2-3,h-58)}}
+  function brick(w,h){g.fillStyle='#d6d4cf';g.fillRect(0,0,w,h);const bh=17,bw=46;for(let r=0;r*bh<h+bh;r++){const off=(r%2)*bw/2;for(let x=-bw;x<w+bw;x+=bw){const v=Math.round(255*(.35+R()*.35));g.fillStyle=`rgb(${v},${v},${v})`;g.fillRect(x+off+1.5,r*bh+1.5,bw-3,bh-3)}}g.fillStyle='rgba(0,0,0,.35)';g.fillRect(0,h-34,w,34)}
+  function flare(w,h){const s=g.createLinearGradient(0,0,0,h);s.addColorStop(0,'#7a7a78');s.addColorStop(.62,'#d9d9d6');s.addColorStop(.63,'#2a2a29');s.addColorStop(1,'#141414');g.fillStyle=s;g.fillRect(0,0,w,h);const sx=w*.62,sy=h*.48,gl=g.createRadialGradient(sx,sy,4,sx,sy,90);gl.addColorStop(0,'rgba(255,255,255,1)');gl.addColorStop(.18,'rgba(255,255,255,.85)');gl.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gl;g.fillRect(0,0,w,h);g.fillStyle='#fff';g.beginPath();g.arc(sx,sy,13,0,Math.PI*2);g.fill();g.fillStyle='#161616';g.fillRect(w*.24,h*.18,5,h);g.fillRect(w*.24,h*.18,28,4);g.beginPath();g.ellipse(w*.24+28,h*.18+6,8,4,0,0,Math.PI*2);g.fill();g.strokeStyle='rgba(255,255,255,.18)';g.lineWidth=2;g.beginPath();g.arc(w-sx+20,h-sy+30,9,0,Math.PI*2);g.stroke()}
+  function grid(w,h){g.fillStyle='#ecebe7';g.fillRect(0,0,w,h);g.strokeStyle='#1a1a1a';g.lineWidth=1.6;for(let x=14;x<w;x+=24){g.beginPath();g.moveTo(x,0);g.lineTo(x,h);g.stroke()}for(let y=7;y<h;y+=24){g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke()}g.fillStyle='#111';g.beginPath();g.arc(w/2,h/2,5,0,Math.PI*2);g.fill()}
+  return n0;
+}
+
+/* ---------- 指针表头 ---------- */
+function gaugeSVG(o){
+  // o: {left,right,mid,zone}  zone = 绿色区间占半幅的比例
+  const cx=120,cy=132,R=96,A=62,zone=o.zone||.667;
+  const pt=(deg,r)=>{const a=(deg-90)*Math.PI/180;return [(cx+r*Math.cos(a)).toFixed(1),(cy+r*Math.sin(a)).toFixed(1)]};
+  const arc=(d0,d1,r)=>{const [x0,y0]=pt(d0,r),[x1,y1]=pt(d1,r);return `M${x0},${y0} A${r},${r} 0 0 1 ${x1},${y1}`};
+  let s=`<svg viewBox="0 0 240 150" role="img" aria-label="${o.aria||'指针表'}"><rect x="2" y="2" width="236" height="146" rx="5" fill="#efeadc"/>`;
+  if(o.plain)s+=`<path d="${arc(-A,A,R)}" fill="none" stroke="#9a9381" stroke-width="7" opacity=".55"/><path d="${arc(A*.4,A,R)}" fill="none" stroke="#3a8f5c" stroke-width="7" opacity=".6"/>`;
+  else{s+=`<path d="${arc(-A,-A*zone,R)}" fill="none" stroke="#c9412e" stroke-width="7" opacity=".7"/><path d="${arc(A*zone,A,R)}" fill="none" stroke="#c9412e" stroke-width="7" opacity=".7"/>`;
+  s+=`<path d="${arc(-A*zone,A*zone,R)}" fill="none" stroke="#3a8f5c" stroke-width="7" opacity=".7"/>`}
+  for(let i=-12;i<=12;i++){const d=i*A/12,[x0,y0]=pt(d,R-6),[x1,y1]=pt(d,R-(i%3===0?18:12));s+=`<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="#222" stroke-width="${i%3===0?1.4:.8}"/>`}
+  (o.labels||[]).forEach(l=>{const [x,y]=pt(l[0]*A,R-30);s+=`<text x="${x}" y="${y}" text-anchor="middle" font-size="11" fill="#222" font-family="Barlow Condensed, sans-serif" font-weight="600">${l[1]}</text>`});
+  s+=`<text x="${cx}" y="${cy-40}" text-anchor="middle" font-size="8" fill="#555" font-family="Jost, sans-serif" letter-spacing="2">${o.unit||''}</text>`;
+  s+=`<g class="needle" style="transform-origin:${cx}px ${cy}px;transform:rotate(0deg);transition:transform .7s cubic-bezier(.3,1.6,.5,1)"><line x1="${cx}" y1="${cy+8}" x2="${cx}" y2="${cy-R+4}" stroke="#151515" stroke-width="1.8"/><line x1="${cx}" y1="${cy-R+30}" x2="${cx}" y2="${cy-R+4}" stroke="#d0301f" stroke-width="1.8"/></g>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="9" fill="#1d1d1e"/><circle cx="${cx-2}" cy="${cy-2}" r="3" fill="#666"/>`;
+  s+=`<path d="M8,10 L232,10 L232,50 Q120,30 8,70 Z" fill="#fff" opacity=".22"/></svg>`;
+  return s;
+}
+function setNeedle(root,frac){const n=root.querySelector('.needle');if(n)n.style.transform=`rotate(${Math.max(-1.08,Math.min(1.08,frac))*62}deg)`}
+
+/* ---------- 镜头灯箱 ---------- */
+function lensBoxSVG(dust){
+  const cx=150,cy=150;
+  let s=`<svg viewBox="0 0 300 300" role="img" aria-label="镜头背光检查示意"><defs><radialGradient id="lbg" cx=".45" cy=".42" r=".7"><stop offset="0" class="lb-g0" stop-color="#2d3550"/><stop offset="1" class="lb-g1" stop-color="#05070c"/></radialGradient></defs>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="138" fill="#151617" stroke="#000"/><circle cx="${cx}" cy="${cy}" r="124" fill="none" stroke="#2c2e31" stroke-width="12" stroke-dasharray="1.2 2"/>`;
+  s+=`<circle class="lb-glass" cx="${cx}" cy="${cy}" r="104" fill="url(#lbg)"/>`;
+  s+=`<circle class="lb-ring" cx="${cx}" cy="${cy}" r="76" fill="none" stroke="rgba(150,120,255,.25)"/><circle class="lb-ring" cx="${cx}" cy="${cy}" r="48" fill="none" stroke="rgba(120,220,170,.2)"/>`;
+  dust.forEach((d,i)=>{const x=cx+d[0]*104,y=cy+d[1]*104;
+    s+=`<g class="lb-dust"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${2.2+(i%2)}" fill="#3a3f47"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="11" fill="none" stroke="#d0301f" stroke-width="1.4" stroke-dasharray="3 2"/><text x="${(x+14).toFixed(1)}" y="${(y-12).toFixed(1)}" font-size="10" fill="#d0301f" font-family="Noto Sans SC, sans-serif" font-weight="700">${i+1}</text></g>`});
+  s+=`<ellipse class="lb-hi" cx="112" cy="104" rx="30" ry="14" fill="#fff" opacity=".35" transform="rotate(-35 112 104)"/></svg>`;
+  return s;
+}
+
+/* ---------- 声音（默认关闭） ---------- */
+const Sound={on:false,ctx:null,
+  init(){if(!this.ctx){try{this.ctx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}},
+  burst(t0,dur,freq,gain){const c=this.ctx;if(!c)return;const n=Math.floor(c.sampleRate*dur),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,4);
+    const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=freq;f.Q.value=1.2;const g=c.createGain();g.gain.value=gain;s.connect(f);f.connect(g);g.connect(c.destination);s.start(c.currentTime+t0)},
+  play(kind){if(!this.on)return;this.init();if(!this.ctx)return;
+    if(this.ctx.state==='suspended')this.ctx.resume();
+    if(kind==='detent')this.burst(0,.012,3800,.25);
+    else if(kind==='shutter'){this.burst(0,.035,1800,.9);this.burst(.07,.05,1200,.8)}
+    else if(kind==='lever'){for(let i=0;i<5;i++)this.burst(i*.022,.012,2600+i*120,.25)}
+    else if(kind==='switch')this.burst(0,.02,2400,.5)}
+};
+
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const yuan=n=>'¥'+Math.round(n).toLocaleString('en-US');
+const screws=()=>['tl','tr','bl','br'].map(p=>`<i class="screw ${p}" style="--r:${Math.round(Math.random()*160)}deg"></i>`).join('');
+
+/* ---------- 拨动开关 ---------- */
+function swHTML(id,label,on,led){
+  return `<button type="button" class="sw" id="${id}" role="switch" aria-checked="${on?'true':'false'}"><span class="sw-track"><span class="sw-knob"></span></span>${led?`<span class="led ${on?'':'off'}"></span>`:''}<span class="sw-label">${label}</span></button>`;
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.sw');if(!b)return;
+  const on=b.getAttribute('aria-checked')!=='true';b.setAttribute('aria-checked',on);
+  const l=b.querySelector('.led');if(l)l.classList.toggle('off',!on);
+  Sound.play('switch');b.dispatchEvent(new CustomEvent('toggle',{bubbles:true,detail:on}));
+});
+const swOn=id=>{const b=document.getElementById(id);return !!b&&b.getAttribute('aria-checked')==='true'};
+
+/* ---------- 光圈环（单选） ---------- */
+function fstopsHTML(id,opts,sel,label){
+  return `<div class="fstops" id="${id}" role="radiogroup" aria-label="${label}" style="--n:${opts.length}">`+
+    opts.map((o,i)=>`<button type="button" role="radio" data-v="${esc(o.v)}" aria-checked="${o.v===sel}" tabindex="${o.v===sel?0:-1}">${o.t}${o.s?`<small>${o.s}</small>`:''}</button>`).join('')+`</div>`;
+}
+function fsSelect(btn){
+  const g=btn.closest('.fstops');g.querySelectorAll('button').forEach(x=>{x.setAttribute('aria-checked',x===btn);x.tabIndex=x===btn?0:-1});
+  Sound.play('detent');g.dispatchEvent(new CustomEvent('pick',{bubbles:true,detail:btn.dataset.v}));
+}
+document.addEventListener('click',e=>{const b=e.target.closest('.fstops button');if(b)fsSelect(b)});
+document.addEventListener('keydown',e=>{
+  const b=e.target.closest&&e.target.closest('.fstops button');if(!b)return;
+  const all=[...b.parentNode.querySelectorAll('button')],i=all.indexOf(b);let j=-1;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')j=Math.min(all.length-1,i+1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')j=Math.max(0,i-1);
+  if(j>=0){e.preventDefault();fsSelect(all[j]);all[j].focus()}
+});
+const fsVal=id=>{const b=document.querySelector(`#${id} [aria-checked="true"]`);return b?b.dataset.v:null};
+
+/* ---------- 滚花转盘 ---------- */
+function Dial(el,o){
+  const opts=o.options,n=opts.length,size=o.size||180,arc=o.arc||300,step=arc>=360?360/n:arc/(n-1);
+  let idx=Math.max(0,o.value||0);
+  el.className='dial'+(o.black?' black':'');el.style.setProperty('--size',size+'px');el.style.setProperty('--fs',(o.fs||13)+'px');
+  el.innerHTML=`<div class="dial-shadow"></div><div class="dial-knob" tabindex="0" role="slider" aria-label="${esc(o.label)}" aria-valuemin="0" aria-valuemax="${n-1}"><div class="dial-face"></div><div class="dial-lab"></div><div class="dial-cap"></div></div><div class="dial-index"></div>`;
+  const knob=el.querySelector('.dial-knob'),lab=el.querySelector('.dial-lab'),R=size*(o.radius||.33);
+  opts.forEach((op,i)=>{const sp=document.createElement('span');sp.textContent=op.t;sp.dataset.i=i;if(op.cls)sp.className=op.cls;
+    sp.style.transformOrigin='0 0';sp.style.transform=`rotate(${i*step}deg) translateY(${-R}px) translate(-50%,-50%)`;lab.appendChild(sp)});
+  if(o.ticks){for(let i=0;i<n;i++){const t=document.createElement('span');t.className='tick';t.textContent='▪';t.style.transformOrigin='0 0';t.style.transform=`rotate(${i*step}deg) translateY(${-size*.43}px) translate(-50%,-50%)`;lab.appendChild(t)}}
+  let rot=-idx*step;
+  const paint=()=>{knob.style.setProperty('--rot',rot+'deg');knob.setAttribute('aria-valuenow',idx);knob.setAttribute('aria-valuetext',opts[idx].t)};
+  const set=(i,silent)=>{i=arc>=360?((i%n)+n)%n:Math.max(0,Math.min(n-1,i));const ch=i!==idx;idx=i;rot=-idx*step;paint();if(ch&&!silent){Sound.play('detent');o.onChange&&o.onChange(opts[idx].v,idx)}};
+  paint();
+  let drag=null;
+  const ang=e=>{const r=knob.getBoundingClientRect();return Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2))*180/Math.PI};
+  knob.addEventListener('pointerdown',e=>{drag={a0:ang(e),r0:rot,x:e.clientX,y:e.clientY,moved:false,last:idx,t:e.target};knob.setPointerCapture(e.pointerId);el.classList.add('dragging')});
+  knob.addEventListener('pointermove',e=>{if(!drag)return;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>4)drag.moved=true;if(!drag.moved)return;
+    let d=ang(e)-drag.a0;if(d>180)d-=360;if(d<-180)d+=360;rot=drag.r0+d;
+    if(arc<360)rot=Math.max(-(n-1)*step-8,Math.min(8,rot));
+    knob.style.setProperty('--rot',rot+'deg');const near=Math.round(-rot/step);if(near!==drag.last){drag.last=near;Sound.play('detent')}});
+  const end=()=>{if(!drag)return;el.classList.remove('dragging');const d=drag;drag=null;
+    if(!d.moved){const t=d.t.closest&&d.t.closest('[data-i]');if(t){set(+t.dataset.i);return}paint();return}
+    const i=Math.round(-rot/step);const was=idx;idx=-1;set(i,true);if(idx!==was)o.onChange&&o.onChange(opts[idx].v,idx)};
+  knob.addEventListener('pointerup',end);knob.addEventListener('pointercancel',end);
+  knob.addEventListener('keydown',e=>{const k=e.key;let d=0;if(k==='ArrowRight'||k==='ArrowUp')d=1;else if(k==='ArrowLeft'||k==='ArrowDown')d=-1;else if(k==='Home'){e.preventDefault();set(0);return}else if(k==='End'){e.preventDefault();set(n-1);return}
+    if(d){e.preventDefault();set(idx+d)}});
+  return {set:(i,s)=>set(i,s),get:()=>opts[idx].v,index:()=>idx};
+}
+
+/* ---------- 卷片拨杆 ---------- */
+function Lever(el,onAdvance){
+  el.className='advance';
+  el.innerHTML=`<div class="adv-hub"></div><div class="adv-arm" role="button" tabindex="0" aria-label="扳动卷片拨杆，换下一台"></div><div class="adv-cap"></div><span class="adv-hint">扳动拨杆过片 ⟳</span>`;
+  const arm=el.querySelector('.adv-arm');let drag=null;
+  const angle=e=>{const r=el.getBoundingClientRect();return Math.atan2(e.clientY-(r.top+56),e.clientX-(r.left+56))*180/Math.PI};
+  const setA=a=>arm.style.setProperty('--a',a+'deg');
+  const stroke=()=>{Sound.play('lever');el.classList.remove('dragging');setA(128);setTimeout(()=>{setA(0);onAdvance()},230)};
+  arm.addEventListener('pointerdown',e=>{drag={fired:false,moved:false,x:e.clientX,y:e.clientY};arm.setPointerCapture(e.pointerId)});
+  arm.addEventListener('pointermove',e=>{if(!drag)return;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>4){drag.moved=true;el.classList.add('dragging')}if(!drag.moved)return;
+    let a=angle(e);if(a<-30)a+=360;a=Math.max(0,Math.min(132,a));setA(a);if(a>105&&!drag.fired){drag.fired=true;Sound.play('lever')}});
+  const end=()=>{if(!drag)return;const d=drag;drag=null;el.classList.remove('dragging');if(!d.moved){stroke();return}setA(0);if(d.fired)setTimeout(onAdvance,120)};
+  arm.addEventListener('pointerup',end);arm.addEventListener('pointercancel',end);
+  arm.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();stroke()}});
+}
+
+/* ---------- 对焦环价格滑块（对数刻度） ---------- */
+const P_MIN=1000,P_MAX=40000;
+const t2p=t=>P_MIN*Math.pow(P_MAX/P_MIN,t/100);
+const p2t=p=>100*Math.log(p/P_MIN)/Math.log(P_MAX/P_MIN);
+function ringHTML(id,a,b,label){
+  const marks=[1000,2000,3000,5000,10000,20000,40000];
+  let sc='';for(let t=0;t<=100;t+=2.5)sc+=`<i style="left:${t}%"></i>`;
+  marks.forEach(m=>{const t=p2t(m);sc+=`<i class="major" style="left:${t}%"></i><b class="${m>=10000?'o':''}" style="left:${t}%">${m>=10000?(m/10000)+'万':(m/1000)+'k'}</b>`});
+  return `<div class="ring" id="${id}"><div class="ring-scale">${sc}</div>
+   <input type="range" id="${id}-a" min="0" max="100" step="0.5" value="${a}" aria-label="${label}下限">
+   <input type="range" id="${id}-b" min="0" max="100" step="0.5" value="${b}" aria-label="${label}上限"></div>`;
+}
+function bindRing(id,onChange){
+  const A=document.getElementById(id+'-a'),B=document.getElementById(id+'-b');let last=[A.value,B.value].join();
+  const fix=src=>{if(+A.value>+B.value-4){if(src===A)A.value=+B.value-4;else B.value=+A.value+4}
+    A.setAttribute('aria-valuetext',yuan(t2p(+A.value)));B.setAttribute('aria-valuetext',yuan(t2p(+B.value)));
+    const k=[A.value,B.value].join();if(k!==last){last=k;Sound.play('detent')}onChange(t2p(+A.value),t2p(+B.value))};
+  A.addEventListener('input',()=>fix(A));B.addEventListener('input',()=>fix(B));fix(null);
+}
+
+const $=(s,r)=>(r||document).querySelector(s),$$=(s,r)=>[...(r||document).querySelectorAll(s)];
+const APP=$('#app');
+const load=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const WATCH=new Set(load('find.watch',[]));
+const isWatched=id=>WATCH.has(id);
+function toggleWatch(id,on){on?WATCH.add(id):WATCH.delete(id);save('find.watch',[...WATCH]);$('#fc-n').textContent=WATCH.size}
+const today=()=>{const d=new Date();return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`};
+const refNo=k=>({sell:'JS',find:'XW',buy:'YY'}[k]||'FD')+'-'+Date.now().toString(36).slice(-6).toUpperCase();
+
+/* ---------- 补全每台器材的检测数据 ---------- */
+const PARTS={slr:['外观','取景器','快门','测光','卷片与计数'],rf:['外观','取景器与测距','快门','测光','卷片'],cp:['外观','液晶屏','镜头光学','对焦','快门与闪光'],mf:['外观','取景器','快门','后背与片夹','镜头光学'],lens:['外观','镜片','光圈叶片','对焦','卡口'],dig:['外观','传感器','屏幕','电池与存储卡','镜头']};
+const LOOK={'A+':'几乎没有使用痕迹','A':'边角有极轻微的使用痕迹','AB':'边角有正常使用痕迹，无凹陷','B':'有明显磨损和细小划痕，无凹陷','C':'有磕碰或较多掉漆'};
+const OKTXT={'取景器':'明亮，轻微尘点不影响对焦','取景器与测距':'测距斑清晰，上下重合准确','快门':'各档实测在 ±1/3 EV 以内','测光':'与标准测光表偏差在 0.3 EV 以内','卷片与计数':'顺畅，计数器归零正常','卷片':'顺畅，无异响','液晶屏':'显示完整，没有漏液','镜头光学':'无霉、无雾、无划痕','对焦':'对焦准确，马达无异响','快门与闪光':'快门与闪光均正常','后背与片夹':'片夹平整，无漏光','镜片':'无霉、无雾、无划痕','光圈叶片':'干净无油，回弹迅速','卡口':'卡口无磨损','传感器':'无坏点','屏幕':'显示正常','电池与存储卡':'原装电池续航正常','镜头':'伸缩顺畅，无异响'};
+const CHECKS={
+  slr:[['ok','快门帘外观'],['ok','反光镜与阻尼'],['fix','遮光海绵','原海绵老化，已更换'],['ok','测光表'],['ok','自拍机构'],['ok','后盖锁扣'],['ok','铭牌与序列号','与机身记录一致'],['ok','改装与非原厂零件','未发现']],
+  rf:[['ok','测距器校准'],['ok','取景器框线'],['ok','快门帘'],['fix','遮光海绵','已更换'],['ok','测光表'],['ok','铭牌与序列号','与机身记录一致'],['ok','改装与仿制','未发现']],
+  cp:[['ok','液晶屏','没有漏液'],['ok','镜头盖与伸缩马达'],['ok','自动对焦'],['ok','闪光灯'],['ok','电池仓','无氧化'],['ok','胶片压板'],['ok','外壳','无裂纹'],['ok','序列号','与机身记录一致']],
+  mf:[['ok','镜间快门逐档'],['ok','取景屏'],['ok','后背片夹'],['fix','遮光海绵','已更换'],['ok','卷片与计数'],['ok','序列号','与机身记录一致']],
+  lens:[['ok','背光检查'],['ok','光圈叶片','干净无油'],['ok','对焦阻尼'],['ok','卡口'],['ok','前后盖','原装']],
+  dig:[['ok','传感器坏点','未发现'],['ok','屏幕'],['ok','电池续航'],['ok','存储卡槽'],['ok','镜头伸缩'],['ok','按键与转盘']]
+};
+STOCK.forEach(it=>{
+  const R=rng(it.id),g=it.grade;
+  if(!it.parts)it.parts=PARTS[it.cat].map((p,i)=>i===0?[p,g,LOOK[g]]:[p,(g==='B'||g==='C')?'AB':'A',OKTXT[p]||'正常']);
+  if(!it.dev)it.dev=SPEEDS.map((s,i)=>+(((R()-.5)*.14)-Math.max(0,i-8)*.035*(.5+R())).toFixed(2));
+  if(!it.dust){const n={'A+':0,'A':1,'AB':2,'B':3,'C':4}[g];it.dust=[];for(let i=0;i<n;i++){const a=R()*Math.PI*2,r=.2+R()*.55;it.dust.push([Math.cos(a)*r,Math.sin(a)*r,'微尘 · 第 '+(1+Math.floor(R()*5))+' 片'])}}
+  if(!it.checks)it.checks=CHECKS[it.cat];
+});
+const forSale=()=>STOCK.filter(s=>s.status!=='已售');
+const catName=id=>(CATS.find(c=>c.id===id)||{}).n||'';
+
+/* ---------- 数据（受邀成员可在线提交） ---------- */
+let DB=null,UID_=null,ADMIN=false,unsubInbox=null;
+(async()=>{
+  try{
+    if(!(window.claude&&window.claude.use))return;
+    const [user,db]=await Promise.all([window.claude.use('user'),window.claude.use('db')]);
+    DB=db;
+    if(user){UID_=await user.id();ADMIN=!!(await user.canEdit());if(ADMIN){$('#nav-inbox').hidden=false;if(location.hash==='#inbox')renderInbox()}}
+  }catch(e){}
+})();
+async function submit(kind,data){
+  const rec=Object.assign({kind,ref:refNo(kind),at:new Date().toISOString()},data);
+  if(DB&&UID_){
+    try{const ref=DB.doc('inbox/'+UID_),snap=await ref.get();
+      const items=snap.exists&&Array.isArray(snap.data().items)?snap.data().items.slice():[];
+      items.push(rec);await ref.set({items,updated:rec.at});return {ok:true,rec}}catch(e){}
+  }
+  const box=load('find.outbox',[]);box.push(rec);save('find.outbox',box);
+  return {ok:false,rec};
+}
+function receiptHTML(res,title){
+  const r=res.rec;
+  return `<div class="receipt"><span class="stamp">${res.ok?'已收到':'已暂存'}</span><h4>${title} · ${r.ref}</h4>
+  <p>${res.ok?'已经送到 Find。我们会在 24 小时内通过你留下的联系方式回复。':'这是预览版，目前只有受邀成员可以在线提交。内容已暂存在这台设备的浏览器里，也可以复制下面的内容，通过微信发给我们。'}</p>
+  ${res.ok?'':`<div class="copybox">${esc(r.summary)}</div><button class="key" type="button" data-copy style="margin-top:10px">复制内容</button>`}</div>`;
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-copy]');if(!b)return;const box=b.parentNode.querySelector('.copybox');
+  const done=()=>{b.textContent='已复制'};
+  try{navigator.clipboard.writeText(box.textContent).then(done,()=>{selectText(box);b.textContent='已选中，请手动复制'})}catch(err){selectText(box);b.textContent='已选中，请手动复制'}
+});
+function selectText(el){const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r)}
+
+/* ---------- 共用片段 ---------- */
+function card(it){
+  const sold=it.status==='已售',led=it.status==='在售'?'':it.status==='已预订'?'amber':'red';
+  return `<a class="card${sold?' is-sold':''}" href="#item-${it.id}">
+    <div class="vit velvet"><span class="grade">${it.grade}</span><span class="st"><span class="led ${led}"></span>${it.status}</span>
+      <div class="cam">${camSVG(it.r,it.f,{mark:it.mark,label:it.name})}</div>${sold?'<div class="sold"><span>已售</span></div>':''}</div>
+    <div class="base chrome"><span class="engr">${it.year} · ${STRUCT[it.struct]} · №${it.no}</span>
+      <div><h3>${esc(it.name)}</h3><div class="sub">${esc(it.lens)}</div></div><div class="pr">${yuan(it.price)}</div></div></a>`;
+}
+const crumb=parts=>`<div class="crumb">${parts.map(p=>p[1]?`<a href="${p[1]}">${p[0]}</a>`:esc(p[0])).join(' / ')}</div>`;
+
+/* ---------- 首页 ---------- */
+let heroI=0;
+function renderHome(){
+  const list=forSale(),fm=STOCK[0];
+  APP.innerHTML=`<div class="wrap page">
+  <h1 class="hero-title foil">三十年的相机，<br>正在等下一任主人。</h1>
+  <p class="hero-sub">Find 只收 1976 到 2006 年间有来历的机身和镜头。每一台都由师傅检测，附一本器材护照：检测数据、本机测试卷、历任主人，还有它经历过的事。</p>
+  <div class="hero">
+    <div class="hero-stage velvet"><div class="cam reflect" id="hero-cam"></div><div class="cap"><span id="hero-no"></span><span>展柜 · 本周上架</span></div></div>
+    <div class="hero-panel chrome">${screws()}
+      <div class="row"><span class="engr">On the shelf · 在架</span><div class="counter"><span class="engr" style="letter-spacing:.1em">№</span><div class="counter-win"><div class="counter-big" id="hero-n">1</div></div></div></div>
+      <div><h2 id="hero-name"></h2><div class="meta" id="hero-meta"></div></div>
+      <p class="line" id="hero-line"></p>
+      <div class="row"><div class="price" id="hero-price"></div><span class="engr" id="hero-st"></span></div>
+      <div class="acts"><a class="key dark" id="hero-go" href="#shop"><span class="dot"></span>看这台的护照</a><a class="key" href="#shop">进店看全部</a></div>
+      <div class="adv-wrap"><div id="lever"></div></div>
+    </div>
+  </div>
+  <div class="plaques">
+    <div class="plaque">${screws()}<b>26 项</b><span>师傅逐项检测</span><p>快门逐档实测、背光查霉雾、测距与测光校验，结论签字负责。</p></div>
+    <div class="plaque">${screws()}<b>1 卷</b><span>本机测试卷</span><p>每台机身拍一卷测试卷，印样附在护照里，看得到这一台拍出来的样子。</p></div>
+    <div class="plaque">${screws()}<b>180 天</b><span>回购与置换</span><p>在 Find 买的器材，180 天内按成交价 70% 回购，或 80% 抵扣换购下一台。</p></div>
+    <div class="plaque">${screws()}<b>担保</b><span>验机后再确认</span><p>付款走第三方担保交易，收到器材、验机满意后再确认收货。</p></div>
+  </div>
+  <div class="sec-h"><div><h2>在架上</h2><p>本周新上架的几台。每一台都只有一台。</p></div><a class="key" href="#shop">进店看全部 ${STOCK.length} 台</a></div>
+  <div class="grid">${STOCK.slice(0,6).map(card).join('')}</div>
+  <div class="sec-h"><div><h2>三件事，都可以交给我们</h2><p>不管你是想卖、想买，还是只想知道家里那台老相机值多少钱。</p></div></div>
+  <div class="services">
+    <a class="svc" href="#sell"><span class="key big">寄售给 Find<i>CONSIGN</i></span><p>检测、拍摄、建护照、定价、售后都由我们完成。你不用应付砍价，也不用担心调包退货。</p></a>
+    <a class="svc" href="#find"><span class="key big">帮我找一台<i>SOURCE</i></span><p>说出型号、成色底线和预算。我们在国内和日本中古渠道找货，先发检测报告，你确认后再付款。</p></a>
+    <a class="svc" href="#sell"><span class="key big">估一估<i>APPRAISE</i></span><p>家里抽屉里的老相机值多少？填几项信息，估价表马上给出参考价，再决定要不要寄售。</p></a>
+  </div>
+  <div class="sec-h"><div><h2>每一台都有一本护照</h2><p>护照跟着器材走。下一次转手时，检测和履历接着往下写。这是 ${esc(fm.name)} 的那一本。</p></div></div>
+  <div class="booklet paper" id="booklet">
+    <div class="bk-page l"><div class="bk-cover"><span class="no">FIND 器材护照 · No.${fm.no}</span><h3>${esc(fm.name)}</h3><p style="font-size:14px;color:#5b5243">${esc(fm.lens)} · ${fm.year} 年产 · ${fm.owners} 位主人</p><div class="cam">${camSVG(fm.r,fm.f,{mark:fm.mark})}</div><div style="display:flex;align-items:center;gap:14px;margin-top:auto"><span class="stamp">${fm.grade}<small>${GRADE_TXT[fm.grade]}</small></span><span style="font-size:13px;color:#5b5243">检测：陈师傅 · ${today()}</span></div></div></div>
+    <div class="bk-page bk-r" id="bk-r"></div>
+    <div class="bk-tabs" role="tablist" aria-label="护照内页">${['检测','测试卷','履历','主人的信'].map((t,i)=>`<button role="tab" type="button" data-tab="${i}" aria-selected="${i===0}">${t}</button>`).join('')}</div>
+  </div>
+  <div class="sec-h"><div><h2>三十年的器材史</h2></div></div>
+  <div class="teaser chrome">${screws()}<div id="mini-dial"></div><div><h3>转动年份，看那一年出了什么</h3><p>1976 到 2006 年，${HIST.length} 台有代表性的机身和镜头，按年份放进展柜。每一台都写了它的时代意义，和买它时该检查的地方。</p><a class="key dark" href="#history" id="to-hist"><span class="dot"></span>打开器材史</a></div></div>
+  </div>`;
+  const showHero=()=>{const it=list[heroI%list.length];
+    $('#hero-cam').innerHTML=camSVG(it.r,it.f,{mark:it.mark,label:it.name});
+    $('#hero-name').textContent=it.name;$('#hero-meta').textContent=`${it.year} · ${it.grade} ${GRADE_TXT[it.grade]} · ${STRUCT[it.struct]} · ${it.lens}`;
+    $('#hero-line').textContent='“'+it.line+'”';$('#hero-price').innerHTML=`<small>¥</small>${Math.round(it.price).toLocaleString('en-US')}`;
+    $('#hero-st').textContent=it.status;$('#hero-go').href='#item-'+it.id;$('#hero-no').textContent=`№ ${it.no} · 第 ${heroI%list.length+1} / ${list.length} 台`;
+    $('#hero-n').textContent=heroI%list.length+1};
+  showHero();
+  Lever($('#lever'),()=>{heroI++;showHero()});
+  const tabs=$$('.bk-tabs button'),bk=$('#bk-r');
+  const tab=i=>{tabs.forEach((b,j)=>b.setAttribute('aria-selected',j===i));
+    if(i===0)bk.innerHTML=`<h4>检测记录</h4><ul class="bk-list">${fm.parts.map(p=>`<li><span>${p[0]}</span><span style="color:#5b5243;flex:1;text-align:right;font-size:12.5px">${p[2]}</span><b>${p[1]}</b></li>`).join('')}</ul>`;
+    if(i===1){bk.innerHTML=`<h4>本机测试卷</h4><p>检测时用这台机身拍的黑白测试卷，第一格看锐度，第二格看曝光。</p><div style="margin-top:14px;overflow:hidden;border-radius:2px"><canvas id="bk-roll" width="1642" height="300" style="width:200%;display:block"></canvas></div>`;drawRoll($('#bk-roll'),fm.id)}
+    if(i===2)bk.innerHTML=`<h4>履历</h4><ul class="bk-list">${fm.life.map(l=>`<li style="display:grid;grid-template-columns:86px 1fr;gap:10px"><b>${l[0]}</b><span>${l[1]}</span></li>`).join('')}</ul><p style="margin-top:12px">第 3 页起留给下一任主人。</p>`;
+    if(i===3)bk.innerHTML=`<h4>第一任主人的信</h4>${fm.letter.slice(0,3).map(p=>`<p class="hand">${p}</p>`).join('')}<p style="text-align:right;margin-top:6px" class="hand">${fm.signer}</p>`};
+  tabs.forEach(b=>b.addEventListener('click',()=>tab(+b.dataset.tab)));tab(0);
+  const yrs=[];for(let y=1976;y<=2006;y+=5)yrs.push(y);
+  Dial($('#mini-dial'),{options:yrs.map(y=>({v:y,t:String(y)})),value:1,size:170,arc:300,fs:13,radius:.31,label:'年份',onChange:v=>{HY=v;HSEL=null}});
+}
+
+/* ---------- 选购 ---------- */
+const SHOP={cat:'all',lo:0,hi:100,grade:'C',mech:false,watch:false,hideSold:false,sort:'new'};
+function renderShop(){
+  APP.innerHTML=`<div class="wrap page">${crumb([['首页','#home'],['选购']])}
+  <div class="shop">
+    <aside class="panel chrome" aria-label="筛选">${screws()}<div class="panel-inner">
+      <div><h4>Category<span>品类</span></h4><div class="dial-box"><div id="cat-dial"></div></div></div>
+      <div><h4>Price<span id="pr-txt"></span></h4>${ringHTML('price',SHOP.lo,SHOP.hi,'价格')}</div>
+      <div><h4>Grade<span>最低成色</span></h4>${fstopsHTML('gr',GRADES.map(g=>({v:g,t:g,s:GRADE_TXT[g]})),SHOP.grade,'最低成色')}</div>
+      <div style="display:grid;gap:4px">${swHTML('f-mech','只看全机械',SHOP.mech,true)}${swHTML('f-watch','只看我关注的',SHOP.watch,true)}${swHTML('f-sold','隐藏已售',SHOP.hideSold,true)}</div>
+      <div><h4>Sort<span>排序</span></h4><div class="sortbar" role="group" aria-label="排序">${[['new','新上架'],['asc','价格低'],['desc','价格高']].map(s=>`<button type="button" data-s="${s[0]}" aria-pressed="${SHOP.sort===s[0]}">${s[1]}</button>`).join('')}</div></div>
+      <div class="lcd"><span>符合条件</span><b id="cnt">0</b><span>台</span></div>
+    </div></aside>
+    <section><div class="shop-head"><div><h1 style="font-family:var(--f-serif);font-size:30px">在架上的器材</h1><p class="crumb" style="margin-top:6px">每一台都附器材护照。点进去可以看检测数据、测试卷和它的经历。</p></div></div><div class="grid" id="shop-grid"></div></section>
+  </div></div>`;
+  Dial($('#cat-dial'),{options:CATS.map(c=>({v:c.id,t:c.n,cls:'cn'})),value:CATS.findIndex(c=>c.id===SHOP.cat),size:200,arc:300,fs:14,radius:.3,label:'品类',onChange:v=>{SHOP.cat=v;shopGrid()}});
+  bindRing('price',(lo,hi)=>{SHOP.lo=p2t(lo);SHOP.hi=p2t(hi);$('#pr-txt').textContent=`${yuan(lo)} – ${hi>=P_MAX*.99?'不限':yuan(hi)}`;shopGrid()});
+  $('#gr').addEventListener('pick',e=>{SHOP.grade=e.detail;shopGrid()});
+  $('.panel').addEventListener('toggle',e=>{const id=e.target.id;if(id==='f-mech')SHOP.mech=e.detail;if(id==='f-watch')SHOP.watch=e.detail;if(id==='f-sold')SHOP.hideSold=e.detail;shopGrid()});
+  $$('.sortbar button').forEach(b=>b.addEventListener('click',()=>{SHOP.sort=b.dataset.s;$$('.sortbar button').forEach(x=>x.setAttribute('aria-pressed',x===b));Sound.play('switch');shopGrid()}));
+  shopGrid();
+}
+function shopGrid(){
+  const lo=t2p(SHOP.lo),hi=SHOP.hi>=99.5?Infinity:t2p(SHOP.hi),gi=GRADES.indexOf(SHOP.grade);
+  let rows=STOCK.filter(it=>(SHOP.cat==='all'||it.cat===SHOP.cat)&&it.price>=lo-1&&it.price<=hi+1&&GRADES.indexOf(it.grade)<=gi&&(!SHOP.mech||it.struct==='m')&&(!SHOP.watch||isWatched(it.id))&&(!SHOP.hideSold||it.status!=='已售'));
+  rows.sort((a,b)=>SHOP.sort==='asc'?a.price-b.price:SHOP.sort==='desc'?b.price-a.price:b.added.localeCompare(a.added));
+  $('#cnt').textContent=String(rows.length).padStart(2,'0');
+  $('#shop-grid').innerHTML=rows.length?rows.map(card).join(''):`<div class="empty velvet" style="grid-column:1/-1"><p style="font-size:16px;color:var(--text)">没有符合条件的器材</p><p style="margin-top:6px">放宽价格或成色试试，或者让我们<a href="#find" style="color:var(--orange)">帮你找一台</a>。</p></div>`;
+}
+
+/* ---------- 商品详情 ---------- */
+function renderItem(id){
+  const it=STOCK.find(s=>s.id===id);if(!it){renderShop();return}
+  const h=HIST.find(x=>x.n===it.hist),avail=it.status==='在售',led=avail?'':it.status==='已预订'?'amber':'red';
+  const film=it.cat!=='dig';
+  const writing=it.letter?{t:'第一任主人的信',ps:it.letter,s:it.signer}:it.note?{t:'主人留言',ps:[it.note],s:it.signer}:null;
+  APP.innerHTML=`<div class="wrap page">${crumb([['首页','#home'],['选购','#shop'],[it.name]])}
+  <div class="item-top">
+    <div><div class="item-stage velvet"><div class="cam reflect">${camSVG(it.r,it.f,{mark:it.mark,label:it.name})}</div></div>
+      <dl class="spec-plate chrome">${screws()}<div><dt>Year</dt><dd>${it.year} 年</dd></div><div><dt>Shutter</dt><dd>${STRUCT[it.struct]}</dd></div><div><dt>Owners</dt><dd>${it.owners} 位主人</dd></div><div><dt>Passport</dt><dd>№ ${it.no}</dd></div></dl></div>
+    <div class="hangtag paper">
+      <div class="no"><span>FIND 器材护照 № ${it.no}</span><span>${catName(it.cat)}</span></div>
+      <h1>${esc(it.name)}</h1><p class="lens">${esc(it.lens)}</p>
+      <div class="mid"><div class="pr"><small>¥</small>${Math.round(it.price).toLocaleString('en-US')}</div><span class="stamp">${it.grade}<small>${GRADE_TXT[it.grade]}</small></span></div>
+      <p class="hand">${esc(it.line)}</p>
+      <div class="status"><span class="led ${led}"></span>${it.status}${avail?' · 预约后为你保留 24 小时':''}</div>
+      <div class="bb"><b>180 天回购</b>：按成交价 70% 回购，或 80% 抵扣换购 Find 的下一台。付款走第三方担保交易，验机满意后再确认收货。</div>
+      <div class="acts"><button class="release" id="buy" type="button" aria-label="预约购买" ${avail?'':'disabled'}></button><div><b style="font-size:16px">${avail?'预约购买':it.status}</b><p style="font-size:12.5px;color:var(--paper-ink-2)">${avail?'按下快门，填写联系方式':'可以让我们帮你找一台同型号'}</p></div><span style="margin-left:auto">${swHTML('watch','关注',isWatched(it.id),true)}</span></div>
+    </div>
+  </div>
+  <div class="sec-h"><div><h2>检测报告</h2><p>由陈师傅检测，${it.parts.length} 个部位分项评级。综合成色取影响使用的最低一项。</p></div></div>
+  <div class="bench">
+    <div class="clip paper"><div class="clip-top"></div><h3>成色评级</h3><p class="note">Find 五级成色标准</p>
+      <div class="gradebar">${GRADES.map(g=>`<div class="${g===it.grade?'on':''}">${g}<small>${GRADE_TXT[g]}</small></div>`).join('')}</div>
+      <table class="parts">${it.parts.map(p=>`<tr><td>${p[0]}</td><td class="g">${p[1]}</td><td>${p[2]}</td></tr>`).join('')}</table></div>
+    <div class="clip paper"><div class="clip-top"></div><h3>检查清单</h3><p class="note">打勾为正常，圈号为已处理，三角为需要留意</p>
+      <ul class="checks">${it.checks.map(c=>`<li><i class="${c[0]==='warn'?'warn':''}">${c[0]==='ok'?'✓':c[0]==='fix'?'○':'△'}</i><span>${c[1]}${c[2]?`<small>${c[2]}</small>`:''}</span></li>`).join('')}</ul></div>
+  </div>
+  <div class="bench" style="margin-top:26px">
+    ${it.cat==='lens'?`<div class="brass-note">${screws()}<h3>镜头不做快门测试</h3><p>镜头检测光圈叶片的回弹速度、对焦行程和阻尼，以及卡口磨损。结果写在左边的检查清单里。</p></div>`:
+    `<div class="instr"><h3 style="color:var(--text)">快门测试仪</h3><p class="note">转动速度盘，看这台机身每一档的实测值。指针停在绿区，说明偏差小于 1/3 档。</p>
+      <div class="instr-body"><div id="spd-dial"></div><div><div class="gauge" id="gauge">${gaugeSVG({labels:[[-1,'−½'],[-.667,'−⅓'],[0,'0'],[.667,'+⅓'],[1,'+½']],unit:'EV',zone:.667,aria:'快门偏差表'})}</div><div class="lcd" id="spd-lcd"></div></div></div></div>`}
+    <div class="light paint"><h3>镜头灯箱</h3><p class="note" style="color:#a8a49c">打开灯箱，从后组照亮镜头。师傅标出的每一处都在这里。</p>
+      <div class="lightbox" id="lbox">${lensBoxSVG(it.dust)}</div>
+      <div class="light-foot">${swHTML('lb-sw','打开灯箱',false,true)}<dl><dt>霉</dt><dd>无</dd><dt>雾</dt><dd>无</dd><dt>划痕</dt><dd>无</dd><dt>微尘</dt><dd>${it.dust.length?it.dust.length+' 处':'无'}</dd></dl></div>
+      ${it.dust.length?`<p style="font-size:12.5px;color:#a8a49c;margin-top:10px">${it.dust.map((d,i)=>`${i+1}. ${d[2]}`).join('　')}，都不影响成像。</p>`:''}</div>
+  </div>
+  ${film?`<div class="lighttable" style="margin-top:34px"><h3>本机测试卷</h3><p class="note">检测时用这台${it.cat==='lens'?'镜头':'机身'}拍一卷黑白测试卷，冲洗后做成印样附在护照里。红笔圈出的那张用来判读锐度。</p>
+    <div class="roll"><div class="roll-in"><canvas id="roll" width="1642" height="300" aria-label="测试卷印样"></canvas><svg viewBox="0 0 1642 300" preserveAspectRatio="none" aria-hidden="true"><path d="M22,44 C110,36 250,38 333,46 C340,110 338,190 330,262 C230,268 110,266 20,258 C14,180 16,110 26,40 L60,38"/></svg></div></div>
+    <div class="frames" id="frames"></div></div>`:''}
+  <div class="sec-h"><div><h2>它的履历</h2><p>护照里的经历由主人讲述，Find 按序列号和票据核对。</p></div></div>
+  <div class="bench">
+    <div class="cards-life">${it.life.map(l=>`<div class="icard"><span class="y">${l[0]}</span><div><b>${l[1]}</b><p>${l[2]}</p></div></div>`).join('')}<div class="icard next"><span class="y">下一页</span><div><b>等下一任主人来写</b><p>买下它以后，你可以在护照里补上自己拍的照片和去过的地方。</p></div></div></div>
+    ${writing?`<div><div class="letter paper"><p style="font-family:var(--f-cn);font-size:12px;color:#6a6152;letter-spacing:.1em">${writing.t}</p>${writing.ps.map(p=>`<p>${esc(p)}</p>`).join('')}<p class="sig">${esc(writing.s)}</p><p class="note">原件随机附赠 · 预览版为示例文本</p></div></div>`:
+      `<div class="brass-note">${screws()}<h3>还没有主人留言</h3><p>寄售时主人可以写一段话给下一任，原件随机附赠。</p></div>`}
+  </div>
+  ${h?`<div class="brass-note" style="margin-top:30px">${screws()}<h3>关于这个型号 · ${h.y} 年</h3><p>${h.w}</p><p><b>买它时要看：</b>${h.k}</p><p style="margin-top:10px"><a href="#history" data-year="${h.y}" style="color:#35270b;font-weight:700">在器材史里看 ${h.y} 年 →</a></p></div>`:''}
+  <div class="sec-h"><div><h2>也许你也会喜欢</h2></div></div>
+  <div class="grid">${STOCK.filter(s=>s.id!==it.id&&s.status!=='已售').sort((a,b)=>(b.cat===it.cat)-(a.cat===it.cat)).slice(0,3).map(card).join('')}</div>
+  </div>`;
+  if(it.cat!=='lens'){
+    const lcd=$('#spd-lcd'),gauge=$('#gauge');
+    const show=i=>{const d=it.dev[i],t=SPEED_SEC[i]*Math.pow(2,d),f=x=>x>=.5?x.toFixed(2)+' s':'1/'+Math.round(1/x);
+      lcd.innerHTML=`<div><span>标称</span><b>${f(SPEED_SEC[i])}</b></div><div><span>实测</span><b>${f(t)}</b></div><div><span>偏差</span><b>${d>0?'+':d<0?'−':''}${Math.abs(d).toFixed(2)}</b></div>`;setNeedle(gauge,d/.5)};
+    const small=innerWidth<640;
+    Dial($('#spd-dial'),{options:SPEEDS.map(s=>({v:s,t:s==='1s'?'1':s,cls:s==='250'?'hot':''})),value:8,size:small?190:176,arc:330,fs:small?13:12,radius:.35,black:true,label:'快门速度',onChange:(v,i)=>show(i)});
+    requestAnimationFrame(()=>show(8));
+  }
+  $('#lbox').closest('.light').addEventListener('toggle',e=>{if(e.target.id==='lb-sw')$('#lbox').classList.toggle('on',e.detail)});
+  if(film){const n0=drawRoll($('#roll'),it.id);$('#frames').innerHTML=['西门子星，看锐度','灰阶，看曝光','砖墙，看细节','逆光，看眩光','网格，看畸变'].map((t,i)=>`<span><b>${n0+i}</b>${t}</span>`).join('')}
+  $('#watch').addEventListener('toggle',e=>toggleWatch(it.id,e.detail));
+  if(avail)$('#buy').addEventListener('click',()=>{Sound.play('shutter');openBuy(it)});
+  const hy=$('[data-year]');if(hy)hy.addEventListener('click',()=>{HY=+hy.dataset.year;HSEL=null});
+}
+function openBuy(it){
+  const d=$('#drawer');d.hidden=false;
+  d.innerHTML=`<div class="slip paper card-form" role="dialog" aria-modal="true" aria-labelledby="buy-h">
+    <div class="head"><h1 id="buy-h" style="font-size:22px">预约购买<br><span style="font-size:16px;font-family:var(--f-cn)">${esc(it.name)} · ${yuan(it.price)}</span></h1><div class="no">No. ${it.no}<br>${today()}</div></div>
+    <form id="buy-form" novalidate>
+      <div class="fld"><label for="b-name">称呼</label><input type="text" id="b-name" autocomplete="name"></div>
+      <div class="fld"><label for="b-contact">微信或手机</label><input type="text" id="b-contact" autocomplete="tel"></div>
+      <div class="fld"><span class="lab">交付方式</span>${fstopsHTML('b-way',[{v:'顺丰保价寄送',t:'寄送',s:'顺丰保价'},{v:'约时间看机',t:'看机',s:'当面验机'}],'顺丰保价寄送','交付方式')}</div>
+      <div class="fld"><label for="b-msg">留言</label><textarea id="b-msg" rows="2" placeholder="想问的问题，或者想先看的细节"></textarea></div>
+      <div class="submit-row"><p id="b-err">提交后这台会为你保留 24 小时。</p><button class="key dark" type="submit"><span class="dot"></span>提交预约</button></div>
+    </form><div id="buy-receipt"></div>
+    <div style="margin-top:16px;text-align:right"><button class="key" type="button" id="buy-close">关闭</button></div></div>`;
+  $('#b-name').focus();
+  $('#buy-close').addEventListener('click',closeDrawer);
+  $('#buy-form').addEventListener('submit',async e=>{e.preventDefault();
+    const name=$('#b-name').value.trim(),contact=$('#b-contact').value.trim();
+    if(!contact){$('#b-err').innerHTML='<b style="color:var(--red)">请留下微信或手机，我们才能联系你。</b>';$('#b-contact').focus();return}
+    const way=fsVal('b-way'),msg=$('#b-msg').value.trim();
+    const res=await submit('buy',{item:it.id,itemName:it.name,price:it.price,name,contact,way,msg,summary:`预约购买：${it.name}（№${it.no}，${yuan(it.price)}）\n称呼：${name||'未填'}\n联系方式：${contact}\n交付：${way}\n留言：${msg||'无'}`});
+    $('#buy-form').hidden=true;$('#buy-receipt').innerHTML=receiptHTML(res,'预约回执')});
+}
+function closeDrawer(){const d=$('#drawer');if(d&&!d.hidden){d.hidden=true;d.innerHTML=''}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+document.addEventListener('click',e=>{if(e.target.id==='drawer')closeDrawer()});
+
+/* ---------- 估价 ---------- */
+function estimate(model,cat,grade,fn,acc){
+  const m=' '+model.toLowerCase()+' ';let base=null,hit=null;
+  REF.forEach(([k,v])=>{if(m.includes(k)&&(!hit||k.length>hit.length)){hit=k;base=v}});
+  const conf=hit?.75:model.trim()?-.35:-.8;
+  if(!base)base=CAT_BASE[cat]||1500;
+  let p=base*{'A+':1.15,'A':1.05,'AB':1,'B':.85,'C':.62}[grade];
+  fn.forEach(ok=>{if(!ok)p*=.8});acc.forEach(a=>{if(a)p*=1.03});
+  return {mid:p,lo:p*.88,hi:p*1.12,hit,conf};
+}
+const round50=n=>Math.round(n/50)*50;
+
+/* ---------- 寄售 ---------- */
+function renderSell(){
+  const no='JS-'+Date.now().toString(36).slice(-5).toUpperCase();
+  const models=[...new Set(HIST.map(h=>h.n).concat(STOCK.map(s=>s.name)))];
+  APP.innerHTML=`<div class="wrap page">${crumb([['首页','#home'],['寄售']])}
+  <div class="sec-h" style="margin-top:14px"><div><h2>把器材交给 Find</h2><p>填一张寄售登记卡。右边的估价表会实时给出参考价，并比较三种出手方式。估价只是起点，最终价格以师傅检测为准。</p></div></div>
+  <div class="form-wrap">
+    <form class="card-form paper" id="sell-form" novalidate>
+      <div class="head"><h1>寄售登记卡</h1><div class="no">No. ${no}<br>${today()}</div></div>
+      <div class="fld"><span class="lab">品类</span><div id="s-cat" style="justify-self:start;margin:16px 0 4px"></div></div>
+      <div class="fld"><label for="s-model">品牌与型号</label><input type="text" id="s-model" list="models" placeholder="例如 Nikon FM2、Contax T2、海鸥 4B" autocomplete="off"><datalist id="models">${models.map(m=>`<option value="${esc(m)}"></option>`).join('')}</datalist></div>
+      <div class="fld"><span class="lab">成色自评</span>${fstopsHTML('s-grade',GRADES.map(g=>({v:g,t:g,s:GRADE_TXT[g]})),'AB','成色自评')}</div>
+      <div class="fld"><span class="lab">功能</span><div class="row">${swHTML('s-f1','快门各档正常',true,true)}${swHTML('s-f2','测光正常',true,true)}${swHTML('s-f3','镜头无霉无雾',true,true)}</div></div>
+      <div class="fld"><span class="lab">附件</span><div class="row">${swHTML('s-a1','原包装',false,true)}${swHTML('s-a2','说明书',false,true)}${swHTML('s-a3','购买凭证',false,true)}</div></div>
+      <div class="fld"><span class="lab">想怎么出手</span>${fstopsHTML('s-way',[{v:'寄售',t:'寄售',s:'成交后结算'},{v:'直接卖给 Find',t:'直收',s:'检测后打款'},{v:'先估价',t:'估价',s:'还没想好'}],'寄售','出手方式')}</div>
+      <div class="fld"><span class="lab">照片</span><div><label class="drop"><span class="canister"></span><span>点这里选照片，或把照片拖进来<br><small style="color:#6a6152">正面、背面、镜头背光各一张就够。照片只在你的浏览器里预览，不会上传。</small></span><input type="file" id="s-photos" accept="image/*" multiple></label><div class="thumbs" id="thumbs"></div></div></div>
+      <div class="fld"><label for="s-story">它的故事</label><textarea id="s-story" rows="3" placeholder="什么时候买的，谁用过，去过哪里。会写进器材护照"></textarea></div>
+      <div class="fld"><label for="s-name">称呼</label><input type="text" id="s-name" autocomplete="name"></div>
+      <div class="fld"><label for="s-contact">微信或手机</label><input type="text" id="s-contact" autocomplete="tel"></div>
+      <div class="submit-row"><p id="s-err">提交后我们会联系你，约定寄送方式和保价。</p><button class="key dark big" type="submit"><span class="dot"></span>提交登记卡</button></div>
+      <div id="s-receipt"></div>
+    </form>
+    <aside class="meter-panel instr"><h3 style="color:var(--text)">估价表</h3><p class="note">按型号、成色、功能和附件估算。预览版的参考价为示例数据。</p>
+      <div class="gauge" id="s-gauge" style="margin-top:16px">${gaugeSVG({labels:[[-1,'低'],[0,'中'],[1,'高']],unit:'估价把握',plain:true,aria:'估价把握程度'})}</div>
+      <div class="lcd" style="margin-top:16px;text-align:center"><span style="font-size:11px;display:block">参考成交价</span><b id="s-range" style="font-size:20px;font-weight:400;white-space:nowrap">—</b></div>
+      <div class="ways" id="s-ways"></div><p class="note" id="s-hit" style="margin-top:12px"></p></aside>
+  </div></div>`;
+  let cat='slr';
+  const sc=CATS.filter(c=>c.id!=='all');
+  Dial($('#s-cat'),{options:sc.map(c=>({v:c.id,t:c.n,cls:'cn'})),value:0,size:170,arc:300,fs:13,radius:.3,label:'品类',onChange:v=>{cat=v;upd()}});
+  const upd=()=>{
+    const model=$('#s-model').value,g=fsVal('s-grade')||'AB';
+    const e=estimate(model,cat,g,[swOn('s-f1'),swOn('s-f2'),swOn('s-f3')],[swOn('s-a1'),swOn('s-a2'),swOn('s-a3')]);
+    $('#s-range').textContent=`${yuan(round50(e.lo))} – ${yuan(round50(e.hi))}`;
+    $('#s-ways').innerHTML=[['寄售，卖家到手',e.mid*.88,'佣金按 12% 计（示例）'],['直接卖给 Find',e.mid*.72,'检测后当天打款'],['自己挂二手平台',e.mid*.9,'自己拍照、回复、发货，承担退货风险']]
+      .map(w=>`<div class="lcd"><span>${w[0]}<br><small style="opacity:.7">${w[2]}</small></span><b>${yuan(round50(w[1]))}</b></div>`).join('');
+    $('#s-hit').textContent=e.hit?`已匹配到参考型号，估价把握较高。`:model.trim()?'没有匹配到这个型号，按品类估算。寄过来检测后会给出准确价格。':'填上型号，估价会更准。';
+    setNeedle($('#s-gauge'),e.conf);return e};
+  $('#s-model').addEventListener('input',upd);$('#s-grade').addEventListener('pick',upd);$('#sell-form').addEventListener('toggle',upd);
+  requestAnimationFrame(upd);
+  $('#s-photos').addEventListener('change',e=>{const t=$('#thumbs');t.innerHTML='';[...e.target.files].slice(0,8).forEach(f=>{const img=document.createElement('img');img.alt=f.name;img.src=URL.createObjectURL(f);t.appendChild(img)})});
+  $('#sell-form').addEventListener('submit',async e=>{e.preventDefault();
+    const model=$('#s-model').value.trim(),contact=$('#s-contact').value.trim();
+    if(!model||!contact){$('#s-err').innerHTML=`<b style="color:var(--red)">${!model?'请填写品牌与型号。':'请留下微信或手机，我们才能联系你。'}</b>`;(!model?$('#s-model'):$('#s-contact')).focus();return}
+    const est=upd(),g=fsVal('s-grade'),way=fsVal('s-way'),name=$('#s-name').value.trim(),story=$('#s-story').value.trim();
+    const fn=[['快门',swOn('s-f1')],['测光',swOn('s-f2')],['镜头',swOn('s-f3')]].map(x=>x[0]+(x[1]?'正常':'有问题')).join('，');
+    const acc=[['原包装',swOn('s-a1')],['说明书',swOn('s-a2')],['购买凭证',swOn('s-a3')]].filter(x=>x[1]).map(x=>x[0]).join('、')||'无';
+    const res=await submit('sell',{model,cat,grade:g,way,name,contact,story,estimate:[round50(est.lo),round50(est.hi)],
+      summary:`寄售登记：${model}（${catName(cat)}）\n成色自评：${g}\n功能：${fn}\n附件：${acc}\n出手方式：${way}\n参考价：${yuan(round50(est.lo))}–${yuan(round50(est.hi))}\n故事：${story||'未填'}\n称呼：${name||'未填'}\n联系方式：${contact}`});
+    $('#s-receipt').innerHTML=receiptHTML(res,'寄售回执');$('#s-err').textContent='登记卡已提交。';$('#s-receipt').scrollIntoView({block:'center',behavior:'smooth'})});
+}
+
+/* ---------- 帮我找 ---------- */
+function renderFind(){
+  const models=[...new Set(HIST.map(h=>h.n).concat(STOCK.map(s=>s.name)))];
+  APP.innerHTML=`<div class="wrap page">${crumb([['首页','#home'],['帮我找']])}
+  <div class="sec-h" style="margin-top:14px"><div><h2>帮我找一台</h2><p>说出想要的型号、成色底线和预算。找到以后先发检测报告和测试卷给你，确认了再付款。</p></div></div>
+  <div class="form-wrap">
+    <form class="card-form paper" id="find-form" novalidate>
+      <div class="head"><h1>寻物委托单</h1><div class="no">FIND 寻物<br>${today()}</div></div>
+      <div class="fld"><label for="q-model">想找的型号</label><input type="text" id="q-model" list="models2" placeholder="例如 Leica M6、Mamiya 7、Contax T3" autocomplete="off"><datalist id="models2">${models.map(m=>`<option value="${esc(m)}"></option>`).join('')}</datalist></div>
+      <div class="fld"><span class="lab">预算 <span id="q-bud" style="display:block;font-family:var(--f-hand);font-size:19px;color:#1f3150;font-weight:400"></span></span>${ringHTML('budget',p2t(3000),p2t(12000),'预算')}</div>
+      <div class="fld"><span class="lab">成色底线</span>${fstopsHTML('q-grade',GRADES.map(g=>({v:g,t:g,s:GRADE_TXT[g]})),'AB','成色底线')}</div>
+      <div class="fld"><span class="lab">愿意等多久</span><div id="q-wait" style="justify-self:start;margin:16px 0 4px"></div></div>
+      <div class="fld"><span class="lab">渠道</span><div class="row">${swHTML('q-c1','国内',true,true)}${swHTML('q-c2','日本中古店',true,true)}</div></div>
+      <div class="fld"><span class="lab">要求</span><div class="row">${swHTML('q-r1','要原包装',false,true)}${swHTML('q-r2','接受维修过',true,true)}${swHTML('q-r3','只要全机械',false,true)}</div></div>
+      <div class="fld"><label for="q-note">还想说的</label><textarea id="q-note" rows="3" placeholder="比如序列号段、颜色、想配的镜头"></textarea></div>
+      <div class="fld"><label for="q-name">称呼</label><input type="text" id="q-name" autocomplete="name"></div>
+      <div class="fld"><label for="q-contact">微信或手机</label><input type="text" id="q-contact" autocomplete="tel"></div>
+      <div class="submit-row"><p id="q-err">委托不收定金。找到后报价里会写清楚货源、检测结果和税费。</p><button class="key dark big" type="submit"><span class="dot"></span>发出委托</button></div>
+      <div id="q-receipt"></div>
+    </form>
+    <aside class="meter-panel chrome">${screws()}
+      <h3 style="color:#1f2124;text-shadow:0 1px 0 #fff">委托之后会发生什么</h3>
+      <ol style="margin:14px 0 0;padding-left:1.3em;color:#3b3f43;font-size:14px;display:grid;gap:8px">
+        <li>我们在 24 小时内回复，确认需求和大致周期。</li><li>在国内和日本中古渠道找货，挑出符合条件的几台。</li><li>到货后由师傅检测，给你发检测报告和测试卷。</li><li>你确认后付款，走第三方担保交易。</li><li>顺丰保价寄出，附上这台的器材护照。</li></ol>
+      <div style="margin-top:20px"><span class="engr">On the shelf · 在架上也许就有</span><div id="q-match" style="display:grid;gap:8px;margin-top:10px"></div></div>
+    </aside>
+  </div></div>`;
+  const waits=['两周','一个月','三个月','不着急'];
+  Dial($('#q-wait'),{options:waits.map(w=>({v:w,t:w,cls:'cn'})),value:1,size:150,arc:240,fs:12,radius:.3,black:true,label:'愿意等多久'});
+  bindRing('budget',(lo,hi)=>{$('#q-bud').textContent=`${yuan(round50(lo))}–${hi>=P_MAX*.99?'不限':yuan(round50(hi))}`});
+  const match=()=>{const q=$('#q-model').value.trim().toLowerCase();
+    const rows=q?STOCK.filter(s=>s.status!=='已售'&&(s.name.toLowerCase().includes(q)||q.includes(s.mark.toLowerCase())||s.cn.includes(q))):[];
+    $('#q-match').innerHTML=rows.length?rows.map(s=>`<a href="#item-${s.id}" class="lcd" style="text-decoration:none;display:flex;justify-content:space-between"><span>${esc(s.name)} · ${s.grade}</span><b style="font-weight:400">${yuan(s.price)}</b></a>`).join(''):`<p style="font-size:13px;color:#4a4e52">${q?'在架上暂时没有，交给我们去找。':'输入型号后，这里会显示在架上的同型号。'}</p>`};
+  $('#q-model').addEventListener('input',match);match();
+  $('#find-form').addEventListener('submit',async e=>{e.preventDefault();
+    const model=$('#q-model').value.trim(),contact=$('#q-contact').value.trim();
+    if(!model||!contact){$('#q-err').innerHTML=`<b style="color:var(--red)">${!model?'请填写想找的型号。':'请留下微信或手机，我们才能联系你。'}</b>`;(!model?$('#q-model'):$('#q-contact')).focus();return}
+    const lo=round50(t2p(+$('#budget-a').value)),hiT=+$('#budget-b').value,hi=hiT>=99.5?null:round50(t2p(hiT));
+    const g=fsVal('q-grade'),wait=waits[+$('#q-wait .dial-knob').getAttribute('aria-valuenow')];
+    const ch=[['国内',swOn('q-c1')],['日本中古店',swOn('q-c2')]].filter(x=>x[1]).map(x=>x[0]).join('、')||'不限';
+    const req=[['要原包装',swOn('q-r1')],['接受维修过',swOn('q-r2')],['只要全机械',swOn('q-r3')]].filter(x=>x[1]).map(x=>x[0]).join('、')||'无';
+    const name=$('#q-name').value.trim(),note=$('#q-note').value.trim();
+    const res=await submit('find',{model,budget:[lo,hi],grade:g,wait,channels:ch,req,note,name,contact,
+      summary:`寻物委托：${model}\n预算：${yuan(lo)}–${hi?yuan(hi):'不限'}\n成色底线：${g}\n期限：${wait}\n渠道：${ch}\n要求：${req}\n备注：${note||'无'}\n称呼：${name||'未填'}\n联系方式：${contact}`});
+    $('#q-receipt').innerHTML=receiptHTML(res,'委托回执');$('#q-err').textContent='委托已发出。';$('#q-receipt').scrollIntoView({block:'center',behavior:'smooth'})});
+}
+
+/* ---------- 器材史 ---------- */
+let HY=1982,HSEL=null;
+function renderHistory(){
+  const years=[];for(let y=1976;y<=2006;y++)years.push(y);
+  APP.innerHTML=`<div class="wrap page">${crumb([['首页','#home'],['器材史']])}
+  <div class="sec-h" style="margin-top:14px"><div><h2>器材史 1976–2006</h2><p>转动年份转盘，或者点下面胶片上的任意一格。展柜里是那一年发布的机身和镜头，点一下看它的故事。</p></div></div>
+  <div class="hist-top">
+    <div class="dial-plate chrome"><div id="y-dial"></div><div class="lcd" id="y-lcd"></div></div>
+    <div class="era chrome">${screws()}<div class="tag-era" id="era-tag"></div><h2 id="era-name"></h2><p id="era-d"></p>
+      <div class="nav-y"><button class="key" type="button" id="y-prev">◀ 上一年</button><button class="key" type="button" id="y-next">下一年 ▶</button></div></div>
+  </div>
+  <div class="cabinet"><div class="cab-in"><div class="shelf" id="shelf"></div><div class="shelf-board"></div></div></div>
+  <div class="exhibit-info paper" id="ex-info"></div>
+  <div class="strip"><div class="strip-in" id="strip">${years.map(y=>{const n=HIST.filter(h=>h.y===y).length,e=ERAS.find(x=>x.from===y);
+    return `<button class="fr" type="button" data-y="${y}" aria-label="${y} 年，${n} 台">${e?`<span class="era-mark">▸ ${e.name}</span>`:''}<b>${y}</b><span class="dots">${'<i></i>'.repeat(n)}</span></button>`}).join('')}</div></div>
+  </div>`;
+  const small=innerWidth<520;
+  const dial=Dial($('#y-dial'),{options:years.map(y=>({v:y,t:"'"+String(y).slice(2)})),value:HY-1976,size:small?250:300,arc:330,fs:small?11:12,radius:.37,label:'年份',ticks:false,onChange:v=>{HY=v;HSEL=null;showYear(false)}});
+  $('#y-prev').addEventListener('click',()=>{if(HY>1976){HY--;HSEL=null;dial.set(HY-1976,true);Sound.play('detent');showYear(false)}});
+  $('#y-next').addEventListener('click',()=>{if(HY<2006){HY++;HSEL=null;dial.set(HY-1976,true);Sound.play('detent');showYear(false)}});
+  $$('.fr').forEach(b=>b.addEventListener('click',()=>{HY=+b.dataset.y;HSEL=null;dial.set(HY-1976,true);Sound.play('detent');showYear(false)}));
+  showYear(true);
+}
+function showYear(first){
+  $('#y-lcd').textContent=HY;
+  const era=ERAS.find(e=>HY>=e.from&&HY<=e.to);
+  $('#era-tag').textContent=`Era · ${era.from}–${era.to}`;$('#era-name').textContent=`${HY} 年 · ${era.name}`;$('#era-d').textContent=era.d;
+  const items=HIST.filter(h=>h.y===HY),shelf=$('#shelf');
+  shelf.style.setProperty('--n',Math.max(1,Math.min(3,items.length)));
+  shelf.innerHTML=items.length?items.map(h=>`<button class="exhibit" type="button" data-h="${h.id}" aria-pressed="false"><div class="cam">${camSVG(h.r,h.f,{mark:'',label:h.n})}</div><div class="bp"><b>${esc(h.n)}</b><span>${catName(h.c)} · ${STRUCT[h.t]}</span></div></button>`).join(''):
+    `<div class="cab-empty"><p>${HY} 年的柜子还空着。<br>这一年的条目正在整理，先看看前后两年。</p></div>`;
+  if(HSEL==null||!items.find(h=>h.id===HSEL))HSEL=items.length?items[0].id:null;
+  $$('.exhibit',shelf).forEach(b=>b.addEventListener('click',()=>{HSEL=+b.dataset.h;Sound.play('detent');info()}));
+  info();
+  $$('.fr').forEach(b=>b.setAttribute('aria-current',+b.dataset.y===HY));
+  const cur=$(`.fr[data-y="${HY}"]`),sc=$('.strip');if(cur&&sc)sc.scrollLeft=cur.offsetLeft-sc.clientWidth/2+cur.offsetWidth/2;
+}
+function info(){
+  $$('.exhibit').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.h===HSEL));
+  const box=$('#ex-info');const h=HIST[HSEL];
+  if(!h){box.hidden=true;return}box.hidden=false;
+  const s=STOCK.find(x=>x.hist===h.n&&x.status!=='已售');
+  box.innerHTML=`<div><h4>${h.y} · ${catName(h.c)} · ${STRUCT[h.t]}</h4><h3>${esc(h.n)}</h3><p>${h.w}</p></div><div><h4>买它时要看</h4><p>${h.k}</p></div><div>${s?`<a class="key dark" href="#item-${s.id}"><span class="dot"></span>在架上有一台 · ${yuan(s.price)}</a>`:`<a class="key" href="#find">帮我找一台</a>`}</div>`;
+}
+
+/* ---------- 收件箱（仅店主与编辑者） ---------- */
+function renderInbox(){
+  APP.innerHTML=`<div class="wrap page">${crumb([['首页','#home'],['收件箱']])}<div class="ledger paper" style="margin-top:16px"><h1>收件箱</h1><p style="font-size:13.5px;color:var(--paper-ink-2);margin-top:4px">顾客提交的寄售登记、寻物委托和购买预约。只有你和编辑者能看到。</p><div class="tblwrap" id="ib"><p style="margin-top:16px">正在读取……</p></div></div></div>`;
+  const ib=$('#ib');
+  if(!ADMIN||!DB){ib.innerHTML='<p style="margin-top:16px">这一页只对店主和编辑者开放。</p>';return}
+  let got=false;const timer=setTimeout(()=>{if(!got)ib.innerHTML='<p style="margin-top:16px">暂时连不上数据，过一会儿再来看。</p>'},10000);
+  if(unsubInbox)unsubInbox();
+  unsubInbox=DB.collection('inbox').onSnapshot(snap=>{got=true;clearTimeout(timer);
+    const rows=[];snap.docs.forEach(d=>{const x=d.data()||{};(x.items||[]).forEach(r=>rows.push(r))});rows.sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+    const K={sell:'寄售',find:'寻物',buy:'预约'};
+    ib.innerHTML=rows.length?`<table><thead><tr><th>时间</th><th>类型</th><th>编号</th><th>联系方式</th><th>内容</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(String(r.at).slice(0,16).replace('T',' '))}</td><td>${K[r.kind]||r.kind}</td><td>${esc(r.ref)}</td><td>${esc(r.name||'')}<br>${esc(r.contact||'')}</td><td style="white-space:pre-wrap">${esc(r.summary||'')}</td></tr>`).join('')}</tbody></table>`:
+      '<p style="margin-top:16px">还没有提交。顾客在寄售、帮我找、预约购买里提交的内容会出现在这里。</p>'},
+    ()=>{got=true;clearTimeout(timer);ib.innerHTML='<p style="margin-top:16px">读取失败，刷新页面再试一次。</p>'});
+}
+
+/* ---------- 路由 ---------- */
+function route(){
+  const h=location.hash.slice(1)||'home';
+  if(unsubInbox&&h!=='inbox'){unsubInbox();unsubInbox=null}
+  closeDrawer();
+  if(h.startsWith('item-'))renderItem(h.slice(5));
+  else ({home:renderHome,shop:renderShop,sell:renderSell,find:renderFind,history:renderHistory,inbox:renderInbox}[h]||renderHome)();
+  const key=h.startsWith('item-')?'shop':h;
+  $$('.nav a').forEach(a=>a.getAttribute('href')==='#'+key?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
+  window.scrollTo(0,0);
+}
+$('#fc').addEventListener('click',e=>{SHOP.watch=true;SHOP.hideSold=false;if(location.hash==='#shop'){e.preventDefault();renderShop()}});
+$('#snd').addEventListener('toggle',e=>{Sound.on=e.detail;save('find.sound',e.detail);if(e.detail){Sound.init();Sound.play('shutter')}});
+window.addEventListener('hashchange',route);
+applyTextures();
+$('#fc-n').textContent=WATCH.size;
+route();
+</script>

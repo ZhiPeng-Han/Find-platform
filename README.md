@@ -10,4 +10,11 @@
   - 器材护照：以一台 Nikon FM2N 为例的护照页（人物、价格、数据均为示例）
   - 三十年图谱：1976–2006 年 58 台代表性机身与镜头，含检测关注点
 
-在线版本：https://claude.ai/artifact/A9Wz1YDxcZ1BUBpLryTAyD
+构想稿在线版本：https://claude.ai/artifact/A9Wz1YDxcZ1BUBpLryTAyD
+
+- `site/`：面向顾客的店铺页面（拟物风格，预览版）
+  - `site/src/`：源文件（样式、数据、材质与相机绘制、控件、页面逻辑）
+  - `site/build.py`：把源文件合并成 `site/index.html`，修改后运行 `python3 site/build.py`
+  - 页面：首页、选购、商品详情（器材护照）、寄售与估价、帮我找、器材史、店主收件箱
+
+店铺在线版本：https://claude.ai/artifact/6npfsRZCx5ZK69S2oAJF7C
